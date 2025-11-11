@@ -23,13 +23,11 @@ rem    but not always
 rem LICENSE is the license file
 rem README is the readme file
 
-set MODNAME=OrbitalDecay
-
-set GAMEDIR=WhitecatIndustries\%MODNAME%
+set GAMEDIR=xxxxx
 set GAMEDATA="GameData\"
-set VERSIONFILE=OrbitalDecay.version
+set VERSIONFILE=%GAMEDIR%.version
 set LICENSE=License.txt
-rem set README=ReadMe.md
+set README=ReadMe.md
 
 set RELEASEDIR=d:\Users\jbb\release
 set ZIP="c:\Program Files\7-zip\7z.exe"
@@ -69,7 +67,7 @@ echo Version:  %VERSION%
 rem Build the zip FILE
 cd %GAMEDATA%\..
 
-set FILE="%RELEASEDIR%\%MODNAME%-%VERSION%.zip"
+set FILE="%RELEASEDIR%\%GAMEDIR%-%VERSION%.zip"
 IF EXIST %FILE% del /F %FILE%
 %ZIP% a -tzip %FILE% GameData
 

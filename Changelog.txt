@@ -1,41 +1,28 @@
 Changelog
 
-1.7.0
-	Fixed uninitialized list causing nullrefs
+1.7.0.0 (unreleased)
+	Added AssemblyVersion.tt
+	Added InstallChecker.cs
+	Added Tooltips for Vessel Information tabs
+	Added code to check for no MasConData
+	Added support for ClickThroughBlocker
+	Added support for ToolbarController
+	Fixed GameEvents not being removed when leaving scene
+	Reorganized directory
+	Added build scripts
+	Fixed the code which hides window on F2 (hide UI)
+	Fixed nullref in editor window
+	Added scrolling to editor window
 	Replaced all ElementAt(x) with index for speed
 	Replaced all code which parsed ConfigNodes during run with a GravityMap dictionary
-	Moved settings storage into Stock settings page, kept settings window
-	Added support for ClickthroughBlocker
-	Added support for ToolbarController
-	Added support for hiding the ui via the F2
-	Added support for hiding the UI when game paused
-	Added InstallChecker
-	Added AssemblyVersion.tt
-	Fixed Orbital Decay Utilities window for the editor (was putting everything on a single line)
 	Eliminated tab in editor since there was only a single pane
 	Fixed calculations in editor for the utilities window
 	Made window in editor scrollable, so it won't use the entire screen.
 	Some minor editing of editor window, mainly removing unnecessary lines
 	In editor, made initial position to the right of the part list
 	In editor, only show fuel resources for which there are engines onboard
-	Dependencies:
+	New Dependencies:
 		SolarCycleSimulator
 		ClickThroughBlocker
 		ToolbarController
 
-1.7.0.1
-	Fixed vessel mass calculation for unloaded vessels
-	Rewrote the VesselData.cs to use internal class instead of confignodes
-	Replaced confignode structure with Dictionary using vessel id (GUID)
-	Fixed bug in DecayManager, which in CheckVesselProximity was comparing the vessel to itself and getting 0, this was preventing any decay from happening during timewarp
-	Misc. cleanup in DecayManager
-
-1.7.0.2
-	Fixed stuttering and resetting of vessel orbital position
-	Fixed issues with timerate not being honored correctly
-	Cleaned up code regarding timerate
-
-1.7.0.3
-	Removed all N-Body references
-	Fixed the initializaiton of the Current Decay Multiplier and Resource drain rate multiplier to be 1
-	Excluded following from calcs:   VesselType.SpaceObject, VesselType.Unknown, VesselType.Debris

@@ -1,19 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30320.27
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36401.2 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrbitalDecay", "OrbitalDecay\OrbitalDecay.csproj", "{5A0A1C2D-253B-465C-9A10-D65377235BBF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrbitalDecay", "Source\OrbitalDecay.csproj", "{5A0A1C2D-253B-465C-9A10-D65377235BBF}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{ADE8166B-7DE5-41D9-A5BC-61168047F4B1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		buildRelease.bat = buildRelease.bat
 		Changelog.txt = Changelog.txt
 		deploy.bat = deploy.bat
 		jenkins.txt = jenkins.txt
-		License.txt = License.txt
 		OrbitalDecay.version = OrbitalDecay.version
-		TODO.txt = TODO.txt
+		READ BEFORE UPLOADING = READ BEFORE UPLOADING
 	EndProjectSection
 EndProject
 Global

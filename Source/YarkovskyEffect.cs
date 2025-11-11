@@ -1,0 +1,131 @@
+﻿/*
+ * Whitecat Industries Orbital Decay for Kerbal Space Program. 
+ * 
+ * Written by Whitecat106 (Marcus Hehir).
+ * 
+ * Kerbal Space Program is Copyright (C) 2013 Squad. See http://kerbalspaceprogram.com/. This
+ * project is in no way associated with nor endorsed by Squad.
+ * 
+ * This code is licensed under the Attribution-NonCommercial-ShareAlike 3.0 (CC BY-NC-SA 3.0)
+ * creative commons license. See <http://creativecommons.org/licenses/by-nc-sa/3.0/legalcode>
+ * for full details.
+ * 
+ * Attribution — You are free to modify this code, so long as you mention that the resulting
+ * work is based upon or adapted from this code.
+ * 
+ * Non-commercial - You may not use this work for commercial purposes.
+ * 
+ * Share Alike — If you alter, transform, or build upon this work, you may distribute the
+ * resulting work only under the same or similar license to the CC BY-NC-SA 3.0 license.
+ * 
+ * Note that Whitecat Industries is a ficticious entity created for entertainment
+ * purposes. It is in no way meant to represent a real entity. Any similarity to a real entity
+ * is purely coincidental.
+ */
+
+using System;
+using UnityEngine;
+
+namespace WhitecatIndustries
+{
+    internal class YarkovskyEffect : MonoBehaviour
+    {
+        public static double FetchDeltaSMA(Vessel vessel)
+        {
+            return TimeWarp.CurrentRate > 1.0 ? SeasonalSMAChange(vessel) : DiuralSMAChange(vessel);
+        }
+
+
+        public static double DiuralSMAChange(Vessel vessel)
+        {
+            double RateOfChangeOfSMA = 0;
+            double InitialSMA = VesselData.FetchSMA(vessel) ;
+            double Albedo = 0.12; // Work on something better for this! Currently using Worn Asphalt as a guide... 
+            double MeanMotion = 360.0 / vessel.orbitDriver.orbit.period;
+            double Area = VesselData.FetchArea(vessel);
+            double Mass = VesselData.FetchMass(vessel);
+            double Radius = Math.Sqrt(Area / Math.PI);
+            double Volume = 4.0 / 3.0 * Math.PI * Math.Pow(Radius, 3.0);
+            double Density = Mass / Volume;
+            double c = Math.Pow(8.0 * 10, 8);
+            double Altitude = vessel.orbitDriver.orbit.referenceBody == Sun.Instance.sun ? 
+                vessel.orbitDriver.orbit.altitude : 
+                vessel.orbitDriver.orbit.referenceBody.orbit.altitude;
+
+            double SolarEnergy = Math.Pow(3.86 * 10.0, 26.0);
+            double SolarConstant = SolarEnergy / (4.0 * Math.PI * Math.Pow(Altitude, 2.0)); // W/m^2
+
+            double BoltzmannConstant = Math.Pow(6.68 * 10.0, -11.0);
+            double SolarTemperature = vessel.externalTemperature; // try this!
+            double Epsilon = UnityEngine.Random.Range(0.75f, 0.9f);
+            double LocalForce = 0;
+            LocalForce = Epsilon * BoltzmannConstant * Math.Pow(SolarTemperature, 4.0) / Albedo;
+
+            double Iota = 3.0 * LocalForce / (4.0 * Radius * Density * c);
+            Vector3d RotationAxis = vessel.upAxis;
+
+            float ObliquityOfSpinAxis = 0;
+            double AmplitudeOfRotation = 0;
+            double RotationPhase = 0;
+
+            if (LoadingCheck.PersistentRotationInstalled)
+            {
+                // Add Persistent Rotation Compatibility here! //1.6.0
+            }
+            else
+            {
+                if (vessel.isActiveVessel)
+                {
+                    Quaternion VesselRotation = vessel.srfRelRotation;
+                    Vector3 TemporaryAxis;
+                    VesselRotation.ToAngleAxis(out ObliquityOfSpinAxis, out TemporaryAxis);
+                    Vector3 AngularSpeed = TemporaryAxis * ObliquityOfSpinAxis; // Rotation Per Second?
+                    AmplitudeOfRotation = AngularSpeed.magnitude;
+                    RotationPhase = Vector3.Angle(RotationAxis, TemporaryAxis);
+                }
+                else
+                {
+                    Quaternion VesselRotation = new Quaternion();//.Inverse(); // Issues here work out a background rotational calculation?
+                    Vector3 TemporaryAxis;
+                    VesselRotation.ToAngleAxis(out ObliquityOfSpinAxis, out TemporaryAxis);
+                    Vector3 AngularSpeed = TemporaryAxis * ObliquityOfSpinAxis; // Rotation Per Second?
+                    AmplitudeOfRotation = AngularSpeed.magnitude;
+                    RotationPhase = Vector3.Angle(RotationAxis, TemporaryAxis);
+                }
+            }
+            
+            double RotationFrequency = AmplitudeOfRotation;
+            double DiuralThermalParameter = 0;
+            double Gamma = 0;
+            double SpecificHeatCapacity = 670; // Lets not model this too far yet... maybe for 1.6.0 using c of Regolith for now
+            double ThermalConductivity = Math.Pow(100.0, 2.0)/ (Density * SpecificHeatCapacity);
+            double PenetrationDepth = 0;
+            double X = 0;
+
+            DiuralThermalParameter = Math.Sqrt(ThermalConductivity * Density * SpecificHeatCapacity * RotationFrequency) / (Epsilon * BoltzmannConstant * Math.Pow(SolarTemperature, 3.0) * Altitude);
+            PenetrationDepth = Math.Sqrt(ThermalConductivity/(Density * SpecificHeatCapacity * RotationFrequency));
+            X = Radius * Math.Sqrt(2) / PenetrationDepth;
+            Gamma = DiuralThermalParameter / X;
+
+            double BigOFunctionOfEccentricity = Math.Pow(vessel.orbitDriver.orbit.eccentricity, 0.0);
+            RateOfChangeOfSMA = -8.0 * Albedo / (9.0 * MeanMotion) * Iota * (AmplitudeOfRotation * Math.Sin(RotationPhase) / 1.0 + Gamma) * Math.Cos(ObliquityOfSpinAxis) + 0;
+
+            if (double.IsNaN(RateOfChangeOfSMA))
+            {
+                RateOfChangeOfSMA = 0;
+            }
+
+            return RateOfChangeOfSMA;
+        }
+
+        public static double SeasonalSMAChange(Vessel vessel)
+        {
+            double RateOfChangeOfSMA = 0;
+
+            // Look up seasonal changes in SMA, for now: (1.6.0)
+            RateOfChangeOfSMA = DiuralSMAChange(vessel) * TimeWarp.CurrentRate;
+
+            return RateOfChangeOfSMA;
+        }
+    }
+}

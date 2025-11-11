@@ -1,5 +1,0 @@
-
-1.  AP & Pe do not update during time warp
-2.  Realistic decay works during time warp, non-realistid decay does not work during time warp
-3.  Stuttering during non-warp, realistic decay , after warp
-4.  Stock setting: ORBIT_DRIFT_COMPENSATION was being set to false
