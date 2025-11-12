@@ -73,6 +73,8 @@
     <Compile Include="ResourceManager.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="StationKeepingManager.cs" />
+    <Compile Include="StockSettings.cs" />
+    <Compile Include="ToolbarInterface.cs" />
     <Compile Include="UserInterface.cs" />
     <Compile Include="VesselData.cs" />
     <Compile Include="YarkovskyEffect.cs" />

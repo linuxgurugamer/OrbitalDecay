@@ -43,7 +43,7 @@ namespace WhitecatIndustries
         private static string[] tabs = { "Vessels", "Settings" };
         private static Rect MainwindowPosition = new Rect(0, 0, 300, 400);
         private static Rect DecayBreakdownwindowPosition = new Rect(0, 0, 450, 150);
-        private static Rect NBodyManagerwindowPosition = new Rect(0, 0, 450, 150);
+        private static bool DecayBreakdownwindowPositionInitted = false;
         private static GUIStyle windowStyle = new GUIStyle(HighLogic.Skin.window);
         private static Color tabUnselectedColor = new Color(0.0f, 0.0f, 0.0f);
         private static Color tabSelectedColor = new Color(0.0f, 0.0f, 0.0f);
@@ -52,15 +52,14 @@ namespace WhitecatIndustries
         private GUISkin skins = HighLogic.Skin;
         private int id = Guid.NewGuid().GetHashCode();
         //public static ApplicationLauncherButton ToolbarButton;
-        public static ToolbarControl toolbarControl = null;
+        //public static ToolbarControl toolbarControl = null;
 
-        public static Dictionary<Vessel, double> NBodyVesselAccelTimes = new Dictionary<Vessel, double>();
+        //public static Dictionary<Vessel, double> NBodyVesselAccelTimes = new Dictionary<Vessel, double>();
         //public static Vector3d NBodyMomentaryDeltaV;
 
-        public static bool Visible = false;
-        private static bool Hidden = false;
-        public static bool DecayBreakdownVisible;
-        public static bool NBodyBreakdownVisible;
+        //public static bool Visible = false;
+        //private static bool Hidden = false;
+        //public static bool DecayBreakdownVisible;
 
         public static List<VesselType> FilterTypes = new List<VesselType>();
 
@@ -79,13 +78,14 @@ namespace WhitecatIndustries
         private void Awake()
         {
             GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
-            GameEvents.onHideUI.Add(onHideUI);
-            GameEvents.onShowUI.Add(onShowUI);
+            //GameEvents.onHideUI.Add(onHideUI);
+            //GameEvents.onShowUI.Add(onShowUI);
+#if false
             if (toolbarControl == null)
             {
                 ApplicationLauncher.AppScenes Scenes = ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW;
                 toolbarControl = gameObject.AddComponent<ToolbarControl>();
-                toolbarControl.AddToAllToolbars(GuiOn, GuiOff,
+                toolbarControl.AddToAllToolbars(ToolbarInterface.GuiOn, ToolbarInterface.GuiOff,
                     Scenes,
                     MODID,
                     "AnyResButton",
@@ -95,23 +95,25 @@ namespace WhitecatIndustries
                     "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
                     MODNAME);
             }
+#endif
         }
 
         public void OnDestroy()
         {
             GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
-            GameEvents.onHideUI.Remove(onHideUI);
-            GameEvents.onShowUI.Remove(onShowUI);
+            //GameEvents.onHideUI.Remove(onHideUI);
+            //GameEvents.onShowUI.Remove(onShowUI);
             DestroyEvent();
         }
 
         public void DestroyEvent()
         {
-            Visible = false;
-            DecayBreakdownVisible = false;
-            NBodyBreakdownVisible = false;
+            //Visible = false;
+            ToolbarInterface.GuiOff();
+            ToolbarInterface.DecayBreakdownVisible = false;
         }
 
+#if false
         private void onHideUI() { Hidden = true; }
         private void onShowUI() { Hidden = false; }
         private void GuiOn() { Visible = true; }
@@ -119,20 +121,24 @@ namespace WhitecatIndustries
         private void GuiOff()
         {
             Visible = false;
-            DecayBreakdownVisible = false;
-            NBodyBreakdownVisible = false;
+            ToolbarInterface.DecayBreakdownVisible = false;
         }
+#endif
 
         public void OnGUI()
         {
-            if (HighLogic.LoadedSceneIsEditor || Hidden)
+            if (HighLogic.LoadedSceneIsEditor || !ToolbarInterface.Visible)
                 return;
-            if (Visible)
+            MainwindowPosition = ClickThruBlocker.GUILayoutWindow(id, MainwindowPosition, MainWindow, "Orbital Decay Manager", windowStyle);
+            if (ToolbarInterface.DecayBreakdownVisible)
             {
-                MainwindowPosition = ClickThruBlocker.GUILayoutWindow(id, MainwindowPosition, MainWindow, "Orbital Decay Manager", windowStyle);
-            }
-            if (DecayBreakdownVisible)
-            {
+                if (ToolbarInterface.Visible && (!DecayBreakdownwindowPositionInitted || HighLogic.CurrentGame.Parameters.CustomParams<OD3>().snapBreakdownWindow))
+                {
+                    DecayBreakdownwindowPosition.x = MainwindowPosition.x + MainwindowPosition.width;
+                    DecayBreakdownwindowPosition.y = MainwindowPosition.y;
+                    DecayBreakdownwindowPositionInitted = true;
+                }
+
                 DecayBreakdownwindowPosition = ClickThruBlocker.GUILayoutWindow(8989, DecayBreakdownwindowPosition, DecayBreakdownWindow, "Orbital Decay Breakdown Display", windowStyle);
             }
             /*
@@ -149,8 +155,8 @@ namespace WhitecatIndustries
             {
                 //if (ToolbarButton != null)
                 //    ToolbarButton.toggleButton.Value = false;
-                toolbarControl.SetFalse(true);
-
+                //toolbarControl.SetFalse(true);
+                ToolbarInterface.GuiOff();
             }
             GUILayout.BeginVertical();
             GUILayout.Space(10);
@@ -402,7 +408,7 @@ namespace WhitecatIndustries
                             if (GUILayout.Button("Toggle Decay Rate Breakdown")) // Display a new window here?
                             {
                                 subwindowVessel = vessel;
-                                DecayBreakdownVisible = !DecayBreakdownVisible;
+                                ToolbarInterface.DecayBreakdownVisible = !ToolbarInterface.DecayBreakdownVisible;
                             }
 
 #if false
@@ -563,11 +569,11 @@ namespace WhitecatIndustries
             GUILayout.Label("_________________________________________");
             GUILayout.Space(3);
 
-            double DecayDifficulty = Settings.ReadDecayDifficulty();
+            double DecayDifficulty = HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
             double ResourceDifficulty = Settings.ReadResourceRateDifficulty();
-           // bool NBody = Settings.ReadNB();
+            // bool NBody = Settings.ReadNB();
 
-            string NBodyText = ""; // 1.6.0 N-Body 
+            //string NBodyText = ""; // 1.6.0 N-Body 
 
 #if false
             // 1.7.0 maybe?
@@ -799,8 +805,8 @@ namespace WhitecatIndustries
         {
             if (GUI.Button(new Rect(DecayBreakdownwindowPosition.width - 22, 3, 19, 19), "x"))
             {
-                if (DecayBreakdownVisible)
-                    DecayBreakdownVisible = false;
+                if (ToolbarInterface.DecayBreakdownVisible)
+                    ToolbarInterface.DecayBreakdownVisible = false;
             }
             GUILayout.BeginVertical();
             GUILayout.Space(10);

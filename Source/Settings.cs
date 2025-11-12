@@ -27,7 +27,7 @@ using UnityEngine;
 
 namespace WhitecatIndustries
 {
-    [KSPAddon(KSPAddon.Startup.EveryScene,false)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class Settings : MonoBehaviour
     {
         public static string FilePath;
@@ -68,16 +68,19 @@ namespace WhitecatIndustries
 
         public static void WriteRD(bool RD)
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("RealisticDecay", RD.ToString());   
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //SimSet.SetValue("RealisticDecay", RD.ToString());
+            HighLogic.CurrentGame.Parameters.CustomParams<OD>().RealisticDecay = RD;
+
+
         }
 
         public static void WriteNBody(bool NB) // 1.6.0 NBody
         {
-                ConfigNode Data = SettingData;
-                ConfigNode SimSet = Data.GetNode("SIMULATION");
-                SimSet.SetValue("NBodySimulation", NB.ToString());
+            ConfigNode Data = SettingData;
+            ConfigNode SimSet = Data.GetNode("SIMULATION");
+            SimSet.SetValue("NBodySimulation", NB.ToString());
         }
 
         public static void WriteNBodyConics(bool NBC) // 1.6.0 NBody
@@ -104,22 +107,26 @@ namespace WhitecatIndustries
 
         public static void Write24H(bool H24)
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("24HourClock", H24.ToString());  
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //SimSet.SetValue("24HourClock", H24.ToString());
+
+            HighLogic.CurrentGame.Parameters.CustomParams<OD>()._24HourClock = H24;
         }
         public static void WritePlanetariumTracking(bool PT)
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("PlanetariumTracking", PT.ToString()); 
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //SimSet.SetValue("PlanetariumTracking", PT.ToString());
+            HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumTracking = PT;
         }
 
         public static void WritePDebrisTracking(bool DT)
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("PlanetariumDebrisTracking", DT.ToString());
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //SimSet.SetValue("PlanetariumDebrisTracking", DT.ToString());
+            HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumDebrisTracking = DT;
         }
 
         public static void WriteDifficulty(double Difficulty)
@@ -130,9 +137,10 @@ namespace WhitecatIndustries
         }
         public static void WriteResourceRateDifficulty(double Difficulty)
         {
-            ConfigNode Data = SettingData;
-            ConfigNode Resources = Data.GetNode("RESOURCES");
-            Resources.SetValue("ResourceRateDifficulty", Difficulty.ToString());
+            //ConfigNode Data = SettingData;
+            //ConfigNode Resources = Data.GetNode("RESOURCES");
+            //Resources.SetValue("ResourceRateDifficulty", Difficulty.ToString());
+            HighLogic.CurrentGame.Parameters.CustomParams<OD2>().ResourceRateDifficulty = Difficulty;
         }
         public static void WriteStatKeepResource(string Resource)
         {
@@ -142,10 +150,10 @@ namespace WhitecatIndustries
         }
         public static bool ReadRD()
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            bool RD = bool.Parse(SimSet.GetValue("RealisticDecay"));
-            return RD;
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //bool RD = bool.Parse(SimSet.GetValue("RealisticDecay"));
+            return HighLogic.CurrentGame.Parameters.CustomParams<OD>().RealisticDecay;
         }
 
 #if false
@@ -184,34 +192,34 @@ namespace WhitecatIndustries
 
         public static bool Read24Hr()
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            bool R24H = bool.Parse(SimSet.GetValue("24HourClock"));
-            return R24H;
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //bool R24H = bool.Parse(SimSet.GetValue("24HourClock"));
+            return HighLogic.CurrentGame.Parameters.CustomParams<OD>()._24HourClock ;
         }
 
         public static bool ReadPT()
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            bool PT = bool.Parse(SimSet.GetValue("PlanetariumTracking"));
-            return PT;
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //bool PT = bool.Parse(SimSet.GetValue("PlanetariumTracking"));
+            return HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumTracking;
         }
 
         public static bool ReadDT()
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            bool DT = bool.Parse(SimSet.GetValue("PlanetariumDebrisTracking"));
-            return DT;
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //bool DT = bool.Parse(SimSet.GetValue("PlanetariumDebrisTracking"));
+            return HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumDebrisTracking;
         }
 
         public static double ReadDecayDifficulty()
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            double Difficulty = double.Parse(SimSet.GetValue("DecayDifficulty"));
-            return Difficulty;
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //double Difficulty = double.Parse(SimSet.GetValue("DecayDifficulty"));
+            return HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
 
         }
 

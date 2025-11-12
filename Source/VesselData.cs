@@ -25,12 +25,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+using static GameEvents;
 
 namespace WhitecatIndustries
 {
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, true)]
     public class VesselData : MonoBehaviour
     {
         public static ConfigNode VesselInformation = new ConfigNode();
@@ -52,39 +52,41 @@ namespace WhitecatIndustries
             FilePath = KSPUtil.ApplicationRootPath +
                        "GameData/WhitecatIndustries/OrbitalDecay/PluginData/VesselData.cfg";
             File = ConfigNode.Load(FilePath);
+            GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
 
-          /*  VesselInformation.ClearNodes();
+            /*  VesselInformation.ClearNodes();
 
-            if (HighLogic.LoadedSceneIsGame && (HighLogic.LoadedScene != GameScenes.LOADING || HighLogic.LoadedScene != GameScenes.LOADINGBUFFER))
-            {
-                if (System.IO.File.ReadAllLines(FilePath).Length == 0)
-                {
-                    ConfigNode FileM = new ConfigNode();
-                    ConfigNode FileN = new ConfigNode("VESSEL");
-                    FileN.AddValue("name", "WhitecatsDummyVessel");
-                    FileN.AddValue("id", "000");
-                    FileN.AddValue("persistence", "WhitecatsDummySaveFileThatNoOneShouldNameTheirSave");
-                    FileM.AddNode(FileN);
-                    FileM.Save(FilePath);
-                }
+              if (HighLogic.LoadedSceneIsGame && (HighLogic.LoadedScene != GameScenes.LOADING || HighLogic.LoadedScene != GameScenes.LOADINGBUFFER))
+              {
+                  if (System.IO.File.ReadAllLines(FilePath).Length == 0)
+                  {
+                      ConfigNode FileM = new ConfigNode();
+                      ConfigNode FileN = new ConfigNode("VESSEL");
+                      FileN.AddValue("name", "WhitecatsDummyVessel");
+                      FileN.AddValue("id", "000");
+                      FileN.AddValue("persistence", "WhitecatsDummySaveFileThatNoOneShouldNameTheirSave");
+                      FileM.AddNode(FileN);
+                      FileM.Save(FilePath);
+                  }
 
-                File = ConfigNode.Load(FilePath);
+                  File = ConfigNode.Load(FilePath);
 
-                if (File.nodes.Count > 0)
-                {
-                    foreach (ConfigNode vessel in File.GetNodes("VESSEL"))
-                    {
-                        string Persistence = vessel.GetValue("persistence");
-                        if (Persistence == HighLogic.SaveFolder.ToString() || Persistence == "WhitecatsDummySaveFileThatNoOneShouldNameTheirSave")
-                        {
-                            VesselInformation.AddNode(vessel);
-                        }
-                    }
-                }
-            }*/
+                  if (File.nodes.Count > 0)
+                  {
+                      foreach (ConfigNode vessel in File.GetNodes("VESSEL"))
+                      {
+                          string Persistence = vessel.GetValue("persistence");
+                          if (Persistence == HighLogic.SaveFolder.ToString() || Persistence == "WhitecatsDummySaveFileThatNoOneShouldNameTheirSave")
+                          {
+                              VesselInformation.AddNode(vessel);
+                          }
+                      }
+                  }
+              }*/
             print("WhitecatIndustries - Orbital Decay - Loaded vessel data.");
+            DontDestroyOnLoad(this);
         }
-    
+
         public void FixedUpdate()
         {
             if (Time.timeSinceLevelLoad > 1 && VesselsLoaded)
@@ -102,7 +104,7 @@ namespace WhitecatIndustries
                             {
                                 if (CheckIfContained(vessel))
                                 {
-                                   if (vessel.situation == Vessel.Situations.ORBITING || vessel.situation == Vessel.Situations.SUB_ORBITAL)
+                                    if (vessel.situation == Vessel.Situations.ORBITING || vessel.situation == Vessel.Situations.SUB_ORBITAL)
                                     {
                                         WriteVesselData(vessel);
                                     }
@@ -130,9 +132,17 @@ namespace WhitecatIndustries
                     print("WhitecatIndustries - Orbital Decay - Vessel Information saved. Ondestroy");
                     File.ClearNodes();
                     VesselInformation.Save(FilePath);
-                   // VesselInformation.ClearNodes();
+                    // VesselInformation.ClearNodes();
                 }
             }
+            GameEvents.onGameSceneSwitchRequested.Remove(onGameSceneSwitchRequested);
+        }
+
+        void onGameSceneSwitchRequested(FromToAction<GameScenes, GameScenes> fta)
+        {
+            print("WhitecatIndustries - Orbital Decay - onGameSceneSwitchRequested - Vessel Information saved.");
+            File.ClearNodes();
+            VesselInformation.Save(FilePath);
         }
 
         public static void OnQuickSave()
@@ -226,12 +236,12 @@ namespace WhitecatIndustries
                     break;
                 }
             }
-            
+
 
             if (found)
             {
                 VesselNode.SetValue("Mass", (vessel.GetTotalMass() * 1000).ToString());
-                
+
                 VesselNode.SetValue("Area", CalculateVesselArea(vessel).ToString());
             }
         }
@@ -248,7 +258,7 @@ namespace WhitecatIndustries
                     found = true;
                     break;
                 }
-                
+
             }
 
             if (found)
@@ -286,10 +296,10 @@ namespace WhitecatIndustries
             newVessel.AddValue("MNA", vessel.GetOrbitDriver().orbit.meanAnomalyAtEpoch);
             newVessel.AddValue("EPH", vessel.GetOrbitDriver().orbit.epoch);
 
-           // newVessel.AddValue("StationKeeping", false.ToString());
+            // newVessel.AddValue("StationKeeping", false.ToString());
             //151newVessel.AddValue("Fuel", ResourceManager.GetResources(vessel, ResourceName));
-        //    newVessel.AddValue("Fuel", ResourceManager.GetResources(vessel));//151
-        //    newVessel.AddValue("Resource", ResourceManager.GetResourceNames(vessel));//151
+            //    newVessel.AddValue("Fuel", ResourceManager.GetResources(vessel));//151
+            //    newVessel.AddValue("Resource", ResourceManager.GetResourceNames(vessel));//151
 
             return newVessel;
         }
@@ -345,7 +355,7 @@ namespace WhitecatIndustries
         {
 
             List<ModuleOrbitalDecay> modlist = FlightGlobals.ActiveVessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
-            foreach(ModuleOrbitalDecay module in modlist )
+            foreach (ModuleOrbitalDecay module in modlist)
             {
                 module.stationKeepData.fuelLost = FuelLost;
             }
@@ -374,31 +384,31 @@ namespace WhitecatIndustries
             }
             return Mass;
         }
-  
 
-              public static double FetchArea(Vessel vessel)
-               {
-                   ConfigNode Data = VesselInformation;
-                   bool Vesselfound = false;
-                   double Area = 0.0;
 
-                   foreach (ConfigNode Vessel in Data.GetNodes("VESSEL"))
-                   {
-                       string id = Vessel.GetValue("id");
-                       if (id == vessel.id.ToString())
-                       {
-                           Vesselfound = true;
-                       }
+        public static double FetchArea(Vessel vessel)
+        {
+            ConfigNode Data = VesselInformation;
+            bool Vesselfound = false;
+            double Area = 0.0;
 
-                       if (Vesselfound)
-                       {
-                           Area = double.Parse(Vessel.GetValue("Area"));
-                           break;
-                       }
-                   }
-                   return Area;
-               }
-       
+            foreach (ConfigNode Vessel in Data.GetNodes("VESSEL"))
+            {
+                string id = Vessel.GetValue("id");
+                if (id == vessel.id.ToString())
+                {
+                    Vesselfound = true;
+                }
+
+                if (Vesselfound)
+                {
+                    Area = double.Parse(Vessel.GetValue("Area"));
+                    break;
+                }
+            }
+            return Area;
+        }
+
         public static void UpdateStationKeeping(Vessel vessel, bool StationKeeping)
         {
             if (vessel == FlightGlobals.ActiveVessel)
@@ -762,12 +772,12 @@ namespace WhitecatIndustries
             float Efficiency = 0;
             if (vessel == FlightGlobals.ActiveVessel)
             {
-                List<ModuleOrbitalDecay> modlist  = vessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
+                List<ModuleOrbitalDecay> modlist = vessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
                 if (modlist.Count > 0)
                 {
                     Efficiency = modlist[0].stationKeepData.ISP;
                 }
-               
+
             }
             else
             {
@@ -790,9 +800,9 @@ namespace WhitecatIndustries
             {
                 Efficiency *= 0.5f; // Balance here!
             }
-            
 
-            return 1/Efficiency;
+
+            return 1 / Efficiency;
         }
 
         public static void UpdateBody(Vessel vessel, CelestialBody body)
@@ -861,7 +871,7 @@ namespace WhitecatIndustries
                 }
             }
 
-            return Area/4.0; // only one side facing prograde
+            return Area / 4.0; // only one side facing prograde
         }
     }
 }

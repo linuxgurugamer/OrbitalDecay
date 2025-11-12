@@ -23,14 +23,14 @@ rem    but not always
 rem LICENSE is the license file
 rem README is the readme file
 
-set GAMEDIR=xxxxx
+set GAMEDIR=WhitecatIndustries\OrbitalDecay
 set GAMEDATA="GameData\"
-set VERSIONFILE=%GAMEDIR%.version
-set LICENSE=License.txt
-set README=ReadMe.md
+set VERSIONFILE=OrbitalDecay.version
+set LICENSE=LICENSE.md
+rem set README=ReadMe.md
 
 set RELEASEDIR=d:\Users\jbb\release
-set ZIP="c:\Program Files\7-zip\7z.exe"
+set ZIP="d:\Program Files\7-zip\7z.exe"
 
 rem Copy files to GameData locations
 

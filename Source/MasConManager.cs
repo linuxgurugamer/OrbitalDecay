@@ -27,7 +27,6 @@
 
 using System;
 using UnityEngine;
-using static WhitecatIndustries.RegisterToolbarOrbitalDecay;
 
 namespace WhitecatIndustries
 {
@@ -60,17 +59,19 @@ namespace WhitecatIndustries
 
             //Required for Integration 
 
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -140,7 +141,7 @@ namespace WhitecatIndustries
 
             double EccentricAnomaly = vessel.orbitDriver.orbit.eccentricAnomaly;
             double InitialMeanAnomaly = OrbitalDecayUtilities.GetMeanAnomalyAtTime(vessel.orbitDriver.orbit.meanAnomalyAtEpoch, vessel.orbitDriver.orbit.epoch, vessel.orbitDriver.orbit.period, HighLogic.CurrentGame.UniversalTime);
-            double MeanAnomalyAtTime = OrbitalDecayUtilities.GetMeanAnomalyAtTime(vessel.orbitDriver.orbit.meanAnomalyAtEpoch, vessel.orbitDriver.orbit.epoch, vessel.orbitDriver.orbit.period, HighLogic.CurrentGame.UniversalTime + _timeInterval); 
+            double MeanAnomalyAtTime = OrbitalDecayUtilities.GetMeanAnomalyAtTime(vessel.orbitDriver.orbit.meanAnomalyAtEpoch, vessel.orbitDriver.orbit.epoch, vessel.orbitDriver.orbit.period, HighLogic.CurrentGame.UniversalTime + _timeInterval);
 
             double ExactInitialEccentricAnomaly = 0; // E0 [Degrees]  
             ExactInitialEccentricAnomaly = vessel.orbitDriver.orbit.GetEccentricAnomaly(HighLogic.CurrentGame.UniversalTime); ;
@@ -184,18 +185,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -311,18 +313,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -442,18 +445,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -552,7 +556,7 @@ namespace WhitecatIndustries
             double TimePassedPerIntervalOfTimewarp = TimeWarp.CurrentRate * _timeInterval;
             double NoOfRevolutions = TimePassedPerIntervalOfTimewarp / vessel.orbitDriver.orbit.period;
 
-            double DeltaLPE = - (3.0 * Math.PI * (MasConMass / BodyMass) * Math.Pow(BodyRadius / SemiLatusRectum, 2.0) * (1.0 - 3.0 / 2.0 * (Math.Pow(SubvectorA, 2.0) +
+            double DeltaLPE = -(3.0 * Math.PI * (MasConMass / BodyMass) * Math.Pow(BodyRadius / SemiLatusRectum, 2.0) * (1.0 - 3.0 / 2.0 * (Math.Pow(SubvectorA, 2.0) +
                                                                                                                                                Math.Pow(SubvectorB, 2.0)))) - Math.Cos(Inc) * GetSecularLANChange(vessel, LAN, MNA, LPE, e, Inc, SMA, EPH);
             return DeltaLPE * NoOfRevolutions; // Change in LPE during the timewarp period 
         }
@@ -573,18 +577,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -705,18 +710,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -834,18 +840,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -965,18 +972,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -1096,18 +1104,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -1227,18 +1236,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;
@@ -1334,7 +1344,7 @@ namespace WhitecatIndustries
             #endregion
 
 
-            double RateOfChangeOfLANDeltaTheta = SubvectorS * Math.Pow(VesselAltitude, 3.0) * Math.Sin(ArgumentOfLatitude) / (Math.Pow(MeanMotion, 2.0) * 
+            double RateOfChangeOfLANDeltaTheta = SubvectorS * Math.Pow(VesselAltitude, 3.0) * Math.Sin(ArgumentOfLatitude) / (Math.Pow(MeanMotion, 2.0) *
                 Math.Pow(SMA, 3.0) * SemiLatusRectum * Math.Sin(Inc)); // [Degrees per Degree] 
 
             double RateOfChangeOfLANDeltaTime = RateOfChangeOfLANDeltaTheta * RateOfChangeOfTrueAnomaly;
@@ -1358,18 +1368,19 @@ namespace WhitecatIndustries
             double GalToGFactor = 0.00101972;
 
             //Required for Integration 
-
+            bool b = false;
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
                 {
-                    CentreLat = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLat"));
-                    CentreGal = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreGal"));
-                    CentreLong = double.Parse(MasConData.LocalMasCon(vessel).GetValue("centreLong"));
+                    b = true;
+                    CentreLat = MasConData.LocalMasCon(vessel).centreLat;
+                    CentreGal = MasConData.LocalMasCon(vessel).centreGal;
+                    CentreLong = MasConData.LocalMasCon(vessel).centreLong;
                 }
             }
-            else
+            if (!b)
             {
                 GalAtVesselDistance = UnityEngine.Random.Range((float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 0.9995), (float)(vessel.orbitDriver.orbit.referenceBody.GeeASL * GalToGFactor * 1.0005));
                 CentreLat = vessel.latitude;

@@ -24,24 +24,129 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-using static WhitecatIndustries.RegisterToolbarOrbitalDecay;
-
 namespace WhitecatIndustries
 {
+    internal class Mascon
+    {
+        internal int id;
+        internal double centreGal;
+        internal double centreLat;
+        internal double centreLong;
+        internal double radiusm;
+        internal double diamdeg;
+
+        internal Mascon()
+        {
+            id = 99;
+            centreGal = 0;
+            centreLat = 0;
+            centreLong = 0;
+            radiusm = 0;
+            diamdeg = 360;
+        }
+        internal Mascon(ConfigNode cn)
+        {
+            cn.TryGetValue("id", ref id);
+            cn.TryGetValue("centreGal", ref centreGal);
+            cn.TryGetValue("centreLat", ref centreLat);
+            cn.TryGetValue("centreLong", ref centreLong);
+            cn.TryGetValue("radiusm", ref radiusm);
+            cn.TryGetValue("diamdeg", ref diamdeg);
+        }
+    }
+    internal class GravityMap
+    {
+        internal string body;
+        internal bool alternate;
+        internal double meanG;
+        internal double meanGal;
+        internal double minGal;
+        internal double maxGal;
+        internal double minASL;
+        internal double maxASL;
+
+        internal Mascon[] masconAr;
+
+        internal GravityMap(ConfigNode GMSData)
+        {
+            body = "";
+            Load(GMSData);
+        }
+        internal void Load(ConfigNode GMSData)
+        {
+            GMSData.TryGetValue("body", ref body);
+            GMSData.TryGetValue("alternate", ref alternate);
+            GMSData.TryGetValue("meanG", ref meanG);
+            GMSData.TryGetValue("meanGal", ref meanGal);
+            GMSData.TryGetValue("minGal", ref minGal);
+            GMSData.TryGetValue("maxGal", ref maxGal);
+            GMSData.TryGetValue("minASL", ref minASL);
+            GMSData.TryGetValue("maxASL", ref maxASL);
+
+            ConfigNode[] mc = GMSData.GetNodes("MASCON");
+            List<Mascon> mcList = new List<Mascon>();
+            foreach (var node in mc)
+            {
+                mcList.Add(new Mascon(node));
+            }
+            masconAr = mcList.ToArray();
+        }
+    }
+
+    [KSPAddon(KSPAddon.Startup.Instantly, false)]
+    public class MasConDataInit : MonoBehaviour
+    {
+
+        public void Start()
+        {
+            MasConData.LoadData();
+        }
+    }
+
+
+
+
+
+
+
     public class MasConData : MonoBehaviour
     {
-        public static string FilePath;
-        public static ConfigNode GMSData;
+        static Dictionary<string, GravityMap> gravityMapDict = null;
+
+        public static string MasConDataFilePath;
+        //public static ConfigNode GMSData;
 
         public static void LoadData()
         {
-            FilePath = KSPUtil.ApplicationRootPath + "GameData/WhitecatIndustries/OrbitalDecay/PluginData/MasConData.cfg";
-            GMSData = ConfigNode.Load(FilePath);
+            MasConDataFilePath = KSPUtil.ApplicationRootPath + "GameData/WhitecatIndustries/OrbitalDecay/PluginData/MasConData.cfg";
+            //GMSData = ConfigNode.Load(MasConDataFilePath);
+
+            if (gravityMapDict == null)
+            {
+                gravityMapDict = new Dictionary<string, GravityMap>();
+                var node = ConfigNode.Load(MasConDataFilePath);
+                foreach (var n in node.GetNodes("GRAVITYMAP"))
+                {
+                    GravityMap gm = new GravityMap(n);
+                    gravityMapDict.Add(gm.body, gm);
+
+                }
+            }
+
         }
 
+        private static GravityMap ThisGravityMap(string Body)
+        {
+            if (gravityMapDict.ContainsKey(Body))
+                return gravityMapDict[Body];
+            else return null;
+        }
+
+#if false
         private static ConfigNode ThisGravityMap(string Body)
         {
             ConfigNode returnNode = new ConfigNode("GRAVITYMAP");
@@ -56,20 +161,22 @@ namespace WhitecatIndustries
             }
             return returnNode;
         }
+#endif
 
-        
-        public static bool IsBetween(double item, double min, double max) 
+        public static bool IsBetween(double item, double min, double max)
         {
             return Enumerable.Range(Math.Abs((int)min), Math.Abs((int)max)).Contains(Math.Abs((int)item));
         }
-        
 
-        public static ConfigNode LocalMasCon(Vessel vessel)
+
+        internal static Mascon LocalMasCon(Vessel vessel)
         {
-            ConfigNode LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
-            ConfigNode Local = null;// new ConfigNode();
+            //ConfigNode LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
+            GravityMap LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
 
-            if (LocalGravityMap.nodes.Count > 0)
+            Mascon Local = new Mascon();
+
+            if (LocalGravityMap.masconAr.Count() > 0)
             {
                 double VesselLat = vessel.latitude;
                 double VesselLong = vessel.longitude;
@@ -77,12 +184,13 @@ namespace WhitecatIndustries
                 bool LatitudeWithin = false;
                 bool LongitudeWithin = false;
 
-                foreach (ConfigNode MasCon in LocalGravityMap.GetNodes("MASCON"))
+                foreach (Mascon MasCon in LocalGravityMap.masconAr)
                 {
-                    double CentreGal = double.Parse(MasCon.GetValue("centreGal"));
-                    double CentreLat = double.Parse(MasCon.GetValue("centreLat"));
-                    double CentreLong = double.Parse(MasCon.GetValue("centreLong"));
-                    double DegDiam = double.Parse(MasCon.GetValue("diamdeg"));
+                    int idx = MasCon.id;
+                    double CentreGal = MasCon.centreGal;
+                    double CentreLat = MasCon.centreLat;
+                    double CentreLong = MasCon.centreLong;
+                    double DegDiam = MasCon.diamdeg;
                     double DegRad = DegDiam / 2.0;
 
                     double UpperBoundLat = CentreLat + DegRad;
@@ -90,44 +198,25 @@ namespace WhitecatIndustries
                     double UpperBoundLong = CentreLong + DegRad;
                     double LowerBoundLong = CentreLong - DegRad;
 
-                    if (UpperBoundLat > 90)
-                    {
-                        UpperBoundLat = Math.Abs(UpperBoundLat - 180);
-                    }
+                    if (UpperBoundLat > 90) { UpperBoundLat = Math.Abs(UpperBoundLat - 180); }
 
-                    if (LowerBoundLat < 90)
-                    {
-                        LowerBoundLat = -1 * (UpperBoundLat + 180);
-                    }
+                    if (LowerBoundLat < 90) { LowerBoundLat = -1 * (UpperBoundLat + 180); }
 
-                    if (UpperBoundLong > 180)
-                    {
-                        UpperBoundLong = UpperBoundLong - 360;
-                    }
+                    if (UpperBoundLong > 180) { UpperBoundLong = UpperBoundLong - 360; }
 
-                    if (UpperBoundLong < -180)
-                    {
-                        UpperBoundLong = UpperBoundLong + 360;
-                    }
-                    Log.Info($"VesselLat: {VesselLat}    UpperBoundLat: {UpperBoundLat} LowerBoundLat: {LowerBoundLat}  ");
-                    Log.Info($"VesselLong: {VesselLong}    UpperBoundLong: {UpperBoundLong} LowerBoundLong: {LowerBoundLong}  ");
+                    if (LowerBoundLong < -180) { LowerBoundLong = LowerBoundLong + 360; }
 
-                    if (IsBetween(VesselLat, UpperBoundLat, LowerBoundLat))
-                    {
-                        LatitudeWithin = true;
-                    }
+                    if (IsBetween(VesselLat, UpperBoundLat, LowerBoundLat)) { LatitudeWithin = true; }
 
-                    if (IsBetween(VesselLong, UpperBoundLong, LowerBoundLong))
-                    {
-                        LongitudeWithin = true;
-                    }
-                    Log.Info($"LatitudeWithin: {LatitudeWithin}   LongitudeWithin: {LongitudeWithin}");
+                    if (IsBetween(VesselLong, UpperBoundLong, LowerBoundLong)) { LongitudeWithin = true; }
+
                     if (LatitudeWithin && LongitudeWithin)
                     {
                         Local = MasCon;
                         break;
                     }
                 }
+
             }
 
             return Local;
@@ -139,9 +228,10 @@ namespace WhitecatIndustries
 
             if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Moon") // 
             {
-                ConfigNode LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
+                GravityMap LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
 
-                if (LocalGravityMap.nodes.Count > 0)
+
+                if (LocalGravityMap.masconAr.Count() > 0)
                 {
                     double VesselLat = vessel.latitude;
                     double VesselLong = vessel.longitude;
@@ -149,12 +239,12 @@ namespace WhitecatIndustries
                     bool LatitudeWithin = false;
                     bool LongitudeWithin = false;
 
-                    foreach (ConfigNode MasCon in LocalGravityMap.GetNodes("MASCON"))
+                    foreach (var MasCon in LocalGravityMap.masconAr)
                     {
-                        double CentreGal = double.Parse(MasCon.GetValue("centreGal"));
-                        double CentreLat = double.Parse(MasCon.GetValue("centreLat"));
-                        double CentreLong = double.Parse(MasCon.GetValue("centreLong"));
-                        double DegDiam = double.Parse(MasCon.GetValue("diamdeg"));
+                        double CentreGal = MasCon.centreGal;
+                        double CentreLat = MasCon.centreLat;
+                        double CentreLong = MasCon.centreLong;
+                        double DegDiam = MasCon.diamdeg;
                         double DegRad = DegDiam / 2.0;
 
                         double UpperBoundLat = CentreLat + DegRad;
@@ -162,36 +252,18 @@ namespace WhitecatIndustries
                         double UpperBoundLong = CentreLong + DegRad;
                         double LowerBoundLong = CentreLong - DegRad;
 
-                        if (UpperBoundLat > 90)
-                        {
-                            UpperBoundLat = Math.Abs(UpperBoundLat - 180);
-                        }
+                        if (UpperBoundLat > 90) { UpperBoundLat = Math.Abs(UpperBoundLat - 180); }
 
-                        if (LowerBoundLat < 90)
-                        {
-                            LowerBoundLat = -1 * (UpperBoundLat + 180);
-                        }
+                        if (LowerBoundLat < 90) { LowerBoundLat = -1 * (UpperBoundLat + 180); }
 
-                        if (UpperBoundLong > 180)
-                        {
-                            UpperBoundLong = UpperBoundLong - 360;
-                        }
+                        if (UpperBoundLong > 180) { UpperBoundLong = UpperBoundLong - 360; }
 
-                        if (UpperBoundLong < -180)
-                        {
-                            UpperBoundLong = UpperBoundLong + 360;
-                        }
+                        if (UpperBoundLong < -180) { UpperBoundLong = UpperBoundLong + 360; }
 
-                        if (IsBetween(VesselLat, UpperBoundLat, LowerBoundLat))
-                        {
-                            LatitudeWithin = true;
-                        }
+                        if (IsBetween(VesselLat, UpperBoundLat, LowerBoundLat)) { LatitudeWithin = true; }
 
-                        if (IsBetween(VesselLong, UpperBoundLong, LowerBoundLong))
-                        {
-                            LongitudeWithin = true;
-                        }
-                        
+                        if (IsBetween(VesselLong, UpperBoundLong, LowerBoundLong)) { LongitudeWithin = true; }
+
 
                         if (LatitudeWithin && LongitudeWithin)
                         {
@@ -205,6 +277,7 @@ namespace WhitecatIndustries
                     }
                 }
             }
+
             return WithinEffectRange;
         }
 
@@ -217,16 +290,16 @@ namespace WhitecatIndustries
 
         public static double GalAtPosition(Vessel vessel)
         {
-            ConfigNode LocalMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
-            double meanGal = double.Parse(LocalMap.GetValue("meanGal"));
+            GravityMap LocalMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
+            double meanGal = LocalMap.meanGal;
 
-            ConfigNode MasCon = LocalMasCon(vessel);
+            Mascon MasCon = LocalMasCon(vessel);
             if (MasCon != null)
             {
-                double CentreGal = double.Parse(MasCon.GetValue("centreGal"));
-                double CentreLat = double.Parse(MasCon.GetValue("centreLat"));
-                double CentreLong = double.Parse(MasCon.GetValue("centreLong"));
-                double radiusdeg = double.Parse(MasCon.GetValue("diamdeg")) / 2;
+                double CentreGal = MasCon.centreGal;
+                double CentreLat = MasCon.centreLat;
+                double CentreLong = MasCon.centreLong;
+                double radiusdeg = MasCon.diamdeg / 2;
                 double EdgeLat = CentreLat + radiusdeg;
                 double EdgeLong = CentreLong + radiusdeg;
 

@@ -28,10 +28,10 @@ namespace WhitecatIndustries
         // private GUISkin skin;
         private int id;
         //public static ApplicationLauncherButton ToolbarButton;
-        public static ToolbarControl toolbarControl = null;
+        //public static ToolbarControl toolbarControl = null;
 
-        public bool Visible = false;
-        public bool Hidden = false;
+        //public bool Visible = false;
+        //public bool Hidden = false;
 
         //public static Texture launcher_icon;
         private float AltitudeValue = 70000f;
@@ -48,14 +48,15 @@ namespace WhitecatIndustries
 
             //GameEvents.onGUIApplicationLauncherReady.Add(ReadyEvent);
             GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
-            GameEvents.onHideUI.Add(onHideUI);
-            GameEvents.onShowUI.Add(onShowUI);
+            //GameEvents.onHideUI.Add(onHideUI);
+            //GameEvents.onShowUI.Add(onShowUI);
 
+#if false
             if (toolbarControl == null)
             {
                 ApplicationLauncher.AppScenes Scenes = ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH;
                 toolbarControl = gameObject.AddComponent<ToolbarControl>();
-                toolbarControl.AddToAllToolbars(GuiOn, GuiOff,
+                toolbarControl.AddToAllToolbars(ToolbarInterface.GuiOn, ToolbarInterface.GuiOff,
                     Scenes,
                     MODID,
                     "AnyResButton",
@@ -65,6 +66,8 @@ namespace WhitecatIndustries
                     "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
                     UserInterface.MODNAME);
             }
+#endif
+
             foreach (CelestialBody body in FlightGlobals.Bodies)
             {
                 if (body.isHomeWorld)
@@ -91,8 +94,8 @@ namespace WhitecatIndustries
         {
             GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
             //GameEvents.onGUIApplicationLauncherReady.Remove(ReadyEvent);
-            GameEvents.onHideUI.Remove(onHideUI);
-            GameEvents.onShowUI.Remove(onShowUI);
+            //GameEvents.onHideUI.Remove(onHideUI);
+            //GameEvents.onShowUI.Remove(onShowUI);
             DestroyEvent();
         }
 
@@ -101,21 +104,24 @@ namespace WhitecatIndustries
             //if (ToolbarButton == null) return;
             //ApplicationLauncher.Instance.RemoveModApplication(ToolbarButton);
             //ToolbarButton = null;
-            Visible = false;
+            ToolbarInterface.GuiOff(); // Visible = false;
         }
 
+#if false
         private void GuiOn()        {            Visible = true;        }
 
         private void GuiOff()        {            Visible = false;        }
 
+
         private void onHideUI() { Hidden = true; }
         private void onShowUI() { Hidden = false; }
+#endif
 
         public void OnGUI()
         {
-            if (Visible && !Hidden)
+            if (ToolbarInterface.Visible) //&& !Hidden)
             {
-                //if (!HighLogic.CurrentGame.Parameters.CustomParams<OD3>().useAltSkin)
+                if (!HighLogic.CurrentGame.Parameters.CustomParams<OD3>().useAltSkin)
                 GUI.skin = HighLogic.Skin;
 
                 MainwindowPosition = ClickThruBlocker.GUILayoutWindow(id, MainwindowPosition, MainWindow, "Orbital Decay Utilities", windowStyle);
@@ -144,7 +150,8 @@ namespace WhitecatIndustries
             {
                 //if (ToolbarButton != null)
                 //    ToolbarButton.toggleButton.Value = false;
-                toolbarControl.SetFalse(true);
+                ToolbarInterface.GuiOff();
+                //T.SetFalse(true);
 
             }
             GUILayout.BeginVertical();

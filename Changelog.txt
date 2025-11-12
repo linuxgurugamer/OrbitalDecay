@@ -17,7 +17,6 @@ Changelog
 	Replaced all code which parsed ConfigNodes during run with a GravityMap dictionary
 	Eliminated tab in editor since there was only a single pane
 	Fixed calculations in editor for the utilities window
-	Made window in editor scrollable, so it won't use the entire screen.
 	Some minor editing of editor window, mainly removing unnecessary lines
 	In editor, made initial position to the right of the part list
 	In editor, only show fuel resources for which there are engines onboard
@@ -25,4 +24,11 @@ Changelog
 		SolarCycleSimulator
 		ClickThroughBlocker
 		ToolbarController
+		SpaceTuxLibrary
 
+1.7.0.1 (unreleased)
+	Converted MasConData to a dictionary instead of constantly decoding and parsing ConfigNodes
+	Added stock setting page
+	Converted current setting page to use the stock settings page for saving option
+	Added ToolbarInterface to manage toolbars on two different windows
+	Eliminated the loading of all the data on every scene change
