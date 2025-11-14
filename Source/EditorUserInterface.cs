@@ -5,15 +5,14 @@ using System.Collections.Generic;
 using ToolbarControl_NS;
 using UnityEngine;
 using static KSP.UI.Screens.ApplicationLauncher;
-using static WhitecatIndustries.RegisterToolbarOrbitalDecay;
+using static OrbitalDecay.RegisterToolbar;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     internal class EditorUserInterface : MonoBehaviour
     {
         const int WINWIDTH = 300;
-        internal const string MODID = "OrbitalDecayEditor";
 
         //private static int currentTab;
         //private static string[] tabs = { "Orbital Decay Utilities" };
@@ -27,8 +26,6 @@ namespace WhitecatIndustries
         //private static Color tabSelectedTextColor = new Color(0.0f, 0.0f, 0.0f);
         // private GUISkin skin;
         private int id;
-        //public static ApplicationLauncherButton ToolbarButton;
-        //public static ToolbarControl toolbarControl = null;
 
         //public bool Visible = false;
         //public bool Hidden = false;
@@ -51,22 +48,6 @@ namespace WhitecatIndustries
             //GameEvents.onHideUI.Add(onHideUI);
             //GameEvents.onShowUI.Add(onShowUI);
 
-#if false
-            if (toolbarControl == null)
-            {
-                ApplicationLauncher.AppScenes Scenes = ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH;
-                toolbarControl = gameObject.AddComponent<ToolbarControl>();
-                toolbarControl.AddToAllToolbars(ToolbarInterface.GuiOn, ToolbarInterface.GuiOff,
-                    Scenes,
-                    MODID,
-                    "AnyResButton",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar_highlighted",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar_highlighted",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
-                    UserInterface.MODNAME);
-            }
-#endif
 
             foreach (CelestialBody body in FlightGlobals.Bodies)
             {

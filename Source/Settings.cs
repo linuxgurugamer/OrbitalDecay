@@ -25,7 +25,7 @@
 
 using UnityEngine;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class Settings : MonoBehaviour

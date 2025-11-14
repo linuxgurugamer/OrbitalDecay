@@ -49,7 +49,7 @@
 
 using UnityEngine;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class LoadingCheck : MonoBehaviour
@@ -63,6 +63,7 @@ namespace WhitecatIndustries
 
         private void Start()
         {
+#if false
             if (System.IO.File.Exists(RealSolar))
             {
                 Settings.WriteRD(true);
@@ -79,6 +80,7 @@ namespace WhitecatIndustries
                 Settings.WriteRD(false);
                 Settings.WritePlanetariumTracking(true);
             }
+#endif
 
             if (System.IO.File.Exists(PersistentRotation))
             {

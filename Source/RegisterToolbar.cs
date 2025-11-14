@@ -1,18 +1,17 @@
 ﻿using ToolbarControl_NS;
 using UnityEngine;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
-    public class RegisterToolbarOrbitalDecay : MonoBehaviour
+    public class RegisterToolbar : MonoBehaviour
     {
         public static KSP_Log.Log Log;
 
 
         void Start()
         {
-            ToolbarControl.RegisterMod(UserInterface.MODID, UserInterface.MODNAME);
-            ToolbarControl.RegisterMod(EditorUserInterface.MODID, UserInterface.MODNAME);
+            ToolbarControl.RegisterMod(ToolbarInterface.MODID, ToolbarInterface.MODNAME);
 
             Log = new KSP_Log.Log("OrbitalDecay"
 #if DEBUG

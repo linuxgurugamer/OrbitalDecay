@@ -26,7 +26,7 @@
 using System;
 using UnityEngine;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     internal class YarkovskyEffect : MonoBehaviour
     {

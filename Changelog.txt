@@ -32,3 +32,11 @@ Changelog
 	Converted current setting page to use the stock settings page for saving option
 	Added ToolbarInterface to manage toolbars on two different windows
 	Eliminated the loading of all the data on every scene change
+
+1.7.0.2 (unreleased)
+	Fixed double entry in the Toolbarcontroller
+
+1.7.0.3 (unreleased)
+	Changed the Vessel Information from being constantly decoded via config node into a 
+	structure in a dictionary for speed
+	Changed namespace to OrbitalConfig

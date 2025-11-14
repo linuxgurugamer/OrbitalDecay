@@ -29,16 +29,13 @@ using System;
 using System.Collections.Generic;
 using ToolbarControl_NS;
 using UnityEngine;
-using static WhitecatIndustries.RegisterToolbarOrbitalDecay;
+using static OrbitalDecay.RegisterToolbar;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
     internal class UserInterface : MonoBehaviour
     {
-        internal const string MODID = "OrbitalDecay";
-        internal const string MODNAME = "Orbital Decay";
-
         private static int currentTab;
         private static string[] tabs = { "Vessels", "Settings" };
         private static Rect MainwindowPosition = new Rect(0, 0, 300, 400);
@@ -52,7 +49,6 @@ namespace WhitecatIndustries
         private GUISkin skins = HighLogic.Skin;
         private int id = Guid.NewGuid().GetHashCode();
         //public static ApplicationLauncherButton ToolbarButton;
-        //public static ToolbarControl toolbarControl = null;
 
         //public static Dictionary<Vessel, double> NBodyVesselAccelTimes = new Dictionary<Vessel, double>();
         //public static Vector3d NBodyMomentaryDeltaV;
@@ -80,22 +76,6 @@ namespace WhitecatIndustries
             GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
             //GameEvents.onHideUI.Add(onHideUI);
             //GameEvents.onShowUI.Add(onShowUI);
-#if false
-            if (toolbarControl == null)
-            {
-                ApplicationLauncher.AppScenes Scenes = ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW;
-                toolbarControl = gameObject.AddComponent<ToolbarControl>();
-                toolbarControl.AddToAllToolbars(ToolbarInterface.GuiOn, ToolbarInterface.GuiOff,
-                    Scenes,
-                    MODID,
-                    "AnyResButton",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar_highlighted",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar_highlighted",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
-                    MODNAME);
-            }
-#endif
         }
 
         public void OnDestroy()

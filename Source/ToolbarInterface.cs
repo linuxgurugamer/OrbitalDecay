@@ -8,7 +8,7 @@ using UnityEngine;
 
 using ToolbarControl_NS;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
 

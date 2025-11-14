@@ -27,7 +27,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
 
     public class StationKeepingManager : MonoBehaviour

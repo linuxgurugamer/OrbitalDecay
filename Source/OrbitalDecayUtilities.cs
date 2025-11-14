@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace WhitecatIndustries
+namespace OrbitalDecay
 {
     internal class OrbitalDecayUtilities : MonoBehaviour // Hopefully A new utilities class to clear up some clutter
     {
