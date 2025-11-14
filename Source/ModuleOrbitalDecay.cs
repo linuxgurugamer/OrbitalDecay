@@ -30,6 +30,36 @@ using UnityEngine;
 
 namespace OrbitalDecay
 {
+    public class Propellant_Data
+    {
+        public string name;
+        public int id;
+        public float ratio;
+        public double Available;
+
+        public Propellant_Data(string name, int id, float ratio, double Available)
+        {
+            this.name = name;
+            this.id = id;
+            this.ratio = ratio;
+            this.Available = Available;
+        }
+    }
+
+    public class Engine_Data
+    {
+        public string name;
+        public float ISP;
+
+        public List<Propellant_Data> propellantData = new List<Propellant_Data>();
+
+        public Engine_Data(string name, float ISP)
+        {
+            this.name = name;
+            this.ISP = ISP;
+        }
+    }
+
     public class ModuleOrbitalDecay : PartModule
     {
 
@@ -47,7 +77,8 @@ namespace OrbitalDecay
         [KSPField(isPersistant = true)]
         public StationKeepData stationKeepData;
 
-        public ConfigNode EngineData = new ConfigNode();
+        Dictionary<string, Engine_Data> engineData = new Dictionary<string, Engine_Data>();
+        //public ConfigNode EngineData = new ConfigNode();
         public string[] EngineList = { "" };
 
         private float UPTInterval = 1.0f;
@@ -159,7 +190,12 @@ namespace OrbitalDecay
 
             bool found = false;
             ConfigNode engineNode = new ConfigNode();
-            foreach (ConfigNode engine in EngineData.GetNodes("ENGINE"))
+            if (engineData.ContainsKey(ODSKengine))
+            {
+                var engine = engineData[ODSKengine];
+
+#if false
+                foreach (ConfigNode engine in EngineData.GetNodes("ENGINE"))
             {
 
                 if (engine.GetValue("name") == ODSKengine)
@@ -172,6 +208,15 @@ namespace OrbitalDecay
             }
             if (found)
             {
+#endif
+                foreach (var p in engine.propellantData)
+                {
+                    proplist.Add(p.name);
+                    amountlist.Add(p.Available);
+                    ratiolist.Add(p.ratio);
+                }
+                stationKeepData.ISP = engine.ISP;
+#if false
                 foreach (ConfigNode propellant in engineNode.GetNodes("PROPELLANT"))
                 {
                     proplist.Add(propellant.GetValue("name"));
@@ -179,7 +224,7 @@ namespace OrbitalDecay
                     ratiolist.Add(float.Parse(propellant.GetValue("ratio")));
                 }
                 stationKeepData.ISP = float.Parse(engineNode.GetValue("ISP"));
-
+#endif
             }
             else
             {
@@ -207,81 +252,159 @@ namespace OrbitalDecay
         {
             double amount = 0;
             bool engineIsListed;
-            EngineData.RemoveNodes("ENGINE");
+            //EngineData.RemoveNodes("ENGINE");
+            engineData.Clear();
+            for (int i = 0; i < vessel.parts.Count; i++)
+            {
+                var part = vessel.parts[i];
+                for (int j = 0; j < part.Modules.Count; j++)
+                {
+
+                    if (part.Modules[j].moduleName.StartsWith("ModuleEngines"))
+                    {
+                        ModuleEngines module = part.Modules[j] as ModuleEngines;
+#if false
+                    }
+                }
+            }
             foreach (ModuleEngines module in vessel.FindPartModulesImplementing<ModuleEngines>())
             {
-                engineIsListed = false;
-                foreach (ConfigNode engineNode in EngineData.GetNodes())
-                {
-                    //ugly names used - can't find way to get editor part names
-                    if (engineNode.GetValue("name") != module.part.protoPartSnapshot.partInfo.title) continue;
-                    engineIsListed = true;
-                    break;
-                }
+#endif
+                        if (module.EngineIgnited && !engineData.ContainsKey(module.part.protoPartSnapshot.partInfo.title))
+                        {
+                            engineData.Add(module.part.protoPartSnapshot.partInfo.title,
+                                new Engine_Data(module.part.protoPartSnapshot.partInfo.title, module.atmosphereCurve.Evaluate(0)));
+                            foreach (Propellant propellant in module.propellants)
+                            {
+                                if (propellant.name == "ElectricCharge") continue;
+                                var p = new Propellant_Data(propellant.name,
+                                                            propellant.id,
+                                                            propellant.ratio,
+                                                            fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW)
+                                    );
+                                engineData[module.part.protoPartSnapshot.partInfo.title].propellantData.Add(p);
+                            }
 
-                if (module.EngineIgnited && !engineIsListed)
-                {
-                    ConfigNode engineNode = new ConfigNode("ENGINE");
-                    engineNode.AddValue("name", module.part.protoPartSnapshot.partInfo.title);//ugly names used - can't find way to get editor part names
-                    engineNode.AddValue("ISP", module.atmosphereCurve.Evaluate(0).ToString());
+                        }
+#if false
+                        engineIsListed = false;
+                        foreach (ConfigNode engineNode in EngineData.GetNodes())
+                        {
+                            //ugly names used - can't find way to get editor part names
+                            if (engineNode.GetValue("name") != module.part.protoPartSnapshot.partInfo.title) continue;
+                            engineIsListed = true;
+                            break;
+                        }
 
-                    foreach (Propellant propellant in module.propellants)
-                    {
-                        if (propellant.name == "ElectricCharge") continue;
-                        ConfigNode propellantNode = new ConfigNode("PROPELLANT");
-                        //amount = module.part.Resources.Get(propellant.id).amount;
-                        amount = fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW);
-                        propellantNode.AddValue("name", propellant.name);
-                        propellantNode.AddValue("id", propellant.id.ToString());
-                        propellantNode.AddValue("ratio", propellant.ratio.ToString());
-                        propellantNode.AddValue("Available", amount.ToString());
-                        engineNode.AddNode(propellantNode);
+                        if (module.EngineIgnited && !engineIsListed)
+                        {
+                            ConfigNode engineNode = new ConfigNode("ENGINE");
+                            engineNode.AddValue("name", module.part.protoPartSnapshot.partInfo.title);//ugly names used - can't find way to get editor part names
+                            engineNode.AddValue("ISP", module.atmosphereCurve.Evaluate(0).ToString());
+
+                            foreach (Propellant propellant in module.propellants)
+                            {
+                                if (propellant.name == "ElectricCharge") continue;
+                                ConfigNode propellantNode = new ConfigNode("PROPELLANT");
+                                //amount = module.part.Resources.Get(propellant.id).amount;
+                                amount = fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW);
+                                propellantNode.AddValue("name", propellant.name);
+                                propellantNode.AddValue("id", propellant.id.ToString());
+                                propellantNode.AddValue("ratio", propellant.ratio.ToString());
+                                propellantNode.AddValue("Available", amount.ToString());
+                                engineNode.AddNode(propellantNode);
+                            }
+                            EngineData.AddNode(engineNode);
+#endif
+                        if (!stationKeepData.IsStationKeeping || !(module.currentThrottle > 0.0)) continue;
+                        ScreenMessages.PostScreenMessage("Warning: Vessel is under thrust, station keeping disabled.");
+                        VesselData.UpdateStationKeeping(vessel, false);
                     }
-                    EngineData.AddNode(engineNode);
-                    if (!stationKeepData.IsStationKeeping || !(module.currentThrottle > 0.0)) continue;
-                    ScreenMessages.PostScreenMessage("Warning: Vessel is under thrust, station keeping disabled.");
-                    VesselData.UpdateStationKeeping(vessel, false);
+
+                    //}
+                    //}
+                    //for (int i = 0; i < vessel.parts.Count; i++)
+                    //{
+                    //var part = vessel.parts[i];
+                    //for (int j = 0; j < part.Modules.Count; j++)
+                    //{
+                    if (part.Modules[j].moduleName.StartsWith("ModuleRCS"))
+                    {
+                        ModuleRCS module = part.Modules[j] as ModuleRCS;
+#if false
+                    }
                 }
             }
 
             foreach (ModuleRCS module in vessel.FindPartModulesImplementing<ModuleRCS>())
             {
-                engineIsListed = false;
-                foreach (ConfigNode engineNode in EngineData.GetNodes())
-                {
-                    if (engineNode.GetValue("name") != module.part.protoPartSnapshot.partInfo.title) continue;
-                    engineIsListed = true;
-                    break;
+#endif
+                        if (!module.rcsEnabled && !engineData.ContainsKey(module.part.protoPartSnapshot.partInfo.title))
+                        {
+                            engineData.Add(module.part.protoPartSnapshot.partInfo.title,
+                                new Engine_Data(module.part.protoPartSnapshot.partInfo.title, module.atmosphereCurve.Evaluate(0)));
+                            foreach (Propellant propellant in module.propellants)
+                            {
+                                if (propellant.name == "ElectricCharge") continue;
+                                var p = new Propellant_Data(propellant.name,
+                                                            propellant.id,
+                                                            propellant.ratio,
+                                                            fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW)
+                                    );
+                                engineData[module.part.protoPartSnapshot.partInfo.title].propellantData.Add(p);
+                            }
 
-                }
+                        }
+#if false
+                    engineIsListed = false;
+                        foreach (ConfigNode engineNode in EngineData.GetNodes())
+                        {
+                            if (engineNode.GetValue("name") != module.part.protoPartSnapshot.partInfo.title) continue;
+                            engineIsListed = true;
+                            break;
 
-                if (!module.rcsEnabled || engineIsListed) continue;
-                ConfigNode newEngineNode = new ConfigNode("ENGINE");
-                newEngineNode.AddValue("name", module.part.protoPartSnapshot.partInfo.title);
-                newEngineNode.AddValue("ISP", module.atmosphereCurve.Evaluate(0).ToString());
-                foreach (Propellant propellant in module.propellants)
-                {
-                    if (propellant.name == "ElectricCharge") continue;
-                    ConfigNode newPropellantNode = new ConfigNode("PROPELLANT");
-                    //amount = module.part.Resources.Get(propellant.id).amount
-                    //amount =
-                    amount = fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW);
-                    newPropellantNode.AddValue("name", propellant.name);
-                    newPropellantNode.AddValue("id", propellant.id.ToString());
-                    newPropellantNode.AddValue("ratio", propellant.ratio.ToString());
-                    newPropellantNode.AddValue("Available", amount.ToString());
-                    newEngineNode.AddNode(newPropellantNode);
+                        }
+
+                        if (!module.rcsEnabled || engineIsListed) continue;
+                        ConfigNode newEngineNode = new ConfigNode("ENGINE");
+                        newEngineNode.AddValue("name", module.part.protoPartSnapshot.partInfo.title);
+                        newEngineNode.AddValue("ISP", module.atmosphereCurve.Evaluate(0).ToString());
+                        foreach (Propellant propellant in module.propellants)
+                        {
+                            if (propellant.name == "ElectricCharge") continue;
+                            ConfigNode newPropellantNode = new ConfigNode("PROPELLANT");
+                            //amount = module.part.Resources.Get(propellant.id).amount
+                            //amount =
+                            amount = fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW);
+                            newPropellantNode.AddValue("name", propellant.name);
+                            newPropellantNode.AddValue("id", propellant.id.ToString());
+                            newPropellantNode.AddValue("ratio", propellant.ratio.ToString());
+                            newPropellantNode.AddValue("Available", amount.ToString());
+                            newEngineNode.AddNode(newPropellantNode);
+                        }
+                        EngineData.AddNode(newEngineNode);
+                    }
+#endif
+                    }
                 }
-                EngineData.AddNode(newEngineNode);
             }
+
+#if false
+            // dumpData
+            Log.Info($"FetchEngineData data dump, vessel: {vessel.vesselName}  part: {name}");
+            foreach (var e in engineData.Values)
+            {
+                Log.Info($"Engine: {e.name}  ISP: {e.ISP}");
+                foreach (var p in e.propellantData)
+                {
+                    Log.Info($"   Propellent name: {p.name}   id: {p.id}   ratio: {p.ratio}   Available: {p.Available}");
+                }
+            }
+#endif
         }
-
-
 
         public override void OnUpdate()
         {
-
-
             if (stationKeepData.IsStationKeeping && vessel == FlightGlobals.ActiveVessel)
             {
                 foreach (ModuleEngines module in vessel.FindPartModulesImplementing<ModuleEngines>())
@@ -298,6 +421,8 @@ namespace OrbitalDecay
             FetchEngineData();
 
             List<string> namelist = new List<string>();
+            namelist = engineData.Keys.ToList();
+#if false
             if (EngineData.HasNode("ENGINE"))
             {
                 foreach (ConfigNode engine in EngineData.GetNodes("ENGINE"))
@@ -305,6 +430,12 @@ namespace OrbitalDecay
                     namelist.Add(engine.GetValue("name"));
                 }
                 EngineList = new string[namelist.Count];
+                EngineList = namelist.ToArray();
+            }
+            else
+#endif
+            if (namelist.Count > 0)
+            {
                 EngineList = namelist.ToArray();
             }
             else

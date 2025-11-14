@@ -24,10 +24,8 @@
  */
 
 using ClickThroughFix;
-using KSP.UI.Screens;
 using System;
 using System.Collections.Generic;
-using ToolbarControl_NS;
 using UnityEngine;
 using static OrbitalDecay.RegisterToolbar;
 
@@ -67,8 +65,6 @@ namespace OrbitalDecay
         private float MultiplierValue = 5.0f;
         private float MultiplierValue2 = 5.0f;
 
-        internal static float NBodyStepsContainer;
-
         private Vessel subwindowVessel = new Vessel();
 
         private void Awake()
@@ -93,18 +89,6 @@ namespace OrbitalDecay
             ToolbarInterface.DecayBreakdownVisible = false;
         }
 
-#if false
-        private void onHideUI() { Hidden = true; }
-        private void onShowUI() { Hidden = false; }
-        private void GuiOn() { Visible = true; }
-
-        private void GuiOff()
-        {
-            Visible = false;
-            ToolbarInterface.DecayBreakdownVisible = false;
-        }
-#endif
-
         public void OnGUI()
         {
             if (HighLogic.LoadedSceneIsEditor || !ToolbarInterface.Visible)
@@ -121,12 +105,6 @@ namespace OrbitalDecay
 
                 DecayBreakdownwindowPosition = ClickThruBlocker.GUILayoutWindow(8989, DecayBreakdownwindowPosition, DecayBreakdownWindow, "Orbital Decay Breakdown Display", windowStyle);
             }
-            /*
-            if (NBodyBreakdownVisible)
-            {
-                NBodyManagerwindowPosition = ClickThruBlocker.GUILayoutWindow(8988, NBodyManagerwindowPosition, NBodyManagerWindow, "Orbital Decay N-Body Manager", windowStyle);
-            }
-             */
         }
 
         public void MainWindow(int windowID)
@@ -188,10 +166,15 @@ namespace OrbitalDecay
             GUILayout.Space(3);
             GUILayout.BeginHorizontal();
             GUIContent guiContent;
-            if (FilterTypes.Contains(VesselType.Probe))
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned_highlighted", false), "Unmanned");
-            else
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned", false), "Unmanned");
+
+            guiContent = FilterTypes.Contains(VesselType.Probe) ?
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned_highlighted", false), "Unmanned") :
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned", false), "Unmanned");
+
+            //if (FilterTypes.Contains(VesselType.Probe))
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned_highlighted", false), "Unmanned");
+            //else
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned", false), "Unmanned");
             if (GUILayout.Button(guiContent))
             {
                 if (FilterTypes.Contains(VesselType.Probe))
@@ -205,10 +188,15 @@ namespace OrbitalDecay
             }
 
             GUILayout.Space(3);
-            if (FilterTypes.Contains(VesselType.Relay))
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay_highlighted", false), "Relay");
-            else
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay", false), "Relay");
+            guiContent = FilterTypes.Contains(VesselType.Relay) ?
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay_highlighted", false), "Relay") :
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay", false), "Relay");
+
+
+            //if (FilterTypes.Contains(VesselType.Relay))
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay_highlighted", false), "Relay");
+            //else
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay", false), "Relay");
             if (GUILayout.Button(guiContent))
             {
                 if (FilterTypes.Contains(VesselType.Relay))
@@ -224,10 +212,14 @@ namespace OrbitalDecay
 
             GUILayout.Space(3);
 
-            if (FilterTypes.Contains(VesselType.Ship))
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship_highlighted", false), "Ship");
-            else
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship", false), "Ship");
+            guiContent = FilterTypes.Contains(VesselType.Ship) ?
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship_highlighted", false), "Ship") :
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship", false), "Ship");
+
+            //if (FilterTypes.Contains(VesselType.Ship))
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship_highlighted", false), "Ship");
+            //else
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship", false), "Ship");
             if (GUILayout.Button(guiContent))
             {
                 if (FilterTypes.Contains(VesselType.Ship))
@@ -242,10 +234,13 @@ namespace OrbitalDecay
             }
 
             GUILayout.Space(3);
-            if (FilterTypes.Contains(VesselType.Station))
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station_highlighted", false), "Station");
-            else
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station", false), "Station");
+            guiContent = FilterTypes.Contains(VesselType.Station) ?
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station_highlighted", false), "Station") :
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station", false), "Station");
+            //if (FilterTypes.Contains(VesselType.Station))
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station_highlighted", false), "Station");
+            //else
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station", false), "Station");
             if (GUILayout.Button(guiContent))
             {
                 if (FilterTypes.Contains(VesselType.Station))
@@ -261,10 +256,14 @@ namespace OrbitalDecay
 
             GUILayout.Space(3);
 
-            if (FilterTypes.Contains(VesselType.SpaceObject))
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject_highlighted", false), "Space Object");
-            else
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject", false), "Space Object");
+            guiContent = FilterTypes.Contains(VesselType.SpaceObject) ?
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject_highlighted", false), "Space Object") :
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject", false), "Space Object");
+
+            //if (FilterTypes.Contains(VesselType.SpaceObject))
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject_highlighted", false), "Space Object");
+            //else
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject", false), "Space Object");
             if (GUILayout.Button(guiContent))
             {
                 if (FilterTypes.Contains(VesselType.SpaceObject))
@@ -287,10 +286,15 @@ namespace OrbitalDecay
             }
 
             GUILayout.Space(3);
-            if (FilterTypes.Contains(VesselType.Debris))
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris_highlighted", false), "Debris");
-            else
-                guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris", false), "Debris");
+
+            guiContent = FilterTypes.Contains(VesselType.Debris) ?
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris_highlighted", false), "Debris") :
+                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris", false), "Debris");
+
+            //if (FilterTypes.Contains(VesselType.Debris))
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris_highlighted", false), "Debris");
+            //else
+            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris", false), "Debris");
             if (GUILayout.Button(guiContent))
             {
                 if (FilterTypes.Contains(VesselType.Debris))
@@ -385,27 +389,11 @@ namespace OrbitalDecay
                             GUILayout.Label("Current Total Decay Rate: " + FormatDecayRateToString(TotalDecayRatePerSecond));
                             GUILayout.Space(2);
 
-                            if (GUILayout.Button("Toggle Decay Rate Breakdown")) // Display a new window here?
-                            {
-                                subwindowVessel = vessel;
-                                ToolbarInterface.DecayBreakdownVisible = !ToolbarInterface.DecayBreakdownVisible;
-                            }
-
-#if false
-                            // 1.7.0 maybe?
-                            if (Settings.ReadNB())
-                            {
-                                GUILayout.Space(2);
-                                if (GUILayout.Button("Toggle NBody Breakdown")) // New Window for NBody
-                                {
-                                    subwindowVessel = vessel;
-                                    NBodyVesselAccelTimes.Clear();
-                                    NBodyBreakdownVisible = !NBodyBreakdownVisible;
-                                }
-                            }
-#endif
-
+#if DEBUG
+                            GUILayout.Label("AP: " + vessel.orbit.ApA.ToString("F3"));
+                            GUILayout.Label($"PE: " + vessel.orbit.PeA.ToString("F3"));
                             GUILayout.Space(2);
+#endif
 
                             double TimeUntilDecayInUnits = 0.0;
                             string TimeUntilDecayInDays = "";
@@ -431,6 +419,12 @@ namespace OrbitalDecay
                         GUILayout.Space(2);
                         GUILayout.Label("Using Fuel Type: " + Resource);//151
                         GUILayout.Space(2); //151
+
+                        if (GUILayout.Button("Toggle Decay Rate Breakdown")) // Display a new window here?
+                        {
+                            subwindowVessel = vessel;
+                            ToolbarInterface.DecayBreakdownVisible = !ToolbarInterface.DecayBreakdownVisible;
+                        }
 
                         if (StationKeeping == "True")
                         {
@@ -551,22 +545,6 @@ namespace OrbitalDecay
 
             double DecayDifficulty = HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
             double ResourceDifficulty = Settings.ReadResourceRateDifficulty();
-            // bool NBody = Settings.ReadNB();
-
-            //string NBodyText = ""; // 1.6.0 N-Body 
-
-#if false
-            // 1.7.0 maybe?
-            if (Settings.ReadNB())
-            {
-                NBodyText = "Disable N-Body Perturbations";
-            }
-
-            else
-            {
-                NBodyText = "Enable N-Body Perturbations";
-            }
-#endif
 
             GUILayout.Space(2);
             if (GUILayout.Button("Toggle Kerbin Day (6 hour) / Earth Day (24 hour)"))
@@ -582,39 +560,6 @@ namespace OrbitalDecay
                 }
 
             }
-            /*
-            GUILayout.Space(2);            // Incompatible with NBody Decay
-            if (GUILayout.Button("Toggle Planetarium Updating"))
-            {
-                Settings.WritePlanetariumTracking(!Settings.ReadPT());
-                if (Settings.ReadPT() == true)
-                {
-                    ScreenMessages.PostScreenMessage("Planetarium Updating Active - Warning this may cause tracking station lag with many vessels.");
-                }
-                else
-                {
-                    ScreenMessages.PostScreenMessage("Planetarium Updating Disabled.");
-                }
-            }
-
-            if (Settings.ReadPT() == true)
-            {
-                GUILayout.Space(2);
-                if (GUILayout.Button("Toggle Debris Updating"))
-                {
-                    Settings.WritePDebrisTracking(!Settings.ReadDT());
-                    if (Settings.ReadDT() == true)
-                    {
-                        ScreenMessages.PostScreenMessage("Debris Tracking Active - Warning Planetarium Lag Increased.");
-                    }
-                    else
-                    {
-                        ScreenMessages.PostScreenMessage("Debris Tracking Disabled - Planetarium Lag Decreased.");
-                    }
-                }
-
-            }
-            */
             GUILayout.Space(3);
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
             MultiplierValue = GUILayout.HorizontalSlider(MultiplierValue, 0.5f, 50.0f);
@@ -648,59 +593,6 @@ namespace OrbitalDecay
             }
 
             GUILayout.Space(2);
-
-#if false
-            if (GUILayout.Button(NBodyText))
-            {
-                Settings.WriteNBody(!NBody);
-
-                GUILayout.Space(2);
-            }
-
-            if (Settings.ReadNB())
-            {
-
-                if (GUILayout.Button("Toggle Body Updating"))
-                {
-                    Settings.WriteNBodyBodyUpdating(!Settings.ReadNBB());
-                    if (Settings.ReadNBB())
-                    {
-                        ScreenMessages.PostScreenMessage("N-Body simulator: Body Updating Enabled");
-                    }
-                    else
-                    {
-                        ScreenMessages.PostScreenMessage("N-Body simulator: Body Updating Disabled");
-                    }
-                }
-
-                GUILayout.Space(2);
-
-                if (GUILayout.Button("Toggle NBody Conics"))
-                {
-                    Settings.WriteNBodyBodyUpdating(!Settings.ReadNBC());
-                    if (Settings.ReadNBC())
-                    {
-                        ScreenMessages.PostScreenMessage("N-Body simulator: Conics Enabled");
-                    }
-                    else
-                    {
-                        ScreenMessages.PostScreenMessage("N-Body simulator: Conics Disabled");
-                    }
-
-                }
-
-                if (Settings.ReadNBC())
-                {
-                    // Slider for Number of Steps for Conics
-                    NBodyStepsContainer = GUILayout.HorizontalSlider(NBodyStepsContainer, 50f, 250f);
-                    GUILayout.Space(2);
-                    GUILayout.Label("Number of simulation iterations: " + NBodyStepsContainer.ToString("F0"));
-                    Settings.WriteNBodyConicsPatches(NBodyStepsContainer);
-                }
-
-            }
-#endif
-
             GUILayout.EndVertical();
         }
 
@@ -792,44 +684,28 @@ namespace OrbitalDecay
             GUILayout.Space(10);
             try
             {
-
-                Log.Info("MasCon 1a");
                 Vessel vessel = subwindowVessel;
-                Log.Info("MasCon 1b");
                 double ADDR = DecayManager.DecayRateAtmosphericDrag(vessel);
-                Log.Info("MasCon 1c");
                 double GPDR = DecayManager.DecayRateGravitationalPertubation(vessel);
-                Log.Info("MasCon 1d");
                 double GPIDR = MasConManager.GetSecularIncChange(vessel, vessel.orbitDriver.orbit.LAN, vessel.orbitDriver.orbit.meanAnomaly, vessel.orbitDriver.orbit.argumentOfPeriapsis, vessel.orbitDriver.orbit.eccentricity, vessel.orbitDriver.orbit.inclination, vessel.orbitDriver.orbit.semiMajorAxis, vessel.orbitDriver.orbit.epoch);
-                Log.Info("MasCon 1e");
                 double GPLANDR = MasConManager.GetSecularLANChange(vessel, vessel.orbitDriver.orbit.LAN, vessel.orbitDriver.orbit.meanAnomaly, vessel.orbitDriver.orbit.argumentOfPeriapsis, vessel.orbitDriver.orbit.eccentricity, vessel.orbitDriver.orbit.inclination, vessel.orbitDriver.orbit.semiMajorAxis, vessel.orbitDriver.orbit.epoch);
-                Log.Info("MasCon 1f");
                 double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
-                Log.Info("MasCon 1g");
                 double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
 
-                Log.Info("MasCon 1");
                 GUILayout.Label("Vessel: " + vessel.GetName());
                 GUILayout.Space(4);
-                Log.Info("MasCon 2");
                 GUILayout.Label("Atmospheric Drag Decay Rate (Delta SMA): " + FormatDecayRateToString(ADDR));
                 GUILayout.Space(2);
-                Log.Info("MasCon 3");
                 GUILayout.Label("Radiation Pressure Decay Rate (Delta SMA): " + FormatDecayRateToString(PRDR));
                 GUILayout.Space(2);
-                Log.Info("MasCon 4");
                 GUILayout.Label("Gravitational Effect Decay Rate (Delta SMA): " + FormatDecayRateToString(GPDR));
                 GUILayout.Space(2);
-                Log.Info("MasCon 5");
                 GUILayout.Label("Gravitational Effect Decay Rate (Delta INC): " + FormatDecayRateDegreesToString(GPIDR));
                 GUILayout.Space(2);
-                Log.Info("MasCon 6");
                 GUILayout.Label("Gravitational Effect Decay Rate (Delta LAN): " + FormatDecayRateDegreesToString(GPLANDR));
                 GUILayout.Space(2);
-                Log.Info("MasCon 7");
                 GUILayout.Label("Yarkovsky Effect Decay Rate (Delta SMA): " + FormatDecayRateSmallToString(YEDR));
                 GUILayout.Space(2);
-                Log.Info("MasCon 8");
                 GUILayout.Label("Note: Prediction estimates accurate to +/- 10% per day.");
             }
             catch (ArgumentNullException)
@@ -861,8 +737,8 @@ namespace OrbitalDecay
                 TimewarpRate = TimeWarp.CurrentRate;
             }
 
+            string DecayRateString = $"none, DecayRate: {DecayRate}";
             DecayRate = DecayRate / TimewarpRate;
-            string DecayRateString = "";
             double SecondsInYear = 0.0;
             double HoursInDay = 0.0;
 

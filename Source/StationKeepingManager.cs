@@ -54,7 +54,6 @@ namespace OrbitalDecay
                 ProtoVessel protovessel = vessel.protoVessel;
                 List<ProtoPartSnapshot> PPSL = protovessel.protoPartSnapshots;
 
-
                 foreach (ProtoPartSnapshot PPS in PPSL)
                 {
                     List<ProtoPartModuleSnapshot> PPMSL = PPS.modules;
@@ -80,7 +79,10 @@ namespace OrbitalDecay
             }
             else if (vessel == FlightGlobals.ActiveVessel)
             {
-                if (vessel.FindPartModulesImplementing<ModuleEngines>().Count > 0 || vessel.FindPartModulesImplementing<ModuleRCS>().Count > 0)
+                if (vessel.FindPartModulesImplementing<ModuleEngines>().Count > 0 ||
+                    vessel.FindPartModulesImplementing<ModuleEnginesFX>().Count > 0 ||
+                    vessel.FindPartModulesImplementing<ModuleRCS>().Count > 0 ||
+                    vessel.FindPartModulesImplementing<ModuleRCSFX>().Count > 0)
                 {
                     HasEngine = true;
                 }
@@ -120,7 +122,7 @@ namespace OrbitalDecay
                     VesselData.UpdateStationKeeping(vessel, false);
                 }
             }
-            else 
+            else
             {
                 SignalCheck = true;
             }

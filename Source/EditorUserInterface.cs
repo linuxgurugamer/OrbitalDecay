@@ -1,10 +1,7 @@
 ﻿using ClickThroughFix;
-using KSP.UI.Screens;
 using System;
 using System.Collections.Generic;
-using ToolbarControl_NS;
 using UnityEngine;
-using static KSP.UI.Screens.ApplicationLauncher;
 using static OrbitalDecay.RegisterToolbar;
 
 namespace OrbitalDecay
@@ -37,7 +34,6 @@ namespace OrbitalDecay
 
         private void Awake()
         {
-            Log.Info("{.Awake");
             id = Guid.NewGuid().GetHashCode();
             windowStyle = new GUIStyle(HighLogic.Skin.window);
             //skins = HighLogic.Skin;
@@ -103,7 +99,7 @@ namespace OrbitalDecay
             if (ToolbarInterface.Visible) //&& !Hidden)
             {
                 if (!HighLogic.CurrentGame.Parameters.CustomParams<OD3>().useAltSkin)
-                GUI.skin = HighLogic.Skin;
+                    GUI.skin = HighLogic.Skin;
 
                 MainwindowPosition = ClickThruBlocker.GUILayoutWindow(id, MainwindowPosition, MainWindow, "Orbital Decay Utilities", windowStyle);
             }
@@ -136,21 +132,7 @@ namespace OrbitalDecay
 
             }
             GUILayout.BeginVertical();
-            GUILayout.Space(10);
-            GUILayout.BeginHorizontal();
-
-#if false
-            for (int i = 0; i < tabs.Length; ++i)
-            {
-                if (GUILayout.Button(tabs[i]))
-                {
-                    currentTab = i;
-                }
-            }
-#endif
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(10);
+            GUILayout.Space(20);
 
             scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, hSmallScrollBar, GUI.skin.verticalScrollbar);
 
@@ -175,7 +157,6 @@ namespace OrbitalDecay
 
         public void InformationTab()
         {
-            Log.Info("InformationTab 1");
             double VesselMass = CalculateMass();
             double VesselArea = CalculateArea();
 
@@ -189,7 +170,6 @@ namespace OrbitalDecay
 
             GUILayout.BeginVertical();
 
-            Log.Info("InformationTab 2");
 
             GUILayout.Space(3);
             GUILayout.Label("Vessel Information:");
@@ -227,7 +207,6 @@ namespace OrbitalDecay
                     GUILayout.Space(2);
                 }
             }
-            Log.Info("InformationTab 4");
             GUILayout.EndHorizontal();
             GUILayout.Space(2);
             GUILayout.Label("Reference Altitude:");
@@ -246,7 +225,6 @@ namespace OrbitalDecay
             GUILayout.Space(2);
             GUILayout.Label("_________________________________________");
             GUILayout.Space(3);
-            Log.Info("InformationTab 5");
 
             GUILayout.Label("Station Keeping Information:");
             //GUILayout.Space(2);
@@ -355,7 +333,14 @@ namespace OrbitalDecay
                 Dictionary<string, double> UsableFuels = new Dictionary<string, double>();
                 Dictionary<string, double> FuelRatios = new Dictionary<string, double>();
 
-                var moduleEngines = p.FindModuleImplementing<ModuleEngines>();
+                ModuleEngines moduleEngines = null;
+                ModuleEnginesFX m = p.FindModuleImplementing<ModuleEnginesFX>();
+                if (m != null)
+                {
+                    moduleEngines = m as ModuleEngines;
+                }
+                else
+                    moduleEngines = p.FindModuleImplementing<ModuleEngines>();
                 if (moduleEngines != null)
                 {
                     double engEfficiency = moduleEngines.atmosphereCurve.Evaluate(0);
@@ -388,7 +373,15 @@ namespace OrbitalDecay
                         }
                     }
                 }
-                var moduleRCS = p.FindModuleImplementing<ModuleRCS>();
+                ModuleRCS moduleRCS = null;
+                var moduleRCSFX = p.FindModuleImplementing<ModuleRCSFX>();
+                if (moduleRCSFX != null)
+                {
+                    moduleRCS = moduleRCSFX as ModuleRCS;
+                }
+                else
+                    moduleRCS = p.FindModuleImplementing<ModuleRCS>();
+
                 if (moduleRCS != null)
                 {
                     var rcsEfficiency = moduleRCS.atmosphereCurve.Evaluate(0);

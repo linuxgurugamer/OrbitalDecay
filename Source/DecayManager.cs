@@ -23,6 +23,7 @@
  * is purely coincidental.
  */
 
+using Expansions.Missions.Editor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -157,10 +158,13 @@ namespace OrbitalDecay
             }
         }
 
+#if false
         public void QuickSaveUpdate(ConfigNode node)
         {
             VesselData.OnQuickSave();
         } // 1.5.0 QuickSave functionality // Thanks zajc3w!
+#endif
+
 
         public void QuickLoadUpdate()
         {
@@ -240,6 +244,8 @@ namespace OrbitalDecay
         public static bool CheckVesselProximity(Vessel vessel)
         {
             bool close = false;
+            if (vessel == FlightGlobals.ActiveVessel)
+                return false;
 
             if (!HighLogic.LoadedSceneIsFlight) return close;
             double distance;
@@ -272,6 +278,12 @@ namespace OrbitalDecay
 
         public void FixedUpdate()
         {
+            if (!HighLogic.LoadedSceneIsGame || 
+                HighLogic.LoadedScene == GameScenes.LOADING || 
+                HighLogic.LoadedScene == GameScenes.LOADINGBUFFER || 
+                HighLogic.LoadedScene == GameScenes.MAINMENU) 
+                return;
+            
             if (Time.time - _lastUpdate2 > _uptInterval / 10.0)
             {
 
@@ -320,38 +332,32 @@ namespace OrbitalDecay
                     CatchupResourceMassAreaDataComplete = true;
                 }
             }
-            /*
-            if (Time.timeSinceLevelLoad > 0.45) // NBody predictions
-            {
-                if (HighLogic.LoadedSceneIsGame && (HighLogic.LoadedScene != GameScenes.LOADING && HighLogic.LoadedScene != GameScenes.LOADINGBUFFER && HighLogic.LoadedScene != GameScenes.MAINMENU))
-                {
-                    if ((Time.time - lastUpdaten) > UPTInterval)
-                    {
-                        lastUpdaten = Time.time;
-
-                        if (Settings.ReadNB())
-                        {
-                            NBodyManager.ManageOrbitalPredictons();
-                        }
-                    }
-                }
-            }
-             */
 
             if (Time.timeSinceLevelLoad <= 0.5) return;
-            if (!HighLogic.LoadedSceneIsGame || HighLogic.LoadedScene == GameScenes.LOADING || HighLogic.LoadedScene == GameScenes.LOADINGBUFFER || HighLogic.LoadedScene == GameScenes.MAINMENU) return;
+
+            //if (!HighLogic.LoadedSceneIsGame || HighLogic.LoadedScene == GameScenes.LOADING || HighLogic.LoadedScene == GameScenes.LOADINGBUFFER || HighLogic.LoadedScene == GameScenes.MAINMENU) return;
+
             if (!(Time.time - _lastUpdate > _uptInterval)) return;
             _lastUpdate = Time.time;
 
-            if (HighLogic.LoadedScene != GameScenes.SPACECENTER && HighLogic.LoadedScene != GameScenes.TRACKSTATION &&
-                HighLogic.LoadedScene != GameScenes.FLIGHT) return;
+
+            //. maybe move this to the beginning???
+
+            if (HighLogic.LoadedScene != GameScenes.SPACECENTER && 
+                HighLogic.LoadedScene != GameScenes.TRACKSTATION &&
+                HighLogic.LoadedScene != GameScenes.FLIGHT) 
+                return;
+
             for (int i = 0; i < FlightGlobals.Vessels.Count; i++)
             {
                 Vessel vessel = FlightGlobals.Vessels[i];
 
                 if (vessel.situation != Vessel.Situations.ORBITING &&
-                    (vessel.situation != Vessel.Situations.SUB_ORBITAL || vessel == FlightGlobals.ActiveVessel ||
-                     vessel != vessel.packed)) continue;
+                    (vessel.situation != Vessel.Situations.SUB_ORBITAL || 
+                    vessel == FlightGlobals.ActiveVessel ||
+                     vessel != vessel.packed)) 
+                    continue;
+
                 if (VesselData.FetchStationKeeping(vessel) == false)
                 {
                     if (VesselData.FetchSMA(vessel) > 0)
@@ -395,7 +401,8 @@ namespace OrbitalDecay
 
         public void Save()
         {
-            if (!HighLogic.LoadedSceneIsGame || HighLogic.LoadedScene == GameScenes.FLIGHT ||
+            if (!HighLogic.LoadedSceneIsGame || 
+                HighLogic.LoadedScene == GameScenes.FLIGHT ||
                 HighLogic.LoadedScene == GameScenes.LOADING &&
                 (HighLogic.LoadedScene == GameScenes.LOADINGBUFFER ||
                  HighLogic.LoadedScene == GameScenes.MAINMENU)) return;
@@ -535,32 +542,6 @@ namespace OrbitalDecay
         {
             Orbit orbit = vessel.orbitDriver.orbit;
             CelestialBody body = orbit.referenceBody;
-
-#if false
-            if (Settings.ReadNB() && CheckNBodyAltitude(vessel))
-            {
-                if (vessel.situation == Vessel.Situations.ORBITING) // For the moment
-                {
-                    #region NBody debugging
-                    /*
-                    print("Pos: " + vessel.orbitDriver.orbit.getRelativePositionAtUT(HighLogic.CurrentGame.UniversalTime));
-                    print("PosAtUT: " + vessel.orbitDriver.orbit.getPositionAtUT(HighLogic.CurrentGame.UniversalTime));
-                    print("PosAlternate: " + vessel.orbitDriver.orbit.getRelativePositionAtUT(HighLogic.CurrentGame.UniversalTime));
-                    print("DifferenceBetween Pos & PosAlt: " + (vessel.orbitDriver.orbit.pos - vessel.orbitDriver.orbit.getRelativePositionAtUT(HighLogic.CurrentGame.UniversalTime)));
-
-                    print("Vel: " + vessel.orbitDriver.orbit.vel.magnitude);
-                    print("VelAt: " + vessel.orbitDriver.orbit.getOrbitalSpeedAt(HighLogic.CurrentGame.UniversalTime));
-                    print("VelAtAlt: " + vessel.orbitDriver.orbit.getOrbitalSpeedAtRelativePos(vessel.orbitDriver.orbit.getRelativePositionAtUT(HighLogic.CurrentGame.UniversalTime)));
-
-                    print("Energy: " + vessel.orbitDriver.orbit.orbitalEnergy);
-                    print("Energy Calculated: " + (((Math.Pow(vessel.orbit.vel.magnitude, 2.0)) / 2.0) - (vessel.orbitDriver.orbit.referenceBody.gravParameter / (vessel.orbitDriver.orbit.altitude + vessel.orbit.referenceBody.Radius))));
-                    */
-                    #endregion
-
-                     // NBodyManager.ManageVessel(vessel); // 1.6.0 N-Body master reference maybe 1.7.0?
-                }
-            }
-#endif
 
             if (!CheckReferenceBody(vessel)) return;
             RealisticGravitationalPertubationDecay(vessel); // 1.5.0
@@ -774,7 +755,6 @@ namespace OrbitalDecay
                 VesselData.UpdateVesselLAN(vessel, VesselData.FetchLAN(vessel) + MasConManager.GetCalculatedLANChange(vessel, orbit.LAN, orbit.meanAnomalyAtEpoch, orbit.argumentOfPeriapsis, orbit.eccentricity, orbit.inclination, orbit.semiMajorAxis, orbit.epoch));
                 //print("Change In MNA from Mascon: " + MasConManager.GetCalculatedMNAChange(vessel, orbit.LAN, orbit.meanAnomalyAtEpoch, orbit.argumentOfPeriapsis, orbit.eccentricity, orbit.inclination, orbit.semiMajorAxis, orbit.epoch));
             }
-
             else
             {
                 if (!MasConData.CheckMasConProximity(vessel)) return;
@@ -870,7 +850,7 @@ namespace OrbitalDecay
                     {
                         TimeWarp.SetRate(0, false);
                         print("Warning: " + vessel.vesselName + " is approaching " + vessel.orbitDriver.referenceBody.name + "'s hard atmosphere");
-                        ScreenMessages.PostScreenMessage("Warning: " + vessel.vesselName + " is approaching " + vessel.orbitDriver.referenceBody.name + "'s hard atmosphere");
+                        ScreenMessages.PostScreenMessage("Warning: " + vessel.vesselName + " is approaching " + vessel.orbitDriver.referenceBody.name + "'s hard atmosphere", 15);
                         MessageDisplayed.Add(vessel, true);
                     }
                 }
@@ -888,7 +868,7 @@ namespace OrbitalDecay
                     {
                         TimeWarp.SetRate(0, false);
                         print("Warning: " + vessel.vesselName + " is approaching " + vessel.orbitDriver.referenceBody.name + "'s surface");
-                        ScreenMessages.PostScreenMessage("Warning: " + vessel.vesselName + " is approaching " + vessel.orbitDriver.referenceBody.name + "'s surface");
+                        ScreenMessages.PostScreenMessage("Warning: " + vessel.vesselName + " is approaching " + vessel.orbitDriver.referenceBody.name + "'s surface", 15);
                         MessageDisplayed.Add(vessel, true);
                     }
                 }
@@ -934,11 +914,8 @@ namespace OrbitalDecay
             double decayForce = deltaVelocity * (VesselData.FetchMass(vessel) * 1000);
             GameObject thisVessel = new GameObject();
 
-            Log.Info($"ActiveDecayRealistic, TimeWarp.CurrentRate: {TimeWarp.CurrentRate}  TimeWarp.WarpMode: {TimeWarp.WarpMode}");
-
             if (TimeWarp.CurrentRate == 0 || TimeWarp.CurrentRate > 0 && TimeWarp.WarpMode == TimeWarp.Modes.LOW)
             {
-                Log.Info($"ActiveDecayRealistic 2");
                 if (vessel.vesselType == VesselType.EVA) return;
 #if false
                 foreach (Part p in vessel.parts)
@@ -954,10 +931,8 @@ namespace OrbitalDecay
 #endif
                 VesselData.UpdateVesselSMA(vessel, newSemiMajorAxis);
             }
-
             else if (TimeWarp.CurrentRate > 0 && TimeWarp.WarpMode == TimeWarp.Modes.HIGH) // 1.3.0 Timewarp Fix
             {
-                Log.Info($"ActiveDecayRealistic 3");
                 bool multipleLoadedSceneVessels = false; // 1.4.0 Debris warp fix
                 multipleLoadedSceneVessels = CheckVesselProximity(vessel);
 
@@ -972,7 +947,6 @@ namespace OrbitalDecay
 
         public static void ActiveDecayStock(Vessel vessel)
         {
-            Log.Info($"ActiveDecayStock 1");
             if (!CheckReferenceBody(vessel)) return;
             double readTime = HighLogic.CurrentGame.UniversalTime;
             double decayValue = DecayRateTotal(vessel);
@@ -986,12 +960,10 @@ namespace OrbitalDecay
             double decayForce = deltaVelocity * (VesselData.FetchMass(vessel) / 1000.0);
             GameObject thisVessel = new GameObject();
 
-            Log.Info($"ActiveDecayStock, TimeWarp.CurrentRate: {TimeWarp.CurrentRate}  TimeWarp.WarpMode: {TimeWarp.WarpMode}");
 
             if (TimeWarp.CurrentRate == 0 || TimeWarp.CurrentRate > 0 && TimeWarp.WarpMode == TimeWarp.Modes.LOW)
             {
                 if (vessel.vesselType == VesselType.EVA) return;
-                Log.Info($"ActiveDecayStock 2");
 #if false
                 foreach (Part p in vessel.parts)
                 {
@@ -1005,12 +977,10 @@ namespace OrbitalDecay
                 VesselData.UpdateVesselSMA(vessel, newSemiMajorAxis);
 
             }
-
             else if (TimeWarp.CurrentRate > 0 && TimeWarp.WarpMode == TimeWarp.Modes.HIGH) // 1.3.0 Timewarp Fix
             {
-                Log.Info($"ActiveDecayStock 3");
-                // 1.4.0 Debris warp fix
                 bool multipleLoadedSceneVessels = CheckVesselProximity(vessel);
+                // 1.4.0 Debris warp fix
                 if (multipleLoadedSceneVessels) return;
                 if (vessel.vesselType == VesselType.EVA) return;
                 VesselData.UpdateVesselSMA(vessel, VesselData.FetchSMA(vessel) - decayValue);
@@ -1123,7 +1093,8 @@ namespace OrbitalDecay
             }
             else
             {
-                if (body.atmosphere != true) return decayRate;
+                if (body.atmosphere != true) 
+                    return decayRate;
                 double initialSemiMajorAxis = VesselData.FetchSMA(vessel);
                 double maxInfluence = body.Radius * 1.5;
 
@@ -1164,6 +1135,7 @@ namespace OrbitalDecay
                 double deltaPeriod = 3 * Math.PI * (initialSemiMajorAxis * atmosphericDensity) * (vesselArea * 2.2 / vesselMass); // Unitless
                 double initialPeriod = 2 * Math.PI * Math.Sqrt(Math.Pow(initialSemiMajorAxis, 3) / standardGravitationalParameter);
                 double finalPeriod = initialPeriod - deltaPeriod;
+
                 double finalSemiMajorAxis = Math.Pow(Math.Pow(finalPeriod / (2.0 * Math.PI), 2.0) * standardGravitationalParameter, 1.0 / 3.0);
 
                 double decayRateModifier = Settings.ReadDecayDifficulty();

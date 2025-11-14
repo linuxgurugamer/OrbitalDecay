@@ -57,6 +57,7 @@ namespace OrbitalDecay
             this.name = name;
             this.id = id;
         }
+
         public Vessel_Information(string name, Guid id, string code, float Mass,
             double Area, string ReferenceBody, double SMA,
             double ECC, double INC, double LPE, double LAN,
@@ -106,6 +107,7 @@ namespace OrbitalDecay
                 file.Save(filename);
             return configNode;
         }
+
         static public Vessel_Information Load(ConfigNode cn)
         {
             Vessel_Information v = new Vessel_Information();
@@ -113,20 +115,18 @@ namespace OrbitalDecay
             v.name = cn.SafeLoad("name", "NoName");
             v.id = cn.SafeLoad("id", Guid.Empty);
             v.code = cn.SafeLoad("code", "");
-            v.Mass = cn.SafeLoad("Mass", 0);
-            v.Area = cn.SafeLoad("Area", 0);
+            v.Mass = cn.SafeLoad("Mass", 0f);
+            v.Area = cn.SafeLoad("Area", 0d);
             v.ReferenceBody = cn.SafeLoad("ReferenceBody", "");
-            // body
-            v.SMA = cn.SafeLoad("SMA", 0);
-            v.ECC = cn.SafeLoad("ECC", 0);
-            v.INC = cn.SafeLoad("INC", 0);
-            v.LPE = cn.SafeLoad("LPE", 0);
-            v.LAN = cn.SafeLoad("LAN", 0);
-            v.MNA = cn.SafeLoad("MNA", 0);
-            v.EPH = cn.SafeLoad("EPH", 0);
-            v.Fuel = cn.SafeLoad("Fuel", 0);
+            v.SMA = cn.SafeLoad("SMA", 0d);
+            v.ECC = cn.SafeLoad("ECC", 0d);
+            v.INC = cn.SafeLoad("INC", 0d);
+            v.LPE = cn.SafeLoad("LPE", 0d);
+            v.LAN = cn.SafeLoad("LAN", 0d);
+            v.MNA = cn.SafeLoad("MNA", 0d);
+            v.EPH = cn.SafeLoad("EPH", 0d);
+            v.Fuel = cn.SafeLoad("Fuel", 0d);
 
-            Debug.Log("[OrbitalDecay] Loaded vessel name: " + v.name);
             return v;
         }
     }
@@ -163,7 +163,7 @@ namespace OrbitalDecay
                 foreach (var n in configNode.GetNodes("VESSEL"))
                 {
                     var vi = Vessel_Information.Load(n);
-                    VesselData.VesselInfo[vi.id] = vi;
+                    VesselInfo[vi.id] = vi;
                 }
             }
             print("WhitecatIndustries - OrbitalDecay - Loaded vessel data, there are " + VesselInfo.Count + " vessels");
@@ -211,12 +211,17 @@ namespace OrbitalDecay
                 {
                     lastUpdate = Time.time;
 
-                    if (HighLogic.LoadedSceneIsGame && HighLogic.LoadedScene != GameScenes.LOADING && HighLogic.LoadedScene != GameScenes.LOADINGBUFFER && HighLogic.LoadedScene != GameScenes.MAINMENU)
+                    if (HighLogic.LoadedSceneIsGame &&
+                        HighLogic.LoadedScene != GameScenes.LOADING &&
+                        HighLogic.LoadedScene != GameScenes.LOADINGBUFFER &&
+                        HighLogic.LoadedScene != GameScenes.MAINMENU)
                     {
                         Vessel vessel = new Vessel();
                         for (int i = 0; i < FlightGlobals.Vessels.Count; i++)
                         {
                             vessel = FlightGlobals.Vessels[i];
+                            WriteVesselData(vessel);
+#if false
                             {
                                 if (CheckIfContained(vessel))
                                 {
@@ -225,7 +230,7 @@ namespace OrbitalDecay
                                         WriteVesselData(vessel);
                                     }
                                 }
-                                else if (CheckIfContained(vessel) == false)
+                                else
                                 {
                                     if (vessel.situation == Vessel.Situations.ORBITING || vessel.situation == Vessel.Situations.SUB_ORBITAL) // 1.4.2
                                     {
@@ -233,6 +238,7 @@ namespace OrbitalDecay
                                     }
                                 }
                             }
+#endif
                         }
                     }
                 }
@@ -241,7 +247,7 @@ namespace OrbitalDecay
 
         public void OnDestroy()
         {
-            if (DecayManager.CheckSceneStateMain(HighLogic.LoadedScene))
+            if (HighLogic.CurrentGame != null && DecayManager.CheckSceneStateMain(HighLogic.LoadedScene))
             {
                 if (Planetarium.GetUniversalTime() == HighLogic.CurrentGame.UniversalTime || HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
@@ -314,10 +320,9 @@ namespace OrbitalDecay
                 VesselInfo[vessel.id] = vD;
                 //ConfigNode vesselData = BuildConfigNode(vessel);
                 //VesselInformation.AddNode(vesselData);
-
             }
 
-            if (CheckIfContained(vessel))
+            //if (CheckIfContained(vessel))
             {
                 if (vessel == FlightGlobals.ActiveVessel)
                 {
@@ -375,6 +380,12 @@ namespace OrbitalDecay
                 //VesselNode.SetValue("Mass", (vessel.GetTotalMass() * 1000).ToString());
                 //VesselNode.SetValue("Area", CalculateVesselArea(vessel).ToString());
             }
+            else
+            {
+                Log.Info($"UpdateActiveVesselData, vessel: {vessel.vesselName}  {vessel.id} not found");
+                foreach (var v in VesselInfo.Keys)
+                    Log.Info($"id: {v}");
+            }
         }
 
         public static void ClearVesselData(Vessel vessel)
@@ -406,6 +417,7 @@ namespace OrbitalDecay
         {
             float Mass;
             double Area;
+            Log.Info("BuildConfigNode");
             if (vessel == FlightGlobals.ActiveVessel)
             {
                 Mass = vessel.GetTotalMass() * 1000;
@@ -417,9 +429,11 @@ namespace OrbitalDecay
                 Area = CalculateVesselArea(vessel);
             }
             Vessel_Information vi = new Vessel_Information(
-                vessel.GetName(), vessel.id,
+                vessel.GetName(),
+                vessel.id,
                 vessel.vesselType.ToString().Substring(0, 1) + vessel.GetInstanceID(),
-                Mass, Area,
+                Mass,
+                Area,
                 vessel.orbitDriver.orbit.referenceBody.GetName(),
                 vessel.GetOrbitDriver().orbit.semiMajorAxis,
 
@@ -556,7 +570,12 @@ namespace OrbitalDecay
         public static double FetchArea(Vessel vessel)
         {
             if (VesselInfo.ContainsKey(vessel.id))
+            {
+                if (VesselInfo[vessel.id].Area == 0)
+                    Log.Info($"FetchArea: id: {vessel.id}   Area: {VesselInfo[vessel.id].Area}");
                 return VesselInfo[vessel.id].Area;
+            }
+            Log.Info("FetchArea, vessel not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -1097,8 +1116,7 @@ namespace OrbitalDecay
 
         public static double CalculateVesselArea(Vessel vessel)
         {
-            double Area = 0;
-            Area = FindVesselArea(vessel);
+            double Area = FindVesselArea(vessel);
             return Area;
         }
 

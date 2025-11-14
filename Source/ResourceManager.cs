@@ -27,6 +27,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using static OrbitalDecay.RegisterToolbar;
+
 namespace OrbitalDecay
 {
     public class ResourceManager : MonoBehaviour
@@ -35,7 +37,11 @@ namespace OrbitalDecay
         public static void RemoveResources(Vessel vessel, double quantity)//151 new wersion consuming multiple resources saved on vessel
         {
             string resource = GetResourceNames(vessel);
-            int index = 0;
+            if (resource != null)
+                Log.Info($"RemoveResources, resource: {resource}");
+            else
+                Log.Info("RemoveResources, resource is null");
+                int index = 0;
             if (vessel == FlightGlobals.ActiveVessel)
             {
                 
@@ -70,7 +76,7 @@ namespace OrbitalDecay
             { 
                     List<ModuleOrbitalDecay> modlist = vessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
                     if (modlist.Count > 0)
-                        ResourceNames = modlist.ElementAt(0).StationKeepResources;
+                        ResourceNames = modlist[0].StationKeepResources;
             }
             else
             {

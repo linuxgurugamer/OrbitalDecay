@@ -40,3 +40,11 @@ Changelog
 	Changed the Vessel Information from being constantly decoded via config node into a 
 	structure in a dictionary for speed
 	Changed namespace to OrbitalConfig
+
+1.7.0.4 (unreleased)
+	Cleaned up code for selecting correct icons for filters
+	Added support for ModuleEnginesFX and ModuleRCSFX
+	Converted EngineData to a Dictionary and PropellantData to a list in the EngineData class
+	Fixed subtle bug re. conversions from confignode to double, was causing decay to not work
+	Moved Toggle Decay Rate Breakdown button below all text
+	Fixed decay not working for active vessel when in timewarp.  Note:  While warping, decay won't happen, but it will catch up once you leave timewarp

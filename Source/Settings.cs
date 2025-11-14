@@ -23,10 +23,21 @@
  * is purely coincidental.
  */
 
+using SpaceTuxUtility;
 using UnityEngine;
 
 namespace OrbitalDecay
 {
+
+    public struct RESOURCES
+    {
+        public string StatKeepResource;
+        public double ResourceRateDifficulty;
+    }
+
+
+
+
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class Settings : MonoBehaviour
     {
@@ -34,6 +45,7 @@ namespace OrbitalDecay
         public static ConfigNode SettingData = new ConfigNode();
         internal static ConfigNode SettingsNode;
 
+        static RESOURCES resources;
         public void Start()
         {
             FilePath = KSPUtil.ApplicationRootPath +
@@ -42,11 +54,19 @@ namespace OrbitalDecay
 
             SettingData.ClearData();
             SettingsNode = ConfigNode.Load(FilePath);
+#if false
             foreach (ConfigNode item in SettingsNode.nodes)
             {
                 SettingData.AddNode(item);
             }
-            UserInterface.NBodyStepsContainer = float.Parse(Settings.ReadNBCC().ToString());
+#endif
+
+            var node = SettingsNode.GetNode("RESOURCES");
+            if (node != null)
+            {
+                resources.StatKeepResource = node.SafeLoad("StatKeepResources","MonoPropellant");
+                resources.ResourceRateDifficulty = node.SafeLoad("ResourceRateDifficulty", 1d);
+            }
         }
 
         public void CheckStockSettings() // 1.6.0 Stock give me back my decaying orbits!!
@@ -76,33 +96,6 @@ namespace OrbitalDecay
 
         }
 
-        public static void WriteNBody(bool NB) // 1.6.0 NBody
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("NBodySimulation", NB.ToString());
-        }
-
-        public static void WriteNBodyConics(bool NBC) // 1.6.0 NBody
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("NBodySimulationConics", NBC.ToString());
-        }
-
-        public static void WriteNBodyConicsPatches(double NBCC) // 1.6.0 NBody
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("NBodySimulationConicsPatches", NBCC.ToString());
-        }
-
-        public static void WriteNBodyBodyUpdating(bool NBB) // 1.6.0 NBody
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("NBodySimulationBodyUpdating", NBB.ToString());
-        }
 
 
         public static void Write24H(bool H24)
@@ -131,9 +124,11 @@ namespace OrbitalDecay
 
         public static void WriteDifficulty(double Difficulty)
         {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            SimSet.SetValue("DecayDifficulty", Difficulty.ToString());
+            //ConfigNode Data = SettingData;
+            //ConfigNode SimSet = Data.GetNode("SIMULATION");
+            //SimSet.SetValue("DecayDifficulty", Difficulty.ToString());
+            HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty = Difficulty;
+
         }
         public static void WriteResourceRateDifficulty(double Difficulty)
         {
@@ -227,7 +222,7 @@ namespace OrbitalDecay
         {
             ConfigNode Data = SettingData;
             ConfigNode Resources = Data.GetNode("RESOURCES");
-            string FavouredResource = Resources.GetValue("StatKeepResource");
+            string FavouredResource = resources.StatKeepResource;
             return FavouredResource;
         }
 
@@ -235,7 +230,7 @@ namespace OrbitalDecay
         {
             ConfigNode Data = SettingData;
             ConfigNode Resources = Data.GetNode("RESOURCES");
-            double FavouredResource = double.Parse(Resources.GetValue("ResourceRateDifficulty"));
+            double FavouredResource = resources.ResourceRateDifficulty;
             return FavouredResource;
         }
 

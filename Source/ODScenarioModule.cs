@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+using static OrbitalDecay.RegisterToolbar;
+
 namespace OrbitalDecay
 {
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
