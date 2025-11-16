@@ -149,6 +149,7 @@ namespace OrbitalDecay
         }
 
         const float INFO_WIDTH = 330f;
+        string filterString = "";
         public void InformationTab()
         {
             GUILayout.BeginHorizontal();
@@ -162,155 +163,105 @@ namespace OrbitalDecay
             GUILayout.BeginVertical();
 
             // 1.5.2 Filtering // 
-
-            GUILayout.Space(3);
-            GUILayout.BeginHorizontal();
-            GUIContent guiContent;
-
-            guiContent = FilterTypes.Contains(VesselType.Probe) ?
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned_highlighted", false), "Unmanned") :
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned", false), "Unmanned");
-
-            //if (FilterTypes.Contains(VesselType.Probe))
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned_highlighted", false), "Unmanned");
-            //else
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned", false), "Unmanned");
-            if (GUILayout.Button(guiContent))
+            using (new GUILayout.HorizontalScope())
             {
-                if (FilterTypes.Contains(VesselType.Probe))
+                GUILayout.FlexibleSpace();
+                GUILayout.Label("Search Filter: ");
+                filterString = GUILayout.TextField(filterString, GUILayout.Width(200));
+            }
+            GUILayout.Space(3);
+
+            using (new GUILayout.HorizontalScope())
+            {
+                GUIContent guiContent;
+
+                guiContent = FilterTypes.Contains(VesselType.Probe) ?
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned_highlighted", false), "Unmanned") :
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned", false), "Unmanned");
+
+                if (GUILayout.Button(guiContent))
                 {
-                    FilterTypes.Remove(VesselType.Probe);
+                    if (FilterTypes.Contains(VesselType.Probe))
+                        FilterTypes.Remove(VesselType.Probe);
+                    else
+                        FilterTypes.Add(VesselType.Probe);
                 }
-                else
+
+                GUILayout.Space(3);
+                guiContent = FilterTypes.Contains(VesselType.Relay) ?
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay_highlighted", false), "Relay") :
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay", false), "Relay");
+
+                if (GUILayout.Button(guiContent))
                 {
-                    FilterTypes.Add(VesselType.Probe);
+                    if (FilterTypes.Contains(VesselType.Relay))
+                        FilterTypes.Remove(VesselType.Relay);
+                    else
+                        FilterTypes.Add(VesselType.Relay);
                 }
+
+                GUILayout.Space(3);
+
+                guiContent = FilterTypes.Contains(VesselType.Ship) ?
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship_highlighted", false), "Ship") :
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship", false), "Ship");
+
+                if (GUILayout.Button(guiContent))
+                {
+                    if (FilterTypes.Contains(VesselType.Ship))
+                        FilterTypes.Remove(VesselType.Ship);
+                    else
+                        FilterTypes.Add(VesselType.Ship);
+                }
+
+                GUILayout.Space(3);
+                guiContent = FilterTypes.Contains(VesselType.Station) ?
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station_highlighted", false), "Station") :
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station", false), "Station");
+                if (GUILayout.Button(guiContent))
+                {
+                    if (FilterTypes.Contains(VesselType.Station))
+                        FilterTypes.Remove(VesselType.Station);
+                    else
+                        FilterTypes.Add(VesselType.Station);
+                }
+
+                GUILayout.Space(3);
+
+                guiContent = FilterTypes.Contains(VesselType.SpaceObject) ?
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject_highlighted", false), "Space Object") :
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject", false), "Space Object");
+
+                if (GUILayout.Button(guiContent))
+                {
+                    if (FilterTypes.Contains(VesselType.SpaceObject))
+                        FilterTypes.Remove(VesselType.SpaceObject);
+                    else
+                        FilterTypes.Add(VesselType.SpaceObject);
+
+                    if (FilterTypes.Contains(VesselType.Unknown))
+                        FilterTypes.Remove(VesselType.Unknown);
+                    else
+                        FilterTypes.Add(VesselType.Unknown);
+                }
+
+                GUILayout.Space(3);
+
+                guiContent = FilterTypes.Contains(VesselType.Debris) ?
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris_highlighted", false), "Debris") :
+                    new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris", false), "Debris");
+
+                if (GUILayout.Button(guiContent))
+                {
+                    if (FilterTypes.Contains(VesselType.Debris))
+                        FilterTypes.Remove(VesselType.Debris);
+                    else
+                        FilterTypes.Add(VesselType.Debris);
+                }
+
+                GUILayout.Space(3);             
             }
 
-            GUILayout.Space(3);
-            guiContent = FilterTypes.Contains(VesselType.Relay) ?
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay_highlighted", false), "Relay") :
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay", false), "Relay");
-
-
-            //if (FilterTypes.Contains(VesselType.Relay))
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay_highlighted", false), "Relay");
-            //else
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay", false), "Relay");
-            if (GUILayout.Button(guiContent))
-            {
-                if (FilterTypes.Contains(VesselType.Relay))
-                {
-                    FilterTypes.Remove(VesselType.Relay);
-                }
-
-                else
-                {
-                    FilterTypes.Add(VesselType.Relay);
-                }
-            }
-
-            GUILayout.Space(3);
-
-            guiContent = FilterTypes.Contains(VesselType.Ship) ?
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship_highlighted", false), "Ship") :
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship", false), "Ship");
-
-            //if (FilterTypes.Contains(VesselType.Ship))
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship_highlighted", false), "Ship");
-            //else
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship", false), "Ship");
-            if (GUILayout.Button(guiContent))
-            {
-                if (FilterTypes.Contains(VesselType.Ship))
-                {
-                    FilterTypes.Remove(VesselType.Ship);
-                }
-
-                else
-                {
-                    FilterTypes.Add(VesselType.Ship);
-                }
-            }
-
-            GUILayout.Space(3);
-            guiContent = FilterTypes.Contains(VesselType.Station) ?
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station_highlighted", false), "Station") :
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station", false), "Station");
-            //if (FilterTypes.Contains(VesselType.Station))
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station_highlighted", false), "Station");
-            //else
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station", false), "Station");
-            if (GUILayout.Button(guiContent))
-            {
-                if (FilterTypes.Contains(VesselType.Station))
-                {
-                    FilterTypes.Remove(VesselType.Station);
-                }
-
-                else
-                {
-                    FilterTypes.Add(VesselType.Station);
-                }
-            }
-
-            GUILayout.Space(3);
-
-            guiContent = FilterTypes.Contains(VesselType.SpaceObject) ?
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject_highlighted", false), "Space Object") :
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject", false), "Space Object");
-
-            //if (FilterTypes.Contains(VesselType.SpaceObject))
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject_highlighted", false), "Space Object");
-            //else
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject", false), "Space Object");
-            if (GUILayout.Button(guiContent))
-            {
-                if (FilterTypes.Contains(VesselType.SpaceObject))
-                {
-                    FilterTypes.Remove(VesselType.SpaceObject);
-                }
-                else
-                {
-                    FilterTypes.Add(VesselType.SpaceObject);
-                }
-
-                if (FilterTypes.Contains(VesselType.Unknown))
-                {
-                    FilterTypes.Remove(VesselType.Unknown);
-                }
-                else
-                {
-                    FilterTypes.Add(VesselType.Unknown);
-                }
-            }
-
-            GUILayout.Space(3);
-
-            guiContent = FilterTypes.Contains(VesselType.Debris) ?
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris_highlighted", false), "Debris") :
-                new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris", false), "Debris");
-
-            //if (FilterTypes.Contains(VesselType.Debris))
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris_highlighted", false), "Debris");
-            //else
-            //    guiContent = new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris", false), "Debris");
-            if (GUILayout.Button(guiContent))
-            {
-                if (FilterTypes.Contains(VesselType.Debris))
-                {
-                    FilterTypes.Remove(VesselType.Debris);
-                }
-                else
-                {
-                    FilterTypes.Add(VesselType.Debris);
-                }
-            }
-
-            GUILayout.Space(3);
-
-
-            GUILayout.EndHorizontal();
             GUILayout.Space(3);
             GUILayout.Label("_______________________________________");
             GUILayout.EndVertical();
@@ -319,10 +270,10 @@ namespace OrbitalDecay
             bool Realistic = Settings.ReadRD();
             bool ClockType = Settings.Read24Hr();
             //151var Resource = Settings.ReadStationKeepingResource();
-
+            var filterString1 = filterString.ToLower();
             foreach (Vessel vessel in FlightGlobals.Vessels)
             {
-                if (FilterTypes.Contains(vessel.vesselType))
+                if (vessel.vesselName.ToLower().Contains(filterString1) &&  FilterTypes.Contains(vessel.vesselType))
                 {
 
                     if (vessel.situation == Vessel.Situations.ORBITING)
@@ -363,10 +314,10 @@ namespace OrbitalDecay
                         {
                             HoursInDay = 6.0;
                         }
-
+                       
                         GUILayout.BeginVertical();
                         //   GUILayout.Label("Vessels count" + VesselData.VesselInformation.CountNodes.ToString());
-                        GUILayout.Label("Vessel Name: " + vessel.vesselName);
+                        GUILayout.Label("Vessel Name: <B>" + vessel.vesselName + "</B>");
                         //    GUILayout.Label("Vessel Area: " + VesselData.FetchArea(vessel).ToString());
                         //    GUILayout.Label("Vessel Mass: " + VesselData.FetchMass(vessel).ToString());
                         GUILayout.Space(2);
@@ -390,8 +341,8 @@ namespace OrbitalDecay
                             GUILayout.Space(2);
 
 #if DEBUG
-                            GUILayout.Label("AP: " + vessel.orbit.ApA.ToString("F3"));
-                            GUILayout.Label($"PE: " + vessel.orbit.PeA.ToString("F3"));
+                            GUILayout.Label("AP: " + vessel.orbit.ApA.ToString("F1"));
+                            GUILayout.Label($"PE: " + vessel.orbit.PeA.ToString("F1"));
                             GUILayout.Space(2);
 #endif
 

@@ -14,7 +14,7 @@ namespace OrbitalDecay
             {
                 //ConfigNode savedVesselsInfo = new ConfigNode("Vessels");
                 ConfigNode savedVesselsInfo = Vessel_Information.Save(VesselData.VesselInfo, "");
-                node.AddNode(savedVesselsInfo);
+                //node.AddNode(savedVesselsInfo);
 #if false
                 foreach (ConfigNode nod in VesselData.VesselInformation.GetNodes("VESSEL"))
                 {
@@ -40,7 +40,7 @@ namespace OrbitalDecay
             try
             {
                 base.OnLoad(node);
-
+#if false
                 if (node.HasNode("Vessels"))
                 {
                     var configNode = node.GetNode("Vessels");
@@ -54,6 +54,7 @@ namespace OrbitalDecay
                     //print("scenario loaded, ship count : " + VesselData.VesselInformation.CountNodes.ToString());
                     
                 }
+#endif
                 VesselData.VesselsLoaded = true;
 
             }

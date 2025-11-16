@@ -82,8 +82,8 @@ namespace OrbitalDecay
 
         public void OnDestroy()
         {
-            SettingsNode.ClearData();
-            SettingData.Save(FilePath);
+            //SettingsNode.ClearData();
+            //SettingData.Save(FilePath);
         }
 
         public static void WriteRD(bool RD)

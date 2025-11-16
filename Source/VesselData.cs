@@ -111,7 +111,7 @@ namespace OrbitalDecay
         static public Vessel_Information Load(ConfigNode cn)
         {
             Vessel_Information v = new Vessel_Information();
-
+#if false
             v.name = cn.SafeLoad("name", "NoName");
             v.id = cn.SafeLoad("id", Guid.Empty);
             v.code = cn.SafeLoad("code", "");
@@ -126,7 +126,7 @@ namespace OrbitalDecay
             v.MNA = cn.SafeLoad("MNA", 0d);
             v.EPH = cn.SafeLoad("EPH", 0d);
             v.Fuel = cn.SafeLoad("Fuel", 0d);
-
+#endif
             return v;
         }
     }
@@ -157,6 +157,7 @@ namespace OrbitalDecay
                        "GameData/WhitecatIndustries/OrbitalDecay/PluginData/VesselData.cfg";
             ConfigNode File = ConfigNode.Load(FilePath);
             VesselInfo.Clear();
+#if false
             if (File.HasNode("Vessels"))
             {
                 var configNode = File.GetNode("Vessels");
@@ -166,6 +167,7 @@ namespace OrbitalDecay
                     VesselInfo[vi.id] = vi;
                 }
             }
+#endif
             print("WhitecatIndustries - OrbitalDecay - Loaded vessel data, there are " + VesselInfo.Count + " vessels");
 
 
