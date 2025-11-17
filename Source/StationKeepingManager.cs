@@ -33,17 +33,14 @@ namespace OrbitalDecay
     public class StationKeepingManager : MonoBehaviour
     {
 
+#if false
         public static bool CheckCanStationkeep(Vessel vessel) // 1.6.0 
         {
             bool CanStationKeep = false;
 
-
-
-
-
             return CanStationKeep;
         }
-
+#endif
         public static bool EngineCheck(Vessel vessel) // 1.3.0
         {
 
@@ -77,7 +74,7 @@ namespace OrbitalDecay
                     }
                 }
             }
-            else if (vessel == FlightGlobals.ActiveVessel)
+            else
             {
                 if (vessel.FindPartModulesImplementing<ModuleEngines>().Count > 0 ||
                     vessel.FindPartModulesImplementing<ModuleEnginesFX>().Count > 0 ||
@@ -87,7 +84,6 @@ namespace OrbitalDecay
                     HasEngine = true;
                 }
             }
-
             return HasEngine;
         }
 

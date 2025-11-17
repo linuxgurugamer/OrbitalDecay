@@ -37,6 +37,7 @@ namespace OrbitalDecay
         public override void OnLoad(ConfigNode node)
         {
             VesselData.VesselInfo.Clear();
+            Log.Info("ODScenarioModule.OnLoad, VesselInfo.Clear()");
             try
             {
                 base.OnLoad(node);

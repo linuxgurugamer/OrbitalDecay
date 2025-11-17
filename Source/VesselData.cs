@@ -23,12 +23,10 @@
  * is purely coincidental.
  */
 
-using SpaceTuxUtility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static GameEvents;
-
 using static OrbitalDecay.RegisterToolbar;
 
 namespace OrbitalDecay
@@ -108,10 +106,10 @@ namespace OrbitalDecay
             return configNode;
         }
 
+#if false
         static public Vessel_Information Load(ConfigNode cn)
         {
             Vessel_Information v = new Vessel_Information();
-#if false
             v.name = cn.SafeLoad("name", "NoName");
             v.id = cn.SafeLoad("id", Guid.Empty);
             v.code = cn.SafeLoad("code", "");
@@ -126,9 +124,9 @@ namespace OrbitalDecay
             v.MNA = cn.SafeLoad("MNA", 0d);
             v.EPH = cn.SafeLoad("EPH", 0d);
             v.Fuel = cn.SafeLoad("Fuel", 0d);
-#endif
             return v;
         }
+#endif
     }
 
 
@@ -153,8 +151,9 @@ namespace OrbitalDecay
 
         public void Awake()
         {
-            FilePath = KSPUtil.ApplicationRootPath +
-                       "GameData/WhitecatIndustries/OrbitalDecay/PluginData/VesselData.cfg";
+            if (!HighLogic.LoadedSceneIsGame) return;
+            //FilePath = KSPUtil.ApplicationRootPath +
+            //           "GameData/WhitecatIndustries/OrbitalDecay/PluginData/VesselData.cfg";
             ConfigNode File = ConfigNode.Load(FilePath);
             VesselInfo.Clear();
 #if false
@@ -374,20 +373,17 @@ namespace OrbitalDecay
             }
 #endif
 
-            if (found)
-            {
-                VesselInfo[vessel.id].Mass = vessel.GetTotalMass() * 1000;
-                VesselInfo[vessel.id].Area = CalculateVesselArea(vessel);
-
-                //VesselNode.SetValue("Mass", (vessel.GetTotalMass() * 1000).ToString());
-                //VesselNode.SetValue("Area", CalculateVesselArea(vessel).ToString());
-            }
-            else
+            if (!found)
             {
                 Log.Info($"UpdateActiveVesselData, vessel: {vessel.vesselName}  {vessel.id} not found");
-                foreach (var v in VesselInfo.Keys)
-                    Log.Info($"id: {v}");
+                var vD = VesselData.BuildConfigNode(vessel);
+                VesselData.VesselInfo[vessel.id] = vD;
             }
+            VesselInfo[vessel.id].Mass = vessel.GetTotalMass() * 1000;
+            VesselInfo[vessel.id].Area = CalculateVesselArea(vessel);
+
+            //VesselNode.SetValue("Mass", (vessel.GetTotalMass() * 1000).ToString());
+            //VesselNode.SetValue("Area", CalculateVesselArea(vessel).ToString());
         }
 
         public static void ClearVesselData(Vessel vessel)
@@ -419,7 +415,6 @@ namespace OrbitalDecay
         {
             float Mass;
             double Area;
-            Log.Info("BuildConfigNode");
             if (vessel == FlightGlobals.ActiveVessel)
             {
                 Mass = vessel.GetTotalMass() * 1000;
@@ -517,14 +512,18 @@ namespace OrbitalDecay
         }
 
 
-        public static double FetchFuelLost()
+        public static double FetchFuelLost(OrbitalDecay.ModuleOrbitalDecay mod)
         {
             double FuelLost = 0;
+            if (mod != null)
+                FuelLost = mod.stationKeepData.fuelLost;
+#if false
             List<ModuleOrbitalDecay> modlist = FlightGlobals.ActiveVessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
             if (modlist.Count > 0)
             {
                 FuelLost = modlist[0].stationKeepData.fuelLost;
             }
+#endif
             return FuelLost;
         }
 
@@ -577,7 +576,8 @@ namespace OrbitalDecay
                     Log.Info($"FetchArea: id: {vessel.id}   Area: {VesselInfo[vessel.id].Area}");
                 return VesselInfo[vessel.id].Area;
             }
-            Log.Info("FetchArea, vessel not found in VesselInfo");
+            Log.Info($"FetchArea, vessel {vessel.vesselName} not found in VesselInfo");
+
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -634,6 +634,9 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 VesselInfo[vessel.id].SMA = SMA;
+            else
+                Log.Info($"UpdateVesselSMA, {vessel.vesselName} not found in VesselInfo");
+
 #if false
             ConfigNode Data = VesselInformation;
             bool Vesselfound = false;
@@ -659,6 +662,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].SMA;
+            Log.Info($"FetchSMA, {vessel.vesselName} not found in VesselInfo");
             return 0;
 
 #if false
@@ -689,6 +693,9 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 VesselInfo[vessel.id].ECC = ECC;
+            else
+                Log.Info($"UpdateVesselECC, {vessel.vesselName} not found in VesselInfo");
+
 #if false
             ConfigNode Data = VesselInformation;
             bool Vesselfound = false;
@@ -719,6 +726,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].ECC;
+            Log.Info($"FetchECC, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -751,6 +759,9 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 VesselInfo[vessel.id].INC = INC;
+            else
+                Log.Info($"UpdateVesselINC, {vessel.vesselName} not found in VesselInfo");
+
 #if false
             ConfigNode Data = VesselInformation;
             bool Vesselfound = false;
@@ -776,6 +787,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].INC;
+            Log.Info($"FetchINC, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -805,6 +817,9 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 VesselInfo[vessel.id].LPE = LPE;
+            else
+                Log.Info($"UpdateVesselLPE, {vessel.vesselName} not found in VesselInfo");
+
 #if false
             ConfigNode Data = VesselInformation;
             bool Vesselfound = false;
@@ -830,6 +845,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].LPE;
+            Log.Info($"FetchLPE, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -859,6 +875,8 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 VesselInfo[vessel.id].LAN = LAN;
+            else
+                Log.Info($"UpdateVesselLAN, {vessel.vesselName} not found in VesselInfo");
 #if false
             ConfigNode Data = VesselInformation;
             bool Vesselfound = false;
@@ -884,6 +902,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].LAN;
+            Log.Info($"FetchLAN, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -913,6 +932,8 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 VesselInfo[vessel.id].MNA = MNA;
+            else
+                Log.Info($"UpdateVesselMNA, {vessel.vesselName} not found in VesselInfo");
 #if false
             ConfigNode Data = VesselInformation;
             bool Vesselfound = false;
@@ -938,6 +959,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].MNA;
+            Log.Info($"FetchMNA, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -967,6 +989,8 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 VesselInfo[vessel.id].EPH = EPH;
+            else
+                Log.Info($"UpdateVesselEPH, {vessel.vesselName} not found in VesselInfo");
 #if false
             ConfigNode Data = VesselInformation;
             bool Vesselfound = false;
@@ -992,6 +1016,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].EPH;
+            Log.Info($"FetchEPH, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -1066,7 +1091,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
             {
-                VesselInfo[vessel.id].ReferenceBody = body.GetName();
+                VesselInfo[vessel.id].ReferenceBody = body.bodyName; // GetName();
             }
 #if false
             ConfigNode Data = VesselInformation;

@@ -33,23 +33,23 @@ namespace OrbitalDecay
 {
     public class ResourceManager : MonoBehaviour
     {
-        
+
         public static void RemoveResources(Vessel vessel, double quantity)//151 new wersion consuming multiple resources saved on vessel
         {
             string resource = GetResourceNames(vessel);
-            if (resource != null)
-                Log.Info($"RemoveResources, resource: {resource}");
-            else
-                Log.Info("RemoveResources, resource is null");
-                int index = 0;
+            //if (resource != null)
+            //    Log.Info($"RemoveResources, vessel: {vessel.vesselName}  resource: {resource}");
+            //else
+            //    Log.Info($"RemoveResources, vessel: {vessel.vesselName}  resource is null");
+            int index = 0;
             if (vessel == FlightGlobals.ActiveVessel)
             {
-                
+
                 foreach (string res in resource.Split(' '))
                 {
                     float ratio = GetResourceRatio(vessel, index++);
                     int MonoPropId = PartResourceLibrary.Instance.GetDefinition(res).id;
-                    vessel.rootPart.RequestResource(MonoPropId, quantity/2*ratio,ResourceFlowMode.STAGE_PRIORITY_FLOW);
+                    vessel.rootPart.RequestResource(MonoPropId, quantity / 2 * ratio, ResourceFlowMode.STAGE_PRIORITY_FLOW);
                 }
             }
             else
@@ -73,10 +73,10 @@ namespace OrbitalDecay
         {
             string ResourceNames = "No Resources Available";
             if (vessel == FlightGlobals.ActiveVessel)
-            { 
-                    List<ModuleOrbitalDecay> modlist = vessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
-                    if (modlist.Count > 0)
-                        ResourceNames = modlist[0].StationKeepResources;
+            {
+                List<ModuleOrbitalDecay> modlist = vessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
+                if (modlist.Count > 0)
+                    ResourceNames = modlist[0].StationKeepResources;
             }
             else
             {
@@ -95,13 +95,13 @@ namespace OrbitalDecay
             }
             return ResourceNames;
         }
-        public static float GetResourceRatio(Vessel vessel,int index)//151 
+        public static float GetResourceRatio(Vessel vessel, int index)//151 
         {
             float ResourceRatio = 0;
             if (vessel == FlightGlobals.ActiveVessel)
-            {               
+            {
                 List<ModuleOrbitalDecay> modlist = vessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
-                if(modlist.Count > 0 )
+                if (modlist.Count > 0)
                     ResourceRatio = modlist.ElementAt(0).stationKeepData.ratios[index];
             }
             else
@@ -139,11 +139,11 @@ namespace OrbitalDecay
                 List<ModuleOrbitalDecay> modlist = vessel.FindPartModulesImplementing<ModuleOrbitalDecay>();
                 foreach (ModuleOrbitalDecay module in modlist)
                 {
-                    for(int i = 0; i < module.stationKeepData.amounts.Count(); i++)
+                    for (int i = 0; i < module.stationKeepData.amounts.Count(); i++)
                     {
                         fuel += module.stationKeepData.amounts[i];
                     }
-                    break; 
+                    break;
                 }
 
             }
@@ -156,7 +156,7 @@ namespace OrbitalDecay
                     {
                         if (protopartmodulesnapshot.moduleName != "ModuleOrbitalDecay" || fuel != 0) continue;
                         ConfigNode node = protopartmodulesnapshot.moduleValues.GetNode("stationKeepData");
-                        foreach( string str in node.GetValue("amounts").Split(' '))
+                        foreach (string str in node.GetValue("amounts").Split(' '))
                         {
                             fuel += double.Parse(str);
                         }

@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static OrbitalDecay.RegisterToolbar;
 
 namespace OrbitalDecay
 {
@@ -130,24 +131,10 @@ namespace OrbitalDecay
                 stationKeepData = new StationKeepData();
 
             }
-
-
         }
 
         public override void OnStart(StartState state)
         {
-            /*
-                        BaseField field = this.Fields["ODSKengine"];
-                        field.guiActive = stationKeepData.IsStationKeeping;
-                        field = this.Fields["StationKeepResources"];
-                        field.guiActive = stationKeepData.IsStationKeeping;
-                        field = this.Fields["amounts"];
-                        field.guiActive = stationKeepData.IsStationKeeping;
-                        field = this.Fields["ISP"];
-                        field.guiActive = stationKeepData.IsStationKeeping;
-                        */
-
-
             BaseEvent even = Events["ToggleSK"];
             if (stationKeepData.IsStationKeeping)
             {
@@ -316,9 +303,11 @@ namespace OrbitalDecay
                             }
                             EngineData.AddNode(engineNode);
 #endif
-                        if (!stationKeepData.IsStationKeeping || !(module.currentThrottle > 0.0)) continue;
-                        ScreenMessages.PostScreenMessage("Warning: Vessel is under thrust, station keeping disabled.");
-                        VesselData.UpdateStationKeeping(vessel, false);
+                        if (stationKeepData.IsStationKeeping && module.currentThrottle > 0.0)
+                        {
+                            ScreenMessages.PostScreenMessage("Warning: Vessel is under thrust, station keeping disabled.");
+                            VesselData.UpdateStationKeeping(vessel, false);
+                        }
                     }
 
                     //}
@@ -409,7 +398,7 @@ namespace OrbitalDecay
             {
                 foreach (ModuleEngines module in vessel.FindPartModulesImplementing<ModuleEngines>())
                 {
-                    if (!(module.currentThrottle > 0)) continue;
+                    if (module.currentThrottle == 0) continue;
                     ScreenMessages.PostScreenMessage("Warning: Vessel is under thrust, station keeping disabled.");
                     VesselData.UpdateStationKeeping(vessel, false);
                     break;

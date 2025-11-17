@@ -36,12 +36,12 @@ Changelog
 1.7.0.2 
 	Fixed double entry in the Toolbarcontroller
 
-1.7.0.3 
+1.7.0.3 c312fe7556c056272136df86181371479c997420
 	Changed the Vessel Information from being constantly decoded via config node into a 
-	structure in a dictionary for speed
+		structure in a dictionary for speed
 	Changed namespace to OrbitalConfig
 
-1.7.0.4 
+1.7.0.4 b2f8bb6bc2b9a03929081c006db25a66cad4782e
 	Cleaned up code for selecting correct icons for filters
 	Added support for ModuleEnginesFX and ModuleRCSFX
 	Converted EngineData to a Dictionary and PropellantData to a list in the EngineData class
@@ -54,3 +54,4 @@ Changelog
 	Deleted settings data from settings.cfg file since it's not used anymore, the file only contains some resource info
 	Removed the loading of vesseldata from the scenariomodule
 	Added search filter string
+	Disabled the initting of the orbit code in the CatchUp method, was causing orbit of active vessel to be reset
