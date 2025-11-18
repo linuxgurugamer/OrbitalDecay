@@ -73,6 +73,7 @@
     <Compile Include="ODScenarioModule.cs" />
     <Compile Include="OrbitalDecayUtilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RCSUtils.cs" />
     <Compile Include="RegisterToolbar.cs" />
     <Compile Include="ResourceManager.cs" />
     <Compile Include="Settings.cs" />

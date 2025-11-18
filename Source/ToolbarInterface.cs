@@ -64,6 +64,7 @@ namespace OrbitalDecay
         void onGameSceneLoadRequested(GameScenes gs)
         {
             visible = hideUI = paused = false;
+            toolbarControl.SetFalse(true);
         }
 
         void onGamePause()

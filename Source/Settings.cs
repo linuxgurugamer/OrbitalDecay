@@ -151,40 +151,6 @@ namespace OrbitalDecay
             return HighLogic.CurrentGame.Parameters.CustomParams<OD>().RealisticDecay;
         }
 
-#if false
-        public static bool ReadNB() // 1.6.0 NBody
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            bool NB = bool.Parse(SimSet.GetValue("NBodySimulation"));
-            return NB;
-        }
-#endif
-
-        public static bool ReadNBC() // 1.6.0 NBody Conics
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            bool NBC = bool.Parse(SimSet.GetValue("NBodySimulationConics"));
-            return NBC;
-        }
-
-        public static double ReadNBCC() // 1.6.0 NBody Conics
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            double NBCC = double.Parse(SimSet.GetValue("NBodySimulationConicsPatches"));
-            return NBCC;
-        }
-
-        public static bool ReadNBB() // 1.6.0 NBody bodies
-        {
-            ConfigNode Data = SettingData;
-            ConfigNode SimSet = Data.GetNode("SIMULATION");
-            bool NBCC = bool.Parse(SimSet.GetValue("NBodySimulationBodyUpdating"));
-            return NBCC;
-        }
-
         public static bool Read24Hr()
         {
             //ConfigNode Data = SettingData;

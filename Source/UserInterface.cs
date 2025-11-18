@@ -27,7 +27,6 @@ using ClickThroughFix;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using static OrbitalDecay.RegisterToolbar;
 
 namespace OrbitalDecay
 {
@@ -36,7 +35,7 @@ namespace OrbitalDecay
     {
         private static int currentTab;
         private static string[] tabs = { "Vessels", "Settings" };
-        private static Rect MainwindowPosition = new Rect(0, 0, 300, 400);
+        private static Rect MainwindowPosition = new Rect(150, 50, 300, 400);
         private static Rect DecayBreakdownwindowPosition = new Rect(0, 0, 450, 150);
         private static bool DecayBreakdownwindowPositionInitted = false;
         private static GUIStyle windowStyle = new GUIStyle(HighLogic.Skin.window);
@@ -47,9 +46,6 @@ namespace OrbitalDecay
         private GUISkin skins = HighLogic.Skin;
         private int id = Guid.NewGuid().GetHashCode();
         //public static ApplicationLauncherButton ToolbarButton;
-
-        //public static Dictionary<Vessel, double> NBodyVesselAccelTimes = new Dictionary<Vessel, double>();
-        //public static Vector3d NBodyMomentaryDeltaV;
 
         //public static bool Visible = false;
         //private static bool Hidden = false;
@@ -150,6 +146,7 @@ namespace OrbitalDecay
 
         const float INFO_WIDTH = 330f;
         string filterString = "";
+        bool showActiveVessel = false;
         public void InformationTab()
         {
             GUILayout.BeginHorizontal();
@@ -165,9 +162,15 @@ namespace OrbitalDecay
             // 1.5.2 Filtering // 
             using (new GUILayout.HorizontalScope())
             {
+                //GUILayout.FlexibleSpace();
+                GUILayout.Label("Filter: ");
+                filterString = GUILayout.TextField(filterString, GUILayout.Width(150));
                 GUILayout.FlexibleSpace();
-                GUILayout.Label("Search Filter: ");
-                filterString = GUILayout.TextField(filterString, GUILayout.Width(200));
+                if (HighLogic.LoadedSceneIsFlight)
+                {
+                    showActiveVessel = GUILayout.Toggle(showActiveVessel, "");
+                    GUILayout.Label("Show Active Vessel");
+                }
             }
             GUILayout.Space(3);
 
@@ -259,7 +262,7 @@ namespace OrbitalDecay
                         FilterTypes.Add(VesselType.Debris);
                 }
 
-                GUILayout.Space(3);             
+                GUILayout.Space(3);
             }
 
             GUILayout.Space(3);
@@ -273,7 +276,8 @@ namespace OrbitalDecay
             var filterString1 = filterString.ToLower();
             foreach (Vessel vessel in FlightGlobals.Vessels)
             {
-                if (vessel.vesselName.ToLower().Contains(filterString1) &&  FilterTypes.Contains(vessel.vesselType))
+                if ((showActiveVessel && vessel == FlightGlobals.ActiveVessel) ||
+                    (vessel.vesselName.ToLower().Contains(filterString1) && FilterTypes.Contains(vessel.vesselType)))
                 {
 
                     if (vessel.situation == Vessel.Situations.ORBITING)
@@ -314,7 +318,7 @@ namespace OrbitalDecay
                         {
                             HoursInDay = 6.0;
                         }
-                       
+
                         GUILayout.BeginVertical();
                         //   GUILayout.Label("Vessels count" + VesselData.VesselInformation.CountNodes.ToString());
                         GUILayout.Label("Vessel Name: <B>" + vessel.vesselName + "</B>");
@@ -546,83 +550,6 @@ namespace OrbitalDecay
             GUILayout.Space(2);
             GUILayout.EndVertical();
         }
-
-        /*
-        public void NBodyManagerWindow(int id) // 1.6.0 
-        {
-            if (GUI.Button(new Rect(NBodyManagerwindowPosition.width - 22, 3, 19, 19), "x"))
-            {
-                if (NBodyBreakdownVisible != null)
-                    NBodyBreakdownVisible = false;
-            }
-            GUILayout.BeginVertical();
-            GUILayout.Space(10);
-
-            /*
-            if (NBodyVesselAccelTimes.ContainsKey(subwindowVessel)) // 1.6.0 Lag Busting
-            {
-                double StoredTime = 0;
-                NBodyVesselAccelTimes.TryGetValue(subwindowVessel, out StoredTime);
-                print("StoredTime " + StoredTime);
-
-                if (HighLogic.CurrentGame.UniversalTime > (StoredTime + 1.0))
-                {
-                    NBodyMomentaryDeltaV = NBodyManager.GetMomentaryDeltaV(subwindowVessel, HighLogic.CurrentGame.UniversalTime);
-                    NBodyVesselAccelTimes.Remove(subwindowVessel);
-                    NBodyVesselAccelTimes.Add(subwindowVessel, HighLogic.CurrentGame.UniversalTime);
-                }
-            }
-
-            else
-            {
-                NBodyVesselAccelTimes.Add(subwindowVessel, HighLogic.CurrentGame.UniversalTime);
-                NBodyMomentaryDeltaV = NBodyManager.GetMomentaryDeltaV(subwindowVessel, HighLogic.CurrentGame.UniversalTime);
-            }
-             * */
-        /*
-            try
-            {
-                NBodyMomentaryDeltaV = NBodyManager.GetMomentaryDeltaV(subwindowVessel, HighLogic.CurrentGame.UniversalTime);
-            }
-
-            catch (NullReferenceException)
-            {
-                NBodyMomentaryDeltaV = new Vector3d(0, 0, 0) ;
-            }
-
-            try
-            {
-                Vessel vessel = subwindowVessel;
-
-                GUILayout.Label("Vessel: " + vessel.GetName());
-                GUILayout.Space(4); // Make new parsing here for vel formatting 
-                GUILayout.Label("Total Change in velocity from external forces: " + (NBodyMomentaryDeltaV.x + NBodyMomentaryDeltaV.y + NBodyMomentaryDeltaV.z).ToString("F9") + "m/s");
-                GUILayout.Space(2);
-                GUILayout.Label("Change in velocity from external forces (Prograde): " + NBodyMomentaryDeltaV.x.ToString("F9") + "m/s");
-                GUILayout.Space(2);
-                GUILayout.Label("Change in velocity from external forces (Normal): " + NBodyMomentaryDeltaV.y.ToString("F9") + "m/s");
-                GUILayout.Space(2);
-                GUILayout.Label("Change in velocity from external forces (Radial): " + NBodyMomentaryDeltaV.z.ToString("F9")+ "m/s");
-                GUILayout.Space(2);
-               
-
-            }
-
-            catch (ArgumentNullException)
-            {
-                GUILayout.Label("WARNING: Error Detected");
-                GUILayout.Space(2);
-                GUILayout.Label("Please post an error report in the Orbital Decay Forum. This is an N-Body problem.");
-                GUILayout.Space(2);
-                GUILayout.Label("Thanks, Whitecat106");
-            }
-            GUILayout.EndVertical();
-            GUI.DragWindow();
-            //NBodyManagerwindowPosition.x = Mathf.Clamp(MainwindowPosition.x, 0f, Screen.width - MainwindowPosition.width);
-            //NBodyManagerwindowPosition.y = Mathf.Clamp(MainwindowPosition.y, 0f, Screen.height - MainwindowPosition.height);
-
-        }
-        */
 
         public void DecayBreakdownWindow(int id)
         {

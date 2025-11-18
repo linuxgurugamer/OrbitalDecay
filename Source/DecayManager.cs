@@ -23,16 +23,10 @@
  * is purely coincidental.
  */
 
-using Expansions.Missions.Editor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-
-using System.Diagnostics;
-
-
-using static OrbitalDecay.RegisterToolbar;
 
 namespace OrbitalDecay
 {
@@ -81,8 +75,6 @@ namespace OrbitalDecay
                 GameEvents.onVesselWasModified.Add(UpdateActiveVesselInformation); // Resource level change 1.3.0
                 GameEvents.onStageSeparation.Add(UpdateActiveVesselInformationEventReport); // Resource level change 1.3.0
                 GameEvents.onNewVesselCreated.Add(UpdateVesselSpawned); // New Vessel Checks 1.4.2
-
-                //GameEvents.onTimeWarpRateChanged.Add(NBodyManager.TimewarpShift); // Timewarp checks for 1.6.0
 
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT)//CheckSceneStateFlight(HighLogic.LoadedScene)) // 1.3.1
                 {
@@ -205,7 +197,7 @@ namespace OrbitalDecay
             VesselData.ClearVesselData(vessel);
             print("Vessel destroyed:" + vessel.GetName());
         }
-#endregion
+        #endregion
 
         #region Check Subroutines 
 
@@ -293,12 +285,12 @@ namespace OrbitalDecay
         Guid modVessel = Guid.Empty;
         public void FixedUpdate()
         {
-            if (!HighLogic.LoadedSceneIsGame || 
-                HighLogic.LoadedScene == GameScenes.LOADING || 
-                HighLogic.LoadedScene == GameScenes.LOADINGBUFFER || 
-                HighLogic.LoadedScene == GameScenes.MAINMENU) 
+            if (!HighLogic.LoadedSceneIsGame ||
+                HighLogic.LoadedScene == GameScenes.LOADING ||
+                HighLogic.LoadedScene == GameScenes.LOADINGBUFFER ||
+                HighLogic.LoadedScene == GameScenes.MAINMENU)
                 return;
-            
+
             if (Time.time - _lastUpdate2 > _uptInterval / 10.0)
             {
 
@@ -365,9 +357,9 @@ namespace OrbitalDecay
 
             //. maybe move this to the beginning???
 
-            if (HighLogic.LoadedScene != GameScenes.SPACECENTER && 
+            if (HighLogic.LoadedScene != GameScenes.SPACECENTER &&
                 HighLogic.LoadedScene != GameScenes.TRACKSTATION &&
-                HighLogic.LoadedScene != GameScenes.FLIGHT) 
+                HighLogic.LoadedScene != GameScenes.FLIGHT)
                 return;
 
             for (int i = 0; i < FlightGlobals.Vessels.Count; i++)
@@ -375,9 +367,9 @@ namespace OrbitalDecay
                 Vessel vessel = FlightGlobals.Vessels[i];
 
                 if (vessel.situation != Vessel.Situations.ORBITING &&
-                    (vessel.situation != Vessel.Situations.SUB_ORBITAL || 
+                    (vessel.situation != Vessel.Situations.SUB_ORBITAL ||
                     vessel == FlightGlobals.ActiveVessel ||
-                     vessel != vessel.packed)) 
+                     vessel != vessel.packed))
                     continue;
                 if (!VesselData.VesselInfo.ContainsKey(vessel.id))
                 {
@@ -427,7 +419,7 @@ namespace OrbitalDecay
 
         public void Save()
         {
-            if (!HighLogic.LoadedSceneIsGame || 
+            if (!HighLogic.LoadedSceneIsGame ||
                 HighLogic.LoadedScene == GameScenes.FLIGHT ||
                 HighLogic.LoadedScene == GameScenes.LOADING &&
                 (HighLogic.LoadedScene == GameScenes.LOADINGBUFFER ||
@@ -448,14 +440,9 @@ namespace OrbitalDecay
             GameEvents.onStageSeparation.Remove(UpdateActiveVesselInformationEventReport); // 1.3.0
             GameEvents.onNewVesselCreated.Remove(UpdateVesselSpawned); // 1.4.2 
 
-            //GameEvents.onTimeWarpRateChanged.Remove(NBodyManager.TimewarpShift); // 1.6.0 
-
-            //if (HighLogic.LoadedScene == GameScenes.FLIGHT) // 1.3.1
-            {
-                GameEvents.onPartActionUIDismiss.Remove(UpdateActiveVesselInformationPart); // 1.3.0
-                GameEvents.onPartActionUIDismiss.Remove(SetGuiToggledFalse);
-                GameEvents.onPartActionUICreate.Remove(UpdateActiveVesselInformationPart);
-            }
+            GameEvents.onPartActionUIDismiss.Remove(UpdateActiveVesselInformationPart); // 1.3.0
+            GameEvents.onPartActionUIDismiss.Remove(SetGuiToggledFalse);
+            GameEvents.onPartActionUICreate.Remove(UpdateActiveVesselInformationPart);
 
             // Set Vessel Orbits
             CatchUpVessels(Vessel.Situations.ORBITING);
@@ -463,7 +450,7 @@ namespace OrbitalDecay
 
         #endregion
 
-#region Active Specific Subroutines
+        #region Active Specific Subroutines
 
 #if false
         public void ActiveVesselOrbitManage()
@@ -480,7 +467,45 @@ namespace OrbitalDecay
 
         public static void CatchUpOrbit(Vessel vessel)
         {
+
             if (vessel.situation == Vessel.Situations.PRELAUNCH || vessel.situation == Vessel.Situations.LANDED) return;
+
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT && vessel.situation != Vessel.Situations.PRELAUNCH)
+            {
+                if (vessel == FlightGlobals.ActiveVessel)
+                {
+                    for (int i = 0; i < vessel.parts.Count; i++)
+                    {
+                        var part = vessel.parts[i];
+                        for (int j = 0; j < part.Modules.Count; j++)
+                        {
+                            if (part.Modules[j].moduleName.StartsWith("ModuleEngines"))
+                            {
+                                ModuleEngines module = part.Modules[j] as ModuleEngines;
+                                if (module.currentThrottle > 0.0)
+                                {
+                                    VesselData.VesselInfo.Remove(vessel.id);
+                                    return;
+                                }
+                            }
+                            if (part.Modules[j].moduleName.StartsWith("ModuleRCS"))
+                            {
+                                ModuleRCS module = part.Modules[j] as ModuleRCS;
+                                float thrust = ((ModuleRCS)module).GetCurrentThrust();
+                                if (thrust > 0.001f)
+                                {
+                                    VesselData.VesselInfo.Remove(vessel.id);
+                                    return;
+                                }
+
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
             if (VesselData.FetchSMA(vessel) >= vessel.GetOrbitDriver().orbit.semiMajorAxis ||
                 CheckVesselProximity(vessel)) return;
             try
@@ -501,13 +526,10 @@ namespace OrbitalDecay
 
             if (HighLogic.LoadedScene == GameScenes.FLIGHT && vessel.situation != Vessel.Situations.PRELAUNCH)
             {
-                if (vessel == FlightGlobals.ActiveVessel)
-                {
-                    vessel.GoOnRails();
-                }
+                vessel.GoOnRails();
             }
 
-            if (VesselData.FetchSMA(vessel) == 0) 
+            if (VesselData.FetchSMA(vessel) == 0)
                 return;
 
             CelestialBody oldBody = vessel.orbitDriver.orbit.referenceBody;
@@ -526,8 +548,8 @@ namespace OrbitalDecay
             //orbit.Init();
 
             orbit.UpdateFromUT(HighLogic.CurrentGame.UniversalTime);
-            vessel.orbitDriver.pos = vessel.orbit.pos.xzy; // Possibly remove these for NBody
-            vessel.orbitDriver.vel = vessel.orbit.vel; // Possibly remove these for NBody
+            vessel.orbitDriver.pos = vessel.orbit.pos.xzy; 
+            vessel.orbitDriver.vel = vessel.orbit.vel; 
 
             CelestialBody newBody = vessel.orbitDriver.orbit.referenceBody;
             if (newBody == oldBody) return;
@@ -536,7 +558,7 @@ namespace OrbitalDecay
             VesselData.UpdateBody(vessel, newBody);
         } // Main Orbit Set
 
-#endregion
+        #endregion
 
         #region Misc Calculation Subroutines
 
@@ -565,14 +587,6 @@ namespace OrbitalDecay
             return validBody;
 
         }
-
-        public static bool CheckNBodyAltitude(Vessel vessel)
-        {
-            bool beyondSafeArea = Math.Abs(vessel.orbitDriver.orbit.altitude) > 2.0 * vessel.orbitDriver.orbit.referenceBody.Radius;
-
-            return beyondSafeArea;
-        }
-
 
         public static void RealisticDecaySimulator(Vessel vessel) // 1.4.0 Cleanup
         {
@@ -953,18 +967,6 @@ namespace OrbitalDecay
             if (TimeWarp.CurrentRate == 0 || TimeWarp.CurrentRate > 0 && TimeWarp.WarpMode == TimeWarp.Modes.LOW)
             {
                 if (vessel.vesselType == VesselType.EVA) return;
-#if false
-                foreach (Part p in vessel.parts)
-                {
-                    if (p.physicalSignificance == Part.PhysicalSignificance.FULL &&
-                        p.Rigidbody != null)
-                    {
-                        // NBody Active
-                        // p.Rigidbody.AddForce(Vector3d.back * (decayForce)); // 1.5.0
-                                
-                    }
-                }
-#endif
                 VesselData.UpdateVesselSMA(vessel, newSemiMajorAxis);
             }
             else if (TimeWarp.CurrentRate > 0 && TimeWarp.WarpMode == TimeWarp.Modes.HIGH) // 1.3.0 Timewarp Fix
@@ -1128,7 +1130,7 @@ namespace OrbitalDecay
             }
             else
             {
-                if (body.atmosphere != true) 
+                if (body.atmosphere != true)
                     return decayRate;
                 double initialSemiMajorAxis = VesselData.FetchSMA(vessel);
                 double maxInfluence = body.Radius * 1.5;
@@ -1212,16 +1214,6 @@ namespace OrbitalDecay
         public static double DecayRateYarkovskyEffect(Vessel vessel)
         {
             double decayRate = YarkovskyEffect.FetchDeltaSMA(vessel);
-            return decayRate;
-        }
-
-        public static double DecayRateNBodyPerturbation(Vessel vessel)
-        {
-            double decayRate = 0;
-            //decayRate = NBodyManager.CalculateSMA(vessel, vessel.orbitDriver.orbit.getOrbitalSpeedAtRelativePos(vessel.orbitDriver.orbit.getRelativePositionAtUT(HighLogic.CurrentGame.UniversalTime)), HighLogic.CurrentGame.UniversalTime, 1.0);
-
-            // Work this out.
-
             return decayRate;
         }
 

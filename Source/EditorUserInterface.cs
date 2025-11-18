@@ -15,7 +15,6 @@ namespace OrbitalDecay
         //private static string[] tabs = { "Orbital Decay Utilities" };
         private static Rect MainwindowPosition = new Rect(250, 0, WINWIDTH + 40, 500);
         //private static Rect DecayBreakdownwindowPosition = new Rect(0, 0, 450, 150);
-        //private static Rect NBodyManagerwindowPosition = new Rect(0, 0, 450, 150);
         private static GUIStyle windowStyle;
         //private static Color tabUnselectedColor = new Color(0.0f, 0.0f, 0.0f);
         //private static Color tabSelectedColor = new Color(0.0f, 0.0f, 0.0f);
