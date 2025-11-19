@@ -9,24 +9,8 @@ namespace OrbitalDecay
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     internal class EditorUserInterface : MonoBehaviour
     {
-        const int WINWIDTH = 300;
-
-        //private static int currentTab;
-        //private static string[] tabs = { "Orbital Decay Utilities" };
-        private static Rect MainwindowPosition = new Rect(250, 0, WINWIDTH + 40, 500);
-        //private static Rect DecayBreakdownwindowPosition = new Rect(0, 0, 450, 150);
-        private static GUIStyle windowStyle;
-        //private static Color tabUnselectedColor = new Color(0.0f, 0.0f, 0.0f);
-        //private static Color tabSelectedColor = new Color(0.0f, 0.0f, 0.0f);
-        //private static Color tabUnselectedTextColor = new Color(0.0f, 0.0f, 0.0f);
-        //private static Color tabSelectedTextColor = new Color(0.0f, 0.0f, 0.0f);
-        // private GUISkin skin;
         private int id;
 
-        //public bool Visible = false;
-        //public bool Hidden = false;
-
-        //public static Texture launcher_icon;
         private float AltitudeValue = 70000f;
         float MaxDisplayValue = 2100000;
         private static CelestialBody ReferenceBody;
@@ -34,15 +18,7 @@ namespace OrbitalDecay
         private void Awake()
         {
             id = Guid.NewGuid().GetHashCode();
-            windowStyle = new GUIStyle(HighLogic.Skin.window);
-            //skins = HighLogic.Skin;
-            //ReferenceBody = FlightGlobals.GetHomeBody();
-
-            //GameEvents.onGUIApplicationLauncherReady.Add(ReadyEvent);
             GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
-            //GameEvents.onHideUI.Add(onHideUI);
-            //GameEvents.onShowUI.Add(onShowUI);
-
 
             foreach (CelestialBody body in FlightGlobals.Bodies)
             {
@@ -53,18 +29,6 @@ namespace OrbitalDecay
                 }
             }
         }
-
-#if false
-        public void ReadyEvent()
-        {
-            if (ApplicationLauncher.Ready && ToolbarButton == null)
-            {
-                ApplicationLauncher.AppScenes Scenes = ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH;
-                launcher_icon = GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar", false);
-                ToolbarButton = ApplicationLauncher.Instance.AddModApplication(GuiOn, GuiOff, null, null, null, null, Scenes, launcher_icon);
-            }
-        }
-#endif
 
         public void OnDestroy()
         {
@@ -83,16 +47,6 @@ namespace OrbitalDecay
             ToolbarInterface.GuiOff(); // Visible = false;
         }
 
-#if false
-        private void GuiOn()        {            Visible = true;        }
-
-        private void GuiOff()        {            Visible = false;        }
-
-
-        private void onHideUI() { Hidden = true; }
-        private void onShowUI() { Hidden = false; }
-#endif
-
         public void OnGUI()
         {
             if (ToolbarInterface.Visible) //&& !Hidden)
@@ -104,31 +58,14 @@ namespace OrbitalDecay
             }
         }
 
-        static GUIStyle centeredBigLabel = null, centeredLabel;
         Vector2 scrollPos;
-        static GUIStyle hSmallScrollBar;
 
         public void MainWindow(int windowID)
         {
-            if (centeredBigLabel == null)
-            {
-                centeredBigLabel = new GUIStyle(GUI.skin.label);
-                centeredBigLabel.fontSize = 16;
-                centeredBigLabel.alignment = TextAnchor.MiddleCenter;
-
-                centeredLabel = new GUIStyle(GUI.skin.label);
-                centeredLabel.alignment = TextAnchor.MiddleCenter;
-                hSmallScrollBar = new GUIStyle(GUI.skin.horizontalScrollbar);
-                hSmallScrollBar.fixedHeight = 0f;
-            }
 
             if (GUI.Button(new Rect(MainwindowPosition.width - 22, 3, 19, 19), "x"))
             {
-                //if (ToolbarButton != null)
-                //    ToolbarButton.toggleButton.Value = false;
                 ToolbarInterface.GuiOff();
-                //T.SetFalse(true);
-
             }
             GUILayout.BeginVertical();
             GUILayout.Space(20);
@@ -159,12 +96,12 @@ namespace OrbitalDecay
             double VesselMass = CalculateMass();
             double VesselArea = CalculateArea();
 
-            GUILayout.BeginHorizontal(GUILayout.Width(WINWIDTH));
-            GUI.skin.label.fontSize = 16;
+            GUILayout.BeginHorizontal(GUILayout.Width(WINWIDTH ));
+            GUI.skin.label.fontSize = (int)Math.Round(LARGEFONTSIZE);
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Vessel Information", GUILayout.Width(290));
+            GUILayout.Label("Vessel Information", GUILayout.Width(VI_BUTTON ));
             GUI.skin.label.alignment = TextAnchor.MiddleLeft;
-            GUI.skin.label.fontSize = 12;
+            GUI.skin.label.fontSize = (int)Math.Round(FONTSIZE);
             GUILayout.EndHorizontal();
 
             GUILayout.BeginVertical();
@@ -196,7 +133,7 @@ namespace OrbitalDecay
                 CelestialBody body = FlightGlobals.Bodies[b];
                 if (body.atmosphere)
                 {
-                    if (GUILayout.Button(body.name, GUILayout.Width(WINWIDTH)))
+                    if (GUILayout.Button(body.name, GUILayout.Width(WINWIDTH )))
                     {
                         ReferenceBody = body;
                         SetMaxDisplayValue(ReferenceBody);
@@ -261,11 +198,11 @@ namespace OrbitalDecay
             GUILayout.Space(2);
             GUILayout.Label("Maximum possible Station Keeping fuel lifetime: " + (UserInterface.FormatTimeUntilDecayInDaysToString(GetMaximumPossibleLifetime())));
             GUILayout.Space(2);
-#if true
+
             GUILayout.Label("Maximum possible lifetime: " + (UserInterface.FormatTimeUntilDecayInDaysToString(DecayManager.DecayTimePredictionEditor(CalculateArea(), CalculateMass() * 1000, ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody) +
               +DecayManager.EditorDecayRateAtmosphericDrag(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)
              + GetMaximumPossibleLifetime())));
-#endif
+
             GUILayout.Space(2);
             GUILayout.Label("_________________________________________");
             GUILayout.Space(3);
@@ -305,11 +242,7 @@ namespace OrbitalDecay
         {
             double Lifetime = 0;
 
-            //List<Part> constructPartsList = EditorLogic.RootPart.FindChildParts<Part>().ToList();
-            //constructPartsList.AddUnique(EditorLogic.RootPart);
             var constructParts = EditorLogic.SortedShipList.ToArray();
-            //Part[] constructParts = EditorLogic.RootPart.FindChildParts<Part>();
-            //constructParts.AddUnique(EditorLogic.RootPart);
 
             bool ClockType = Settings.Read24Hr();
             double HoursInDay = 6;
@@ -420,13 +353,6 @@ namespace OrbitalDecay
             return 0;
         }
 
-        public string GetEngines()
-        {
-            string Engines = "";
-
-            return Engines;
-        }
-
         public Dictionary<string, double> GetResources(Part[] constructParts)
         {
             Dictionary<string, double> reslist = new Dictionary<string, double>();
@@ -455,22 +381,6 @@ namespace OrbitalDecay
                         }
                     }
                 }
-
-                /*
-                ProtoPartSnapshot protopart = p.protoPartSnapshot;
-             
-                {
-                    foreach (ProtoPartModuleSnapshot protopartmodulesnapshot in protopart.modules)
-                    {
-                        if (protopartmodulesnapshot.moduleName == "ModuleOrbitalDecay")
-                        {
-                            ConfigNode node = protopartmodulesnapshot.moduleValues.GetNode("stationKeepData");
-                            reslist.Add(node.GetValue("resources"));
-                            break;
-                        }
-                    }
-                }
-                 */
             }
 
             return reslist;

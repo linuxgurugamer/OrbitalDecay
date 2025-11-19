@@ -82,12 +82,34 @@ namespace OrbitalDecay
                   toolTip = "Use an alternate skin")]
         public bool useAltSkin = true;
 
+        [GameParameters.CustomFloatParameterUI("Window Scaling ", minValue = 0.8f, maxValue = 2f, stepCount =  23, displayFormat = "F2")]
+        public double windowScaling = 1f;
 
 
         public override void SetDifficultyPreset(GameParameters.Preset preset) { }
         public override bool Enabled(MemberInfo member, GameParameters parameters) { return true; }
-        public override bool Interactible(MemberInfo member, GameParameters parameters) { return true; }
-        public override IList ValidValues(MemberInfo member) { return null; }
+        public override bool Interactible(MemberInfo member, GameParameters parameters) 
+        {
+            if (!initted)
+            {
+                oldWindowScaling = (float)windowScaling;
+                initted = true;
+            }
+            if (oldWindowScaling != windowScaling)
+            {
+                oldWindowScaling = (float)windowScaling;
+                RegisterToolbar.UpdateWindowSizes();
+            }
+
+            return true; 
+        }
+
+        bool initted = false;
+        float oldWindowScaling;
+        public override IList ValidValues(MemberInfo member) 
+        {
+            return null; 
+        }
     }
 
 

@@ -66,3 +66,16 @@ Changelog
 	Fixed filter string being interpreted along with the View Active Vessel, now if Active Vessel is enabled, will only show the active vessel
 	Fixed the toolbar button status after clicking the X button
 	Fixed code to allow stationkeeping to work with parts with both RCS and engines to work 
+
+1.7.0.8 (unreleased)
+	Fixed Selecting toggle to show active vessel and then switching to any other scene would cause nothing to show
+	Removed more float/double parsing of strings
+	Simplified code for converting lines of numbers to numeric arrays
+	Simplified code for converting lines of strings to string arrays
+	Widened the window a bit to accomodate moving the breakdown window button 
+	Changed the button to toggle the decay breakdown window to say either show or hide
+	Moved the button to toggle the decay breakdown window to the same line as enable stationkeeping
+	Cleaned up filter button placement and spaced them out evenly
+	Added GUI scaling
+	Cleaned up disabled code
+	

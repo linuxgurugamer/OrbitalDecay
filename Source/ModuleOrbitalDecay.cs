@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static OrbitalDecay.RegisterToolbar;
 
 namespace OrbitalDecay
 {
@@ -182,21 +181,6 @@ namespace OrbitalDecay
             {
                 var engine = engineData[ODSKengine];
 
-#if false
-                foreach (ConfigNode engine in EngineData.GetNodes("ENGINE"))
-            {
-
-                if (engine.GetValue("name") == ODSKengine)
-                {
-                    engineNode = engine;
-                    found = true;
-                    break;
-                }
-
-            }
-            if (found)
-            {
-#endif
                 foreach (var p in engine.propellantData)
                 {
                     proplist.Add(p.name);
@@ -204,15 +188,6 @@ namespace OrbitalDecay
                     ratiolist.Add(p.ratio);
                 }
                 stationKeepData.ISP = engine.ISP;
-#if false
-                foreach (ConfigNode propellant in engineNode.GetNodes("PROPELLANT"))
-                {
-                    proplist.Add(propellant.GetValue("name"));
-                    amountlist.Add(double.Parse(propellant.GetValue("Available")));
-                    ratiolist.Add(float.Parse(propellant.GetValue("ratio")));
-                }
-                stationKeepData.ISP = float.Parse(engineNode.GetValue("ISP"));
-#endif
             }
             else
             {
@@ -251,13 +226,6 @@ namespace OrbitalDecay
                     if (part.Modules[j].moduleName.StartsWith("ModuleEngines"))
                     {
                         ModuleEngines module = part.Modules[j] as ModuleEngines;
-#if false
-                    }
-                }
-            }
-            foreach (ModuleEngines module in vessel.FindPartModulesImplementing<ModuleEngines>())
-            {
-#endif
                         if (module.EngineIgnited && !engineData.ContainsKey(module.part.protoPartSnapshot.partInfo.title))
                         {
                             engineData.Add(module.part.protoPartSnapshot.partInfo.title,
@@ -274,36 +242,6 @@ namespace OrbitalDecay
                             }
 
                         }
-#if false
-                        engineIsListed = false;
-                        foreach (ConfigNode engineNode in EngineData.GetNodes())
-                        {
-                            //ugly names used - can't find way to get editor part names
-                            if (engineNode.GetValue("name") != module.part.protoPartSnapshot.partInfo.title) continue;
-                            engineIsListed = true;
-                            break;
-                        }
-
-                        if (module.EngineIgnited && !engineIsListed)
-                        {
-                            ConfigNode engineNode = new ConfigNode("ENGINE");
-                            engineNode.AddValue("name", module.part.protoPartSnapshot.partInfo.title);//ugly names used - can't find way to get editor part names
-                            engineNode.AddValue("ISP", module.atmosphereCurve.Evaluate(0).ToString());
-
-                            foreach (Propellant propellant in module.propellants)
-                            {
-                                if (propellant.name == "ElectricCharge") continue;
-                                ConfigNode propellantNode = new ConfigNode("PROPELLANT");
-                                //amount = module.part.Resources.Get(propellant.id).amount;
-                                amount = fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW);
-                                propellantNode.AddValue("name", propellant.name);
-                                propellantNode.AddValue("id", propellant.id.ToString());
-                                propellantNode.AddValue("ratio", propellant.ratio.ToString());
-                                propellantNode.AddValue("Available", amount.ToString());
-                                engineNode.AddNode(propellantNode);
-                            }
-                            EngineData.AddNode(engineNode);
-#endif
                         if (stationKeepData.IsStationKeeping && module.currentThrottle > 0.0)
                         {
                             ScreenMessages.PostScreenMessage("Warning: Vessel is under thrust, station keeping disabled.");
@@ -311,24 +249,9 @@ namespace OrbitalDecay
                         }
                     }
 
-                    //}
-                    //}
-                    //for (int i = 0; i < vessel.parts.Count; i++)
-                    //{
-                    //var part = vessel.parts[i];
-                    //for (int j = 0; j < part.Modules.Count; j++)
-                    //{
                     if (part.Modules[j].moduleName.StartsWith("ModuleRCS"))
                     {
                         ModuleRCS module = part.Modules[j] as ModuleRCS;
-#if false
-                    }
-                }
-            }
-
-            foreach (ModuleRCS module in vessel.FindPartModulesImplementing<ModuleRCS>())
-            {
-#endif
                         if ( /* !module.rcsEnabled && */ !engineData.ContainsKey(module.part.protoPartSnapshot.partInfo.title))
                         {
                             engineData.Add(module.part.protoPartSnapshot.partInfo.title,
@@ -345,52 +268,9 @@ namespace OrbitalDecay
                             }
 
                         }
-#if false
-                    engineIsListed = false;
-                        foreach (ConfigNode engineNode in EngineData.GetNodes())
-                        {
-                            if (engineNode.GetValue("name") != module.part.protoPartSnapshot.partInfo.title) continue;
-                            engineIsListed = true;
-                            break;
-
-                        }
-
-                        if (!module.rcsEnabled || engineIsListed) continue;
-                        ConfigNode newEngineNode = new ConfigNode("ENGINE");
-                        newEngineNode.AddValue("name", module.part.protoPartSnapshot.partInfo.title);
-                        newEngineNode.AddValue("ISP", module.atmosphereCurve.Evaluate(0).ToString());
-                        foreach (Propellant propellant in module.propellants)
-                        {
-                            if (propellant.name == "ElectricCharge") continue;
-                            ConfigNode newPropellantNode = new ConfigNode("PROPELLANT");
-                            //amount = module.part.Resources.Get(propellant.id).amount
-                            //amount =
-                            amount = fetchPartResource(module.part, propellant.id, ResourceFlowMode.STAGE_PRIORITY_FLOW);
-                            newPropellantNode.AddValue("name", propellant.name);
-                            newPropellantNode.AddValue("id", propellant.id.ToString());
-                            newPropellantNode.AddValue("ratio", propellant.ratio.ToString());
-                            newPropellantNode.AddValue("Available", amount.ToString());
-                            newEngineNode.AddNode(newPropellantNode);
-                        }
-                        EngineData.AddNode(newEngineNode);
-                    }
-#endif
                     }
                 }
             }
-
-#if false
-            // dumpData
-            Log.Info($"FetchEngineData data dump, vessel: {vessel.vesselName}  part: {name}");
-            foreach (var e in engineData.Values)
-            {
-                Log.Info($"Engine: {e.name}  ISP: {e.ISP}");
-                foreach (var p in e.propellantData)
-                {
-                    Log.Info($"   Propellent name: {p.name}   id: {p.id}   ratio: {p.ratio}   Available: {p.Available}");
-                }
-            }
-#endif
         }
 
         public override void OnUpdate()
@@ -412,18 +292,7 @@ namespace OrbitalDecay
 
             List<string> namelist = new List<string>();
             namelist = engineData.Keys.ToList();
-#if false
-            if (EngineData.HasNode("ENGINE"))
-            {
-                foreach (ConfigNode engine in EngineData.GetNodes("ENGINE"))
-                {
-                    namelist.Add(engine.GetValue("name"));
-                }
-                EngineList = new string[namelist.Count];
-                EngineList = namelist.ToArray();
-            }
-            else
-#endif
+
             if (namelist.Count > 0)
             {
                 EngineList = namelist.ToArray();
@@ -453,16 +322,10 @@ namespace OrbitalDecay
                 }
             }
 
-            StationKeepResources = "";
-            amounts = "";
             ISP = stationKeepData.ISP;
-            StationKeepResources += stationKeepData.resources[0];
-            amounts += stationKeepData.amounts[0].ToString("F3");
-            for (int i = 1; i < stationKeepData.resources.Count(); i++)
-            {
-                StationKeepResources += ' ' + stationKeepData.resources[i];
-                amounts += ' ' + stationKeepData.amounts[i].ToString("F3");
-            }
+
+            StationKeepResources = string.Join(" ", stationKeepData.resources);
+            amounts = string.Join(" ", stationKeepData.amounts.Select(v => v.ToString("F3")));
         }
 
 
@@ -509,7 +372,7 @@ namespace OrbitalDecay
         {
             IsStationKeeping = node.SafeLoad("IsStationKeeping", false);
 
-            resources = new string[node.GetValue("resources").Split(' ').Count()];
+            //resources = new string[node.GetValue("resources").Split(' ').Count()];
             if (node.HasValue("resources"))
             {
                 resources = node.GetValue("resources").Split(' ');
@@ -519,29 +382,25 @@ namespace OrbitalDecay
             {
                 int i = 0;
 
-                amounts = new double[node.GetValue("amounts").Split(' ').Count()];
-                foreach (string str in node.GetValue("amounts").Split(' '))
-                {
-                    if (double.TryParse(str, out d))
+                amounts = node.GetValue("amounts").Split((char[])null, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
+                    .Select(token =>
                     {
-                        amounts[i++] = d;
-                    }
-                }
+                        double v;
+                        return double.TryParse(token, out v) ? v : 0f;
+                    })
+                    .ToArray();
 
             }
             float f;
             if (node.HasValue("ratios"))
             {
-                int i = 0;
-
-                ratios = new float[node.GetValue("ratios").Split(' ').Count()];
-                foreach (string str in node.GetValue("ratios").Split(' '))
-                {
-                    if (float.TryParse(str, out f))
+                ratios = node.GetValue("ratios").Split((char[])null, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
+                    .Select(token =>
                     {
-                        ratios[i++] = f;
-                    }
-                }
+                        float v;
+                        return float.TryParse(token, out v) ? v : 0f; 
+                    })
+                    .ToArray();
 
             }
             fuelLost = node.SafeLoad("fuelLost", 0);
@@ -551,23 +410,12 @@ namespace OrbitalDecay
 
         public void Save(ConfigNode node)
         {
-            string temporary = resources[0];
-            for (int i = 1; i < resources.Count(); i++)
-            {
-                temporary += ' ' + resources[i];
-            }
+            string temporary = string.Join(" ", resources);
             node.AddValue("resources", temporary);
-            temporary = amounts[0].ToString();
-            for (int i = 1; i < amounts.Count(); i++)
-            {
-                temporary += ' ' + amounts[i].ToString();
-            }
+            temporary = string.Join(" ", amounts.Select(v => v.ToString()));
+
             node.AddValue("amounts", temporary);
-            temporary = "";
-            for (int i = 0; i < ratios.Count(); i++)
-            {
-                temporary += ratios[i].ToString() + ' ';
-            }
+            temporary = string.Join(" ", ratios.Select(v => v.ToString()));
             node.AddValue("ratios", temporary);
 
             node.AddValue("fuelLost", fuelLost);

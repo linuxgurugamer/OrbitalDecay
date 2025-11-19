@@ -32,15 +32,6 @@ namespace OrbitalDecay
 
     public class StationKeepingManager : MonoBehaviour
     {
-
-#if false
-        public static bool CheckCanStationkeep(Vessel vessel) // 1.6.0 
-        {
-            bool CanStationKeep = false;
-
-            return CanStationKeep;
-        }
-#endif
         public static bool EngineCheck(Vessel vessel) // 1.3.0
         {
 

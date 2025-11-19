@@ -107,12 +107,6 @@ namespace OrbitalDecay
         }
     }
 
-
-
-
-
-
-
     public class MasConData : MonoBehaviour
     {
         static Dictionary<string, GravityMap> gravityMapDict = null;
@@ -123,7 +117,6 @@ namespace OrbitalDecay
         public static void LoadData()
         {
             MasConDataFilePath = KSPUtil.ApplicationRootPath + "GameData/WhitecatIndustries/OrbitalDecay/PluginData/MasConData.cfg";
-            //GMSData = ConfigNode.Load(MasConDataFilePath);
 
             if (gravityMapDict == null)
             {
@@ -146,22 +139,6 @@ namespace OrbitalDecay
             else return null;
         }
 
-#if false
-        private static ConfigNode ThisGravityMap(string Body)
-        {
-            ConfigNode returnNode = new ConfigNode("GRAVITYMAP");
-
-            foreach (ConfigNode GravityMap in GMSData.GetNodes("GRAVITYMAP"))
-            {
-                if (GravityMap.GetValue("body") == Body)
-                {
-                    returnNode = GravityMap;
-                    break;
-                }
-            }
-            return returnNode;
-        }
-#endif
 
         public static bool IsBetween(double item, double min, double max)
         {
@@ -171,7 +148,6 @@ namespace OrbitalDecay
 
         internal static Mascon LocalMasCon(Vessel vessel)
         {
-            //ConfigNode LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
             GravityMap LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
 
             Mascon Local = new Mascon();
@@ -280,13 +256,6 @@ namespace OrbitalDecay
 
             return WithinEffectRange;
         }
-
-#if false
-        public static double LocalGal(Vessel vessel)
-        {
-            return double.Parse(LocalMasCon(vessel).GetValue("centreGal"));
-        }
-#endif
 
         public static double GalAtPosition(Vessel vessel)
         {

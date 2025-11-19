@@ -35,11 +35,6 @@ namespace OrbitalDecay
         public double ResourceRateDifficulty;
     }
 
-
-
-
-    //[KSPAddon(KSPAddon.Startup.EveryScene, false)]
-
     [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
     public class SettingsFlightAndKSP : Settings
     {
@@ -67,12 +62,6 @@ namespace OrbitalDecay
 
             SettingData.ClearData();
             SettingsNode = ConfigNode.Load(FilePath);
-#if false
-            foreach (ConfigNode item in SettingsNode.nodes)
-            {
-                SettingData.AddNode(item);
-            }
-#endif
 
             var node = SettingsNode.GetNode("RESOURCES");
             if (node != null)
@@ -101,53 +90,32 @@ namespace OrbitalDecay
 
         public static void WriteRD(bool RD)
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //SimSet.SetValue("RealisticDecay", RD.ToString());
             HighLogic.CurrentGame.Parameters.CustomParams<OD>().RealisticDecay = RD;
-
-
         }
 
 
 
         public static void Write24H(bool H24)
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //SimSet.SetValue("24HourClock", H24.ToString());
-
             HighLogic.CurrentGame.Parameters.CustomParams<OD>()._24HourClock = H24;
         }
         public static void WritePlanetariumTracking(bool PT)
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //SimSet.SetValue("PlanetariumTracking", PT.ToString());
             HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumTracking = PT;
         }
 
         public static void WritePDebrisTracking(bool DT)
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //SimSet.SetValue("PlanetariumDebrisTracking", DT.ToString());
             HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumDebrisTracking = DT;
         }
 
         public static void WriteDifficulty(double Difficulty)
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //SimSet.SetValue("DecayDifficulty", Difficulty.ToString());
             HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty = Difficulty;
 
         }
         public static void WriteResourceRateDifficulty(double Difficulty)
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode Resources = Data.GetNode("RESOURCES");
-            //Resources.SetValue("ResourceRateDifficulty", Difficulty.ToString());
             HighLogic.CurrentGame.Parameters.CustomParams<OD2>().ResourceRateDifficulty = Difficulty;
         }
         public static void WriteStatKeepResource(string Resource)
@@ -158,41 +126,26 @@ namespace OrbitalDecay
         }
         public static bool ReadRD()
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //bool RD = bool.Parse(SimSet.GetValue("RealisticDecay"));
             return HighLogic.CurrentGame.Parameters.CustomParams<OD>().RealisticDecay;
         }
 
         public static bool Read24Hr()
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //bool R24H = bool.Parse(SimSet.GetValue("24HourClock"));
             return HighLogic.CurrentGame.Parameters.CustomParams<OD>()._24HourClock ;
         }
 
         public static bool ReadPT()
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //bool PT = bool.Parse(SimSet.GetValue("PlanetariumTracking"));
             return HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumTracking;
         }
 
         public static bool ReadDT()
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //bool DT = bool.Parse(SimSet.GetValue("PlanetariumDebrisTracking"));
             return HighLogic.CurrentGame.Parameters.CustomParams<OD>().PlanetariumDebrisTracking;
         }
 
         public static double ReadDecayDifficulty()
         {
-            //ConfigNode Data = SettingData;
-            //ConfigNode SimSet = Data.GetNode("SIMULATION");
-            //double Difficulty = double.Parse(SimSet.GetValue("DecayDifficulty"));
             return HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
 
         }
@@ -212,6 +165,5 @@ namespace OrbitalDecay
             double FavouredResource = resources.ResourceRateDifficulty;
             return FavouredResource;
         }
-
     }
 }

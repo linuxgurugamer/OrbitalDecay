@@ -23,6 +23,7 @@
  * is purely coincidental.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -37,10 +38,6 @@ namespace OrbitalDecay
         public static void RemoveResources(Vessel vessel, double quantity)//151 new wersion consuming multiple resources saved on vessel
         {
             string resource = GetResourceNames(vessel);
-            //if (resource != null)
-            //    Log.Info($"RemoveResources, vessel: {vessel.vesselName}  resource: {resource}");
-            //else
-            //    Log.Info($"RemoveResources, vessel: {vessel.vesselName}  resource is null");
             int index = 0;
             if (vessel == FlightGlobals.ActiveVessel)
             {
@@ -115,6 +112,7 @@ namespace OrbitalDecay
                         if (protopartmodulesnapshot.moduleName != "ModuleOrbitalDecay") continue;
                         ConfigNode node = protopartmodulesnapshot.moduleValues.GetNode("stationKeepData");
                         int i = 0;
+
                         foreach (string str in node.GetValue("ratios").Split(' '))
                         {
                             if (i == index)
@@ -157,10 +155,18 @@ namespace OrbitalDecay
                     {
                         if (protopartmodulesnapshot.moduleName != "ModuleOrbitalDecay" || fuel != 0) continue;
                         ConfigNode node = protopartmodulesnapshot.moduleValues.GetNode("stationKeepData");
-                        foreach (string str in node.GetValue("amounts").Split(' '))
-                        {
-                            fuel += double.Parse(str);
-                        }
+
+                        var ar = node.GetValue("amounts")
+                             .Split((char[])null, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
+                             .Select(token =>
+                             {
+                                 double v;
+                                 return double.TryParse(token, out v) ? v : 0f;
+                             })
+                             .ToArray();
+                        for (int i = 0; i < ar.Length; i++)
+                            fuel += ar[i];
+
                         fuel -= double.Parse(node.GetValue("fuelLost"));
                         break;
                     }

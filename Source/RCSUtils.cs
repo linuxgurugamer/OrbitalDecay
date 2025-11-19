@@ -5,7 +5,7 @@ using static OrbitalDecay.RegisterToolbar;
 
 public static class RCSUtils
 {
-    // Cache the FieldInfo for performance (do this once, e.g. in a static constructor or OnStart)
+    // Cache the FieldInfo for performance 
     private static readonly FieldInfo currentThrustField = typeof(ModuleRCS).GetField("currentThrustForce",
         BindingFlags.Instance | BindingFlags.NonPublic);
 
