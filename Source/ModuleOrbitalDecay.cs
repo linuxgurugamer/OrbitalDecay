@@ -23,6 +23,7 @@
  * is purely coincidental.
  */
 
+using SpaceTuxUtility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -328,7 +329,7 @@ namespace OrbitalDecay
             foreach (ModuleRCS module in vessel.FindPartModulesImplementing<ModuleRCS>())
             {
 #endif
-                        if (!module.rcsEnabled && !engineData.ContainsKey(module.part.protoPartSnapshot.partInfo.title))
+                        if ( /* !module.rcsEnabled && */ !engineData.ContainsKey(module.part.protoPartSnapshot.partInfo.title))
                         {
                             engineData.Add(module.part.protoPartSnapshot.partInfo.title,
                                 new Engine_Data(module.part.protoPartSnapshot.partInfo.title, module.atmosphereCurve.Evaluate(0)));
@@ -506,13 +507,8 @@ namespace OrbitalDecay
 
         public void Load(ConfigNode node)
         {
-            if (node.HasValue("IsStationKeeping"))
-            {
-                if (bool.TryParse(node.GetValue("IsStationKeeping"), out IsStationKeeping))
-                {
+            IsStationKeeping = node.SafeLoad("IsStationKeeping", false);
 
-                }
-            }
             resources = new string[node.GetValue("resources").Split(' ').Count()];
             if (node.HasValue("resources"))
             {
@@ -548,24 +544,9 @@ namespace OrbitalDecay
                 }
 
             }
-            if (node.HasValue("fuelLost"))
-            {
-                if (double.TryParse(node.GetValue("fuelLost"), out d))
-                {
-                    fuelLost = d;
-                }
-            }
-            if (node.HasValue("ISP"))
-            {
-                if (float.TryParse(node.GetValue("ISP"), out f))
-                {
-                    ISP = f;
-                }
-            }
-            if (node.HasValue("engine"))
-            {
-                engine = node.GetValue("engine");
-            }
+            fuelLost = node.SafeLoad("fuelLost", 0);
+            ISP = node.SafeLoad("ISP", 0);
+            engine = node.SafeLoad("engine", "");
         }
 
         public void Save(ConfigNode node)

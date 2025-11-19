@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using KSP.UI.Screens;
+﻿using KSP.UI.Screens;
+using ToolbarControl_NS;
 using UnityEngine;
 
-using ToolbarControl_NS;
+using static OrbitalDecay.RegisterToolbar;
 
 namespace OrbitalDecay
 {
@@ -51,6 +47,7 @@ namespace OrbitalDecay
             DontDestroyOnLoad(this);
         }
 
+
         internal void OnDestroy()
         {
             if (!HighLogic.LoadedSceneIsEditor)
@@ -93,6 +90,7 @@ namespace OrbitalDecay
         {
             visible = false;
             DecayBreakdownVisible = false;
+            toolbarControl.SetFalse(false);
         }
     }
 }

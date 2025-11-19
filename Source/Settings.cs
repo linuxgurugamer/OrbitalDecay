@@ -38,7 +38,20 @@ namespace OrbitalDecay
 
 
 
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    //[KSPAddon(KSPAddon.Startup.EveryScene, false)]
+
+    [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
+    public class SettingsFlightAndKSP : Settings
+    {
+
+    }
+
+    [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
+    public class SettingsrTrackingStation : Settings
+    {
+
+    }
+
     public class Settings : MonoBehaviour
     {
         public static string FilePath;

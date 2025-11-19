@@ -141,6 +141,7 @@ namespace OrbitalDecay
                 {
                     for (int i = 0; i < module.stationKeepData.amounts.Count(); i++)
                     {
+                        Log.Info($"Resource[{i}]  {module.stationKeepData.resources[i]}   fuel: {module.stationKeepData.amounts[i]}");
                         fuel += module.stationKeepData.amounts[i];
                     }
                     break;

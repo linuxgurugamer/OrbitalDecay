@@ -61,3 +61,8 @@ Changelog
 	Added toggle to show active vessel only
 	Fixed orbits being reset during and after orbital change maneuvers 
 	Fixed toolbar icon to show correct status after changing scenes
+
+1.7.0.7
+	Fixed filter string being interpreted along with the View Active Vessel, now if Active Vessel is enabled, will only show the active vessel
+	Fixed the toolbar button status after clicking the X button
+	Fixed code to allow stationkeeping to work with parts with both RCS and engines to work 

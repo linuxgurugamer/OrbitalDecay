@@ -30,7 +30,21 @@ using UnityEngine;
 
 namespace OrbitalDecay
 {
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    // [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+
+    [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
+    public class DecayManagerFlightAndKSP: DecayManager
+    {
+
+    }
+
+    [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
+    public class DecayManagerTrackingStation: DecayManager
+    {
+
+    }
+
+
     public class DecayManager : MonoBehaviour
     {
         #region Declared Variables

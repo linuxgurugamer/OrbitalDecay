@@ -30,7 +30,21 @@ using UnityEngine;
 
 namespace OrbitalDecay
 {
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    //[KSPAddon(KSPAddon.Startup.EveryScene, false)]
+
+    [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
+    public class MasConManagerFlightAndKSP : MasConManager
+    {
+
+    }
+
+    [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
+    public class MasConManagerTrackingStation : MasConManager
+    {
+
+    }
+
+
     public class MasConManager : MonoBehaviour
     {
         private static double _timeInterval = 1.0; // Timewarp managed by HighLogic Current Time 

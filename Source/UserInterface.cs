@@ -30,7 +30,20 @@ using UnityEngine;
 
 namespace OrbitalDecay
 {
-    [KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
+    //[KSPAddon(KSPAddon.Startup.AllGameScenes, false)]
+
+    [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
+    internal class UserInterfaceFlightAndKSP : UserInterface
+    {
+
+    }
+
+    [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
+    internal class UserInterfaceTrackingStation : UserInterface
+    {
+
+    }
+
     internal class UserInterface : MonoBehaviour
     {
         private static int currentTab;
@@ -107,9 +120,6 @@ namespace OrbitalDecay
         {
             if (GUI.Button(new Rect(MainwindowPosition.width - 22, 3, 19, 19), "x"))
             {
-                //if (ToolbarButton != null)
-                //    ToolbarButton.toggleButton.Value = false;
-                //toolbarControl.SetFalse(true);
                 ToolbarInterface.GuiOff();
             }
             GUILayout.BeginVertical();
@@ -146,7 +156,7 @@ namespace OrbitalDecay
 
         const float INFO_WIDTH = 330f;
         string filterString = "";
-        bool showActiveVessel = false;
+        static bool showActiveVessel = false;
         public void InformationTab()
         {
             GUILayout.BeginHorizontal();
@@ -274,16 +284,18 @@ namespace OrbitalDecay
             bool ClockType = Settings.Read24Hr();
             //151var Resource = Settings.ReadStationKeepingResource();
             var filterString1 = filterString.ToLower();
+
             foreach (Vessel vessel in FlightGlobals.Vessels)
             {
-                if ((showActiveVessel && vessel == FlightGlobals.ActiveVessel) ||
-                    (vessel.vesselName.ToLower().Contains(filterString1) && FilterTypes.Contains(vessel.vesselType)))
+                if ((showActiveVessel && vessel.id == FlightGlobals.ActiveVessel.id) ||
+                    (!showActiveVessel && vessel.vesselName.ToLower().Contains(filterString1) && FilterTypes.Contains(vessel.vesselType))
+                    )
                 {
 
                     if (vessel.situation == Vessel.Situations.ORBITING)
                     {
                         string StationKeeping = VesselData.FetchStationKeeping(vessel).ToString();
-                        string StationKeepingFuelRemaining = ResourceManager.GetResources(vessel).ToString("F3");
+                        double StationKeepingFuelRemaining = ResourceManager.GetResources(vessel);
                         string Resource = ResourceManager.GetResourceNames(vessel);
                         string ButtonText = "";
                         double HoursInDay = 6.0;
@@ -370,7 +382,7 @@ namespace OrbitalDecay
 
                         GUILayout.Label("Station Keeping: " + StationKeeping);
                         GUILayout.Space(2);
-                        GUILayout.Label("Station Keeping Fuel Remaining: " + StationKeepingFuelRemaining);
+                        GUILayout.Label("Station Keeping Fuel Remaining: " + StationKeepingFuelRemaining.ToString("F3"));
                         GUILayout.Space(2);
                         GUILayout.Label("Using Fuel Type: " + Resource);//151
                         GUILayout.Space(2); //151
@@ -388,7 +400,7 @@ namespace OrbitalDecay
                             DecayRateSKL = DecayManager.DecayRateAtmosphericDrag(vessel) + DecayManager.DecayRateRadiationPressure(vessel) + DecayManager.DecayRateYarkovskyEffect(vessel);
 
 
-                            double StationKeepingLifetime = double.Parse(StationKeepingFuelRemaining) / (DecayRateSKL / TimeWarp.CurrentRate * VesselData.FetchEfficiency(vessel) /*ResourceManager.GetEfficiency(Resource)*/ * Settings.ReadResourceRateDifficulty()) / (60 * 60 * HoursInDay);
+                            double StationKeepingLifetime = StationKeepingFuelRemaining / (DecayRateSKL / TimeWarp.CurrentRate * VesselData.FetchEfficiency(vessel) /*ResourceManager.GetEfficiency(Resource)*/ * Settings.ReadResourceRateDifficulty()) / (60 * 60 * HoursInDay);
 
                             if (StationKeepingLifetime < -5) // SRP Fixes
                             {
@@ -441,7 +453,7 @@ namespace OrbitalDecay
                             {
                                 if (StationKeepingManager.EngineCheck(vessel))
                                 {
-                                    if (double.Parse(StationKeepingFuelRemaining) > 0.01) // Good enough...
+                                    if (StationKeepingFuelRemaining > 0.01) // Good enough...
                                     {
 
                                         VesselData.UpdateStationKeeping(vessel, true);
@@ -463,7 +475,14 @@ namespace OrbitalDecay
                         GUILayout.Space(3);
                         GUILayout.EndVertical();
                     }
-
+                    else
+                    {
+                        GUILayout.Label($"Vessel Name: <B>{vessel.vesselName}</B>");
+                        GUILayout.Label($"Situation: {vessel.situation.ToString()}");
+                        GUILayout.Space(2);
+                        GUILayout.Label("_____________________________________");
+                        GUILayout.Space(3);
+                    }
                 }
             }
             GUILayout.EndScrollView();

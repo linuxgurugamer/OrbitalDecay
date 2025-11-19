@@ -45,6 +45,7 @@ namespace OrbitalDecay
         {
 
             bool HasEngine = false;
+            bool HasRCS = false;
 
             if (vessel != FlightGlobals.ActiveVessel)
             {
@@ -56,19 +57,23 @@ namespace OrbitalDecay
                     List<ProtoPartModuleSnapshot> PPMSL = PPS.modules;
                     foreach (ProtoPartModuleSnapshot PPMS in PPMSL)
                     {
+                        if (PPMS.moduleName.Contains("ModuleRCS"))
+                        {
+                            if (!bool.Parse(PPMS.moduleValues.GetValue("rcsEnabled"))) continue;
+                            HasRCS = true;
+                            //break;
+                        }
                         if (PPMS.moduleName.Contains("ModuleEngines")) // 1.5.0 Part Module Fixes
                         {
-                            if (!bool.Parse(PPMS.moduleValues.GetValue("EngineIgnited"))) continue;
-                            HasEngine = true;
-                            break;
+                            if (bool.Parse(PPMS.moduleValues.GetValue("EngineIgnited")))
+                            {
+                                HasEngine = true;
+                                //break;
+                            }
                         }
-                        if (!PPMS.moduleName.Contains("ModuleRCS")) continue;
-                        if (!bool.Parse(PPMS.moduleValues.GetValue("rcsEnabled"))) continue;
-                        HasEngine = true;
-                        break;
                     }
 
-                    if (HasEngine)
+                    if (HasEngine || HasRCS)
                     {
                         break;
                     }
@@ -84,7 +89,7 @@ namespace OrbitalDecay
                     HasEngine = true;
                 }
             }
-            return HasEngine;
+            return HasEngine || HasRCS;
         }
 
         public static void FuelManager(Vessel vessel)

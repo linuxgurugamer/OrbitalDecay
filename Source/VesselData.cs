@@ -130,7 +130,21 @@ namespace OrbitalDecay
     }
 
 
-    [KSPAddon(KSPAddon.Startup.EveryScene, true)]
+    //[KSPAddon(KSPAddon.Startup.EveryScene, true)]
+
+    [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
+    public class VesselDataFlightAndKSP : VesselData
+    {
+
+    }
+
+    [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
+    public class VesselDataTrackingStation : VesselData
+    {
+
+    }
+
+
     public class VesselData : MonoBehaviour
     {
         //public static ConfigNode VesselInformation = new ConfigNode();
@@ -662,7 +676,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].SMA;
-            Log.Info($"FetchSMA, {vessel.vesselName} not found in VesselInfo");
+            //Log.Info($"FetchSMA, {vessel.vesselName} not found in VesselInfo");
             return 0;
 
 #if false
@@ -726,7 +740,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].ECC;
-            Log.Info($"FetchECC, {vessel.vesselName} not found in VesselInfo");
+            //Log.Info($"FetchECC, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -787,7 +801,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].INC;
-            Log.Info($"FetchINC, {vessel.vesselName} not found in VesselInfo");
+            //Log.Info($"FetchINC, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -845,7 +859,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].LPE;
-            Log.Info($"FetchLPE, {vessel.vesselName} not found in VesselInfo");
+            //Log.Info($"FetchLPE, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -902,7 +916,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].LAN;
-            Log.Info($"FetchLAN, {vessel.vesselName} not found in VesselInfo");
+            //Log.Info($"FetchLAN, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -959,7 +973,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].MNA;
-            Log.Info($"FetchMNA, {vessel.vesselName} not found in VesselInfo");
+            //Log.Info($"FetchMNA, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
@@ -1016,7 +1030,7 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].EPH;
-            Log.Info($"FetchEPH, {vessel.vesselName} not found in VesselInfo");
+            //Log.Info($"FetchEPH, {vessel.vesselName} not found in VesselInfo");
             return 0;
 #if false
             ConfigNode Data = VesselInformation;
