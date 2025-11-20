@@ -8,6 +8,8 @@ namespace OrbitalDecay
     [KSPScenario(ScenarioCreationOptions.AddToAllGames, GameScenes.EDITOR, GameScenes.FLIGHT, GameScenes.TRACKSTATION, GameScenes.SPACECENTER)]
     internal class ODScenarioModule : ScenarioModule
     {
+        static bool _initted = false;
+        public static bool Initted { get { return _initted; } set { _initted = value; } }
         public override void OnSave(ConfigNode node)
         {
             try
@@ -39,6 +41,9 @@ namespace OrbitalDecay
             {
                 Debug.LogError("[OrbitalDecay] OnLoad(): " + e.ToString());             
             }
+
+            RegisterToolbar.UpdateWindowSizes();
+            Initted = true;
         }
     }
 }

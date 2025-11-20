@@ -54,38 +54,43 @@ namespace OrbitalDecay
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class LoadingCheck : MonoBehaviour
     {
-        //public string KSPOrbitDecayLite = KSPUtil.ApplicationRootPath + "GameData/WhitecatIndustries/OrbitDecayLite/KSPOrbitDecayLite.dll";
         public string RealSolar = KSPUtil.ApplicationRootPath + "GameData/RealSolarSystem/Plugins/RealSolarSystem.dll";
-        public string PersistentRotation = KSPUtil.ApplicationRootPath + "GameData/PersistentRotation/Plugins/NOTREADYYET1.6.0"; // 1.6.0 Persistent Rotation
-        //public string RemoteTech = KSPUtil.ApplicationRootPath + "GameData/RemoteTech/Plugins/RemoteTechNOTREADYYET1.6.0.dll"; // 1.6.0 Remote Tech Compatibility
+        //public string PersistentRotation = KSPUtil.ApplicationRootPath + "GameData/PersistentRotation/Plugins/NOTREADYYET1.6.0"; // 1.6.0 Persistent Rotation
         public static bool PersistentRotationInstalled;
         public static bool RemoteTechInstalled = false;
 
-        private void Start()
+        public void Awake()
         {
-#if false
+            GameEvents.onGameNewStart.Add(onGameNewStart);
+        }
+        void OnDestroy()
+        {
+            GameEvents.onGameNewStart.Remove(onGameNewStart);
+        }
+
+        void onGameNewStart()
+        {
             if (System.IO.File.Exists(RealSolar))
             {
-                Settings.WriteRD(true);
-                Settings.Write24H(true);
-                Settings.WriteDifficulty(1.0);
-                Settings.WritePlanetariumTracking(true);
+                Settings.WriteRD(true);     // realistic decay
+                Settings.Write24H(true);    // 24H clock
                 print("WhitecatIndustries - Real Solar System Detected, Multiplier Set Changed");
             }
 
             else
             {
-                Settings.WriteDifficulty(1.0);
                 Settings.Write24H(false);
                 Settings.WriteRD(false);
-                Settings.WritePlanetariumTracking(true);
             }
-#endif
+            Settings.WriteDifficulty(1.0);
+            Settings.WritePlanetariumTracking(true);
 
+#if false
             if (System.IO.File.Exists(PersistentRotation))
             {
                 PersistentRotationInstalled = true;
             }
+#endif
         }
 
     }

@@ -81,7 +81,9 @@
     <Compile Include="StockSettings.cs" />
     <Compile Include="ToolbarInterface.cs" />
     <Compile Include="UserInterface.cs" />
+    <Compile Include="VesselSwitcher.cs" />
     <Compile Include="VesselData.cs" />
+    <Compile Include="Vessel_Information.cs" />
     <Compile Include="YarkovskyEffect.cs" />
   </ItemGroup>
   <ItemGroup>

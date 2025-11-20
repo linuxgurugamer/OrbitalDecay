@@ -17,21 +17,19 @@ namespace OrbitalDecay
         public override int SectionOrder { get { return 1; } }
         public override bool HasPresets { get { return true; } }
 
-        [GameParameters.CustomParameterUI("Realistic Decay ",
-                  toolTip = "Use realistic values for decay")]
+        [GameParameters.CustomParameterUI("Realistic Decay", toolTip = "Use realistic values for decay")]
         public bool RealisticDecay = false;
 
         [GameParameters.CustomParameterUI("24HourClock ")]
         public bool _24HourClock = false;
 
-        [GameParameters.CustomFloatParameterUI("DecayDifficulty ", minValue = 0.5f, maxValue = 50f, stepCount =101, toolTip = "Higher means harder")]
+        [GameParameters.CustomFloatParameterUI("DecayDifficulty", minValue = 0.5f, maxValue = 50f, stepCount = 101, toolTip = "Higher means harder")]
         public double DecayDifficulty = 1f;
 
-        [GameParameters.CustomParameterUI("Planetarium Tracking ", toolTip = "")]
+        [GameParameters.CustomParameterUI("Planetarium Tracking", toolTip = "")]
         public bool PlanetariumTracking = true;
 
-        [GameParameters.CustomParameterUI("Planetarium Debris Tracking ",
-                  toolTip = "")]
+        [GameParameters.CustomParameterUI("Planetarium Debris Tracking", toolTip = "")]
         public bool PlanetariumDebrisTracking = true;
 
         public override void SetDifficultyPreset(GameParameters.Preset preset) { }
@@ -51,8 +49,7 @@ namespace OrbitalDecay
         public override bool HasPresets { get { return true; } }
 
 
-        [GameParameters.CustomFloatParameterUI("Resource Rate Difficulty ", minValue = 0.1f, maxValue = 10f,
-                  toolTip = "")]
+        [GameParameters.CustomFloatParameterUI("Resource Rate Difficulty", minValue = 0.1f, maxValue = 10f, toolTip = "")]
         public double ResourceRateDifficulty = 1f;
 
 
@@ -78,37 +75,50 @@ namespace OrbitalDecay
                   toolTip = "Make the Decay Rate Breakdown window snap to the upper-right of the main window")]
         public bool snapBreakdownWindow = true;
 
-        [GameParameters.CustomParameterUI("Use alt skin ",
-                  toolTip = "Use an alternate skin")]
-        public bool useAltSkin = true;
+        [GameParameters.CustomParameterUI("Use alt skin", toolTip = "Use an alternate skin")]
+        public bool useAltSkin = false;
 
-        [GameParameters.CustomFloatParameterUI("Window Scaling ", minValue = 0.8f, maxValue = 2f, stepCount =  23, displayFormat = "F2")]
+        [GameParameters.CustomFloatParameterUI("Window Scaling ", minValue = 0.8f, maxValue = 2f, stepCount = 23, displayFormat = "F2")]
         public double windowScaling = 1f;
 
+        [GameParameters.CustomParameterUI("Show tooltips", toolTip = "Show tooltips for icons")]
+        public bool showTooltips = true;
+
+        [GameParameters.CustomParameterUI("Use flat icons", toolTip = "Use the non-shaded icons")]
+        public bool useFlatIcons= true;
 
         public override void SetDifficultyPreset(GameParameters.Preset preset) { }
         public override bool Enabled(MemberInfo member, GameParameters parameters) { return true; }
-        public override bool Interactible(MemberInfo member, GameParameters parameters) 
+        public override bool Interactible(MemberInfo member, GameParameters parameters)
         {
             if (!initted)
             {
                 oldWindowScaling = (float)windowScaling;
+                oldIcon = useFlatIcons;
                 initted = true;
             }
             if (oldWindowScaling != windowScaling)
             {
                 oldWindowScaling = (float)windowScaling;
+                UserInterface.windowScaling2 = oldWindowScaling;
                 RegisterToolbar.UpdateWindowSizes();
+
+                if (oldIcon != useFlatIcons)
+                {
+                    oldIcon = useFlatIcons;
+                    UserInterface.UpdateIconFolder();
+                }
             }
 
-            return true; 
+            return true;
         }
 
         bool initted = false;
         float oldWindowScaling;
-        public override IList ValidValues(MemberInfo member) 
+        bool oldIcon;
+        public override IList ValidValues(MemberInfo member)
         {
-            return null; 
+            return null;
         }
     }
 

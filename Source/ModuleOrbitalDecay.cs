@@ -175,7 +175,6 @@ namespace OrbitalDecay
             List<double> amountlist = new List<double>();
             List<float> ratiolist = new List<float>();
 
-            bool found = false;
             ConfigNode engineNode = new ConfigNode();
             if (engineData.ContainsKey(ODSKengine))
             {
@@ -213,8 +212,6 @@ namespace OrbitalDecay
 
         public void FetchEngineData()
         {
-            double amount = 0;
-            bool engineIsListed;
             //EngineData.RemoveNodes("ENGINE");
             engineData.Clear();
             for (int i = 0; i < vessel.parts.Count; i++)
@@ -372,37 +369,22 @@ namespace OrbitalDecay
         {
             IsStationKeeping = node.SafeLoad("IsStationKeeping", false);
 
-            //resources = new string[node.GetValue("resources").Split(' ').Count()];
-            if (node.HasValue("resources"))
-            {
-                resources = node.GetValue("resources").Split(' ');
-            }
-            double d;
-            if (node.HasValue("amounts"))
-            {
-                int i = 0;
+            resources = node.SafeLoad("resources", "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
-                amounts = node.GetValue("amounts").Split((char[])null, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
-                    .Select(token =>
-                    {
-                        double v;
-                        return double.TryParse(token, out v) ? v : 0f;
-                    })
-                    .ToArray();
+            amounts = node.SafeLoad("amounts", "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
+                .Select(token =>
+                {
+                    double v;
+                    return double.TryParse(token, out v) ? v : 0f;
+                }).ToArray();
 
-            }
-            float f;
-            if (node.HasValue("ratios"))
-            {
-                ratios = node.GetValue("ratios").Split((char[])null, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
-                    .Select(token =>
-                    {
-                        float v;
-                        return float.TryParse(token, out v) ? v : 0f; 
-                    })
-                    .ToArray();
+            ratios = node.SafeLoad("ratios", "").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
+                .Select(token =>
+                {
+                    float v;
+                    return float.TryParse(token, out v) ? v : 0f;
+                }).ToArray();
 
-            }
             fuelLost = node.SafeLoad("fuelLost", 0);
             ISP = node.SafeLoad("ISP", 0);
             engine = node.SafeLoad("engine", "");
@@ -410,20 +392,12 @@ namespace OrbitalDecay
 
         public void Save(ConfigNode node)
         {
-            string temporary = string.Join(" ", resources);
-            node.AddValue("resources", temporary);
-            temporary = string.Join(" ", amounts.Select(v => v.ToString()));
-
-            node.AddValue("amounts", temporary);
-            temporary = string.Join(" ", ratios.Select(v => v.ToString()));
-            node.AddValue("ratios", temporary);
-
+            node.AddValue("resources", string.Join(" ", resources));
+            node.AddValue("amounts", amounts.Select(v => v.ToString()));
+            node.AddValue("ratios", ratios.Select(v => v.ToString()));
             node.AddValue("fuelLost", fuelLost);
-
             node.AddValue("ISP", ISP);
-
             node.AddValue("engine", engine);
-
             node.AddValue("IsStationKeeping", IsStationKeeping);
         }
     }

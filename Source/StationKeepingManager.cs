@@ -23,6 +23,7 @@
  * is purely coincidental.
  */
 
+using SpaceTuxUtility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -48,15 +49,19 @@ namespace OrbitalDecay
                     List<ProtoPartModuleSnapshot> PPMSL = PPS.modules;
                     foreach (ProtoPartModuleSnapshot PPMS in PPMSL)
                     {
-                        if (PPMS.moduleName.Contains("ModuleRCS"))
-                        {
-                            if (!bool.Parse(PPMS.moduleValues.GetValue("rcsEnabled"))) continue;
-                            HasRCS = true;
-                            //break;
-                        }
+                        //if (PPMS.moduleName.Contains("ModuleRCS"))
+                        //{
+                        if (!(bool)PPMS.moduleValues.SafeLoad("rcsEnabled", false))
+                            continue;
+                        //if (!bool.Parse(PPMS.moduleValues.GetValue("rcsEnabled"))) 
+                        //    continue;
+                        HasRCS = true;
+                        //break;
+                        //}
                         if (PPMS.moduleName.Contains("ModuleEngines")) // 1.5.0 Part Module Fixes
                         {
-                            if (bool.Parse(PPMS.moduleValues.GetValue("EngineIgnited")))
+                            if ((bool)PPMS.moduleValues.SafeLoad("EngineIgnited", false))
+                                //if (bool.Parse(PPMS.moduleValues.GetValue("EngineIgnited")))
                             {
                                 HasEngine = true;
                                 //break;

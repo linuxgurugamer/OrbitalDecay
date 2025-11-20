@@ -23,6 +23,7 @@
  * is purely coincidental.
  */
 
+using SpaceTuxUtility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +43,7 @@ namespace OrbitalDecay
             if (vessel == FlightGlobals.ActiveVessel)
             {
 
-                foreach (string res in resource.Split(' '))
+                foreach (string res in resource.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     float ratio = GetResourceRatio(vessel, index++);
                     int MonoPropId = PartResourceLibrary.Instance.GetDefinition(res).id;
@@ -59,7 +60,8 @@ namespace OrbitalDecay
                     {
                         if (protopartmodulesnapshot.moduleName != "ModuleOrbitalDecay") continue;
                         ConfigNode node = protopartmodulesnapshot.moduleValues.GetNode("stationKeepData");
-                        node.SetValue("fuelLost", (quantity + double.Parse(node.GetValue("fuelLost"))).ToString());
+                        double d = node.SafeLoad("fuelLost", 0d);
+                        node.SetValue("fuelLost", (quantity + d).ToString());
                         break;
                     }
                 }
@@ -113,11 +115,11 @@ namespace OrbitalDecay
                         ConfigNode node = protopartmodulesnapshot.moduleValues.GetNode("stationKeepData");
                         int i = 0;
 
-                        foreach (string str in node.GetValue("ratios").Split(' '))
+                        foreach (string str in node.GetValue("ratios").Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                         {
                             if (i == index)
                             {
-                                ResourceRatio = float.Parse(str);
+                                ResourceRatio = float.TryParse(str, out float v) ? v : 0f;
                                 break;
                             }
                             i++;
@@ -156,18 +158,21 @@ namespace OrbitalDecay
                         if (protopartmodulesnapshot.moduleName != "ModuleOrbitalDecay" || fuel != 0) continue;
                         ConfigNode node = protopartmodulesnapshot.moduleValues.GetNode("stationKeepData");
 
-                        var ar = node.GetValue("amounts")
-                             .Split((char[])null, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
-                             .Select(token =>
-                             {
-                                 double v;
-                                 return double.TryParse(token, out v) ? v : 0f;
-                             })
-                             .ToArray();
+                        string amounts = node.SafeLoad("amounts", "");
+                        var ar = amounts.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)   // split on whitespace
+                         .Select(token =>
+                         {
+                             double v;
+                             return double.TryParse(token, out v) ? v : 0f;
+                         }).ToArray();
+
                         for (int i = 0; i < ar.Length; i++)
                             fuel += ar[i];
-
-                        fuel -= double.Parse(node.GetValue("fuelLost"));
+                        if (node.HasValue("fuelLost"))
+                        {
+                            double d = node.SafeLoad("fuelLost", 0);
+                            fuel -= d;
+                        }
                         break;
                     }
                 }

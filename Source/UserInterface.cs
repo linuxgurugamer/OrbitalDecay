@@ -45,6 +45,8 @@ namespace OrbitalDecay
 
     internal class UserInterface : MonoBehaviour
     {
+        const string ICON_FOLDER_BASE = "WhitecatIndustries/OrbitalDecay/Icon/";
+        static string ICON_FOLDER = ICON_FOLDER_BASE;
         private static int currentTab;
         private static string[] tabs = { "Vessels", "Settings" };
         private static bool DecayBreakdownwindowPositionInitted = false;
@@ -62,15 +64,19 @@ namespace OrbitalDecay
         private Vector2 scrollPosition3 = Vector2.zero;
         private float MultiplierValue = 5.0f;
         private float MultiplierValue2 = 5.0f;
-        private float windowScaling2;
+        public static float windowScaling2;
         private Vessel subwindowVessel = new Vessel();
 
         private void Awake()
         {
             GameEvents.onGUIApplicationLauncherDestroyed.Add(DestroyEvent);
             windowScaling2 = (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling;
+            UpdateIconFolder();
         }
-
+        public static void UpdateIconFolder()
+        {
+            ICON_FOLDER = ICON_FOLDER_BASE + (HighLogic.CurrentGame.Parameters.CustomParams<OD3>().useFlatIcons ? "Flat/" : "Shaded/");
+        }
         public void OnDestroy()
         {
             GameEvents.onGUIApplicationLauncherDestroyed.Remove(DestroyEvent);
@@ -102,6 +108,17 @@ namespace OrbitalDecay
             }
         }
 
+        void DrawLine(float spaceBefore = 4, float spaceAfter = 4f)
+        {
+            GUILayout.Space(spaceBefore);
+            var rect = GUILayoutUtility.GetRect(GUIContent.none,
+                                                GUIStyle.none,
+                                                GUILayout.Height(2),
+                                                GUILayout.ExpandWidth(true));
+            GUI.DrawTexture(rect, lineTex);
+            GUILayout.Space(spaceAfter);
+        }
+
         public void MainWindow(int windowID)
         {
             if (GUI.Button(new Rect(MainwindowPosition.width - 22, 3, 19, 19), "x"))
@@ -117,6 +134,7 @@ namespace OrbitalDecay
                 if (GUILayout.Button(tabs[i]))
                 {
                     currentTab = i;
+                    windowScaling2 = (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling;
                 }
             }
 
@@ -143,8 +161,83 @@ namespace OrbitalDecay
         string filterString = "";
         static bool showActiveVessel = false;
 
-        const float BUTTON_WIDTH = 34;
-        const float BUTTON_HEIGHT = 32;
+        const float BUTTON_WIDTH_BASE = 34;
+        const float BUTTON_HEIGHT_BASE = 32;
+
+        static float BUTTON_WIDTH = BUTTON_WIDTH_BASE;
+        static float BUTTON_HEIGHT = BUTTON_HEIGHT_BASE;
+
+        static Dictionary<Guid, bool> displayedVessel = new Dictionary<Guid, bool>();
+
+
+        static Texture2D Icon_Debris,
+            Icon_Debris_highlighted,
+            Icon_Relay,
+            Icon_Relay_highlighted,
+            Icon_Ship,
+            Icon_Ship_highlighted,
+            Icon_Spaceobject,
+            Icon_Spaceobject_highlighted,
+            Icon_Station,
+            Icon_Station_highlighted,
+            Icon_Unmanned,
+            Icon_Unmanned_highlighted;
+
+
+        public static void UpdateTextures()
+        {
+            Icon_Debris = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Debris", false);
+            Icon_Debris_highlighted = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Debris_highlighted", false);
+            Icon_Relay = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Relay", false);
+            Icon_Relay_highlighted = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Relay_highlighted", false);
+            Icon_Ship = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Ship", false);
+            Icon_Ship_highlighted = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Ship_highlighted", false);
+            Icon_Spaceobject = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Spaceobject", false);
+            Icon_Spaceobject_highlighted = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Spaceobject_highlighted", false);
+            Icon_Station = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Station", false);
+            Icon_Station_highlighted = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Station_highlighted", false);
+            Icon_Unmanned = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Unmanned", false);
+            Icon_Unmanned_highlighted = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Unmanned_highlighted", false);
+
+            Icon_Debris = ResizeTexture(Icon_Debris, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Debris_highlighted = ResizeTexture(Icon_Debris_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Relay = ResizeTexture(Icon_Relay, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Relay_highlighted = ResizeTexture(Icon_Relay_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Ship = ResizeTexture(Icon_Ship, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Ship_highlighted = ResizeTexture(Icon_Ship_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Spaceobject = ResizeTexture(Icon_Spaceobject, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Spaceobject_highlighted = ResizeTexture(Icon_Spaceobject_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Station = ResizeTexture(Icon_Station, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Station_highlighted = ResizeTexture(Icon_Station_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Unmanned = ResizeTexture(Icon_Unmanned, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Unmanned_highlighted = ResizeTexture(Icon_Unmanned_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+        }
+
+        public static Texture2D ResizeTexture(Texture2D source, float newWidth1, float newHeight1)
+        {
+            int newWidth = (int)Math.Round(newWidth1);
+            int newHeight = (int)Math.Round(newHeight1);
+            // Create a render target
+            RenderTexture rt = new RenderTexture(newWidth, newHeight, 0, RenderTextureFormat.ARGB32);
+            rt.filterMode = FilterMode.Bilinear;
+
+            // Copy source → RT (scaled)
+            RenderTexture.active = rt;
+            Graphics.Blit(source, rt);
+
+            // Read pixels back into a new texture
+            Texture2D newTex = new Texture2D(newWidth, newHeight, TextureFormat.ARGB32, false);
+            newTex.ReadPixels(new Rect(0, 0, newWidth, newHeight), 0, 0);
+            newTex.Apply();
+
+            // Cleanup
+            RenderTexture.active = null;
+            rt.Release();
+
+            return newTex;
+        }
+
+
         public void InformationTab()
         {
             using (new GUILayout.VerticalScope())
@@ -156,6 +249,10 @@ namespace OrbitalDecay
                     GUILayout.Label("Vessel Information Filters");
                     GUI.skin.label.alignment = TextAnchor.MiddleLeft;
                     GUI.skin.label.fontSize = (int)FONTSIZE;
+                    GUI.skin.button.fontSize = (int)FONTSIZE;
+
+                    RegisterToolbar.noPadStyle.fixedHeight = BUTTON_WIDTH * windowScaling2;
+                    RegisterToolbar.noPadStyle.fixedWidth = BUTTON_HEIGHT * windowScaling2;
                 }
 
                 // 1.5.2 Filtering // 
@@ -165,10 +262,26 @@ namespace OrbitalDecay
                     GUILayout.Label("Filter: ");
                     filterString = GUILayout.TextField(filterString, GUILayout.Width(150));
                     GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button("+ all", GUILayout.Width(40)))
+                    {
+                        foreach (var v in FlightGlobals.Vessels)
+                            displayedVessel[v.id] = true;
+                    }
+                    if (GUILayout.Button("- all", GUILayout.Width(40)))
+                    {
+                        foreach (var v in FlightGlobals.Vessels)
+                            displayedVessel[v.id] = false;
+                    }
+
+
                     if (HighLogic.LoadedSceneIsFlight)
                     {
+                        GUILayout.FlexibleSpace();
                         showActiveVessel = GUILayout.Toggle(showActiveVessel, "");
                         GUILayout.Label("Show Active Vessel");
+                        if (showActiveVessel)
+                            displayedVessel[FlightGlobals.ActiveVessel.id] = true;
                     }
                     else
                         showActiveVessel = false;
@@ -180,10 +293,10 @@ namespace OrbitalDecay
                     GUIContent guiContent;
 
                     guiContent = FilterTypes.Contains(VesselType.Probe) ?
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned_highlighted", false), "Unmanned") :
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Unmanned", false), "Unmanned");
+                                            new GUIContent(Icon_Unmanned_highlighted, "Unmanned") :
+                                            new GUIContent(Icon_Unmanned, "Unmanned");
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle, GUILayout.Width(BUTTON_WIDTH), GUILayout.Height(BUTTON_HEIGHT)))
+                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
                     {
                         if (FilterTypes.Contains(VesselType.Probe))
                             FilterTypes.Remove(VesselType.Probe);
@@ -193,11 +306,11 @@ namespace OrbitalDecay
 
                     //GUILayout.Space(3);
                     guiContent = FilterTypes.Contains(VesselType.Relay) ?
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay_highlighted", false), "Relay") :
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Relay", false), "Relay");
+                        new GUIContent(Icon_Relay_highlighted, "Relay") :
+                        new GUIContent(Icon_Relay, "Relay");
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle, GUILayout.Width(BUTTON_WIDTH), GUILayout.Height(BUTTON_HEIGHT)))
+                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
                     {
                         if (FilterTypes.Contains(VesselType.Relay))
                             FilterTypes.Remove(VesselType.Relay);
@@ -208,11 +321,11 @@ namespace OrbitalDecay
                     //GUILayout.Space(3);
 
                     guiContent = FilterTypes.Contains(VesselType.Ship) ?
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship_highlighted", false), "Ship") :
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Ship", false), "Ship");
+                        new GUIContent(Icon_Ship_highlighted, "Ship") :
+                        new GUIContent(Icon_Ship, "Ship");
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle, GUILayout.Width(BUTTON_WIDTH), GUILayout.Height(BUTTON_HEIGHT)))
+                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
                     {
                         if (FilterTypes.Contains(VesselType.Ship))
                             FilterTypes.Remove(VesselType.Ship);
@@ -222,10 +335,10 @@ namespace OrbitalDecay
 
                     //GUILayout.Space(3);
                     guiContent = FilterTypes.Contains(VesselType.Station) ?
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station_highlighted", false), "Station") :
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Station", false), "Station");
+                        new GUIContent(Icon_Station_highlighted, "Station") :
+                        new GUIContent(Icon_Station, "Station");
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle, GUILayout.Width(BUTTON_WIDTH), GUILayout.Height(BUTTON_HEIGHT)))
+                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
                     {
                         if (FilterTypes.Contains(VesselType.Station))
                             FilterTypes.Remove(VesselType.Station);
@@ -236,11 +349,11 @@ namespace OrbitalDecay
                     //GUILayout.Space(3);
 
                     guiContent = FilterTypes.Contains(VesselType.SpaceObject) ?
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject_highlighted", false), "Space Object") :
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Spaceobject", false), "Space Object");
+                        new GUIContent(Icon_Spaceobject_highlighted, "Space Object") :
+                        new GUIContent(Icon_Spaceobject, "Space Object");
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle, GUILayout.Width(BUTTON_WIDTH), GUILayout.Height(BUTTON_HEIGHT)))
+                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
                     {
                         if (FilterTypes.Contains(VesselType.SpaceObject))
                             FilterTypes.Remove(VesselType.SpaceObject);
@@ -253,14 +366,12 @@ namespace OrbitalDecay
                             FilterTypes.Add(VesselType.Unknown);
                     }
 
-                    //GUILayout.Space(3);
-
                     guiContent = FilterTypes.Contains(VesselType.Debris) ?
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris_highlighted", false), "Debris") :
-                        new GUIContent(GameDatabase.Instance.GetTexture("WhitecatIndustries/OrbitalDecay/Icon/Icon_Debris", false), "Debris");
+                        new GUIContent(Icon_Debris_highlighted, "Debris") :
+                        new GUIContent(Icon_Debris, "Debris");
 
                     GUILayout.FlexibleSpace();
-                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle, GUILayout.Width(BUTTON_WIDTH), GUILayout.Height(BUTTON_HEIGHT)))
+                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
                     {
                         if (FilterTypes.Contains(VesselType.Debris))
                             FilterTypes.Remove(VesselType.Debris);
@@ -268,12 +379,10 @@ namespace OrbitalDecay
                             FilterTypes.Add(VesselType.Debris);
                     }
 
-                    //GUILayout.Space(3);
                     GUILayout.FlexibleSpace();
                 }
 
-                GUILayout.Space(3);
-                GUILayout.Label("_______________________________________");
+                DrawLine(4, 4);
             }
 
             scrollPosition1 = GUILayout.BeginScrollView(scrollPosition1,
@@ -285,213 +394,240 @@ namespace OrbitalDecay
             var filterString1 = filterString.ToLower();
 
             foreach (Vessel vessel in FlightGlobals.Vessels)
-            {
-                if ((showActiveVessel && vessel.id == FlightGlobals.ActiveVessel.id) ||
-                    (!showActiveVessel && vessel.vesselName.ToLower().Contains(filterString1) && FilterTypes.Contains(vessel.vesselType))
-                    )
+                if (vessel != null)
                 {
+                    if (!displayedVessel.ContainsKey(vessel.id))
+                        displayedVessel[vessel.id] = false;
 
-                    if (vessel.situation == Vessel.Situations.ORBITING)
+                    if ((showActiveVessel && vessel.id == FlightGlobals.ActiveVessel.id) ||
+                        (!showActiveVessel && vessel.vesselName.ToLower().Contains(filterString1) && FilterTypes.Contains(vessel.vesselType))
+                        )
                     {
-                        bool StationKeeping = VesselData.FetchStationKeeping(vessel);
-                        double StationKeepingFuelRemaining = ResourceManager.GetResources(vessel);
-                        string Resource = ResourceManager.GetResourceNames(vessel);
-                        double HoursInDay = 6.0;
 
-                        double DaysInYear = 0;
-                        bool KerbinTime = GameSettings.KERBIN_TIME;
-
-                        if (KerbinTime)
+                        using (new GUILayout.VerticalScope())
                         {
-                            DaysInYear = 9203545 / (60 * 60 * HoursInDay);
-                        }
-                        else
-                        {
-                            DaysInYear = 31557600 / (60 * 60 * HoursInDay);
-                        }
+                            if (vessel.situation == Vessel.Situations.ORBITING)
+                            {
+                                bool StationKeeping = VesselData.FetchStationKeeping(vessel);
+                                double StationKeepingFuelRemaining = ResourceManager.GetResources(vessel);
+                                string Resource = ResourceManager.GetResourceNames(vessel);
+                                double HoursInDay = 6.0;
 
+                                double DaysInYear = 0;
+                                bool KerbinTime = GameSettings.KERBIN_TIME;
 
+#if false
+                            if (KerbinTime)
+                            {
+                                DaysInYear = 9203545 / (60 * 60 * HoursInDay);
+                            }
+                            else
+                            {
+                                DaysInYear = 31557600 / (60 * 60 * HoursInDay);
+                            }
+#endif
 
-                        if (ClockType)
-                        {
-                            HoursInDay = 24.0;
-                        }
-                        else
-                        {
-                            HoursInDay = 6.0;
-                        }
+                                DaysInYear = KerbinTime ? (9203545 / (60 * 60 * HoursInDay)) : (31557600 / (60 * 60 * HoursInDay));
 
-                        GUILayout.BeginVertical();
-                        //   GUILayout.Label("Vessels count" + VesselData.VesselInformation.CountNodes.ToString());
-                        GUILayout.Label("Vessel Name: <B>" + vessel.vesselName + "</B>");
-                        //    GUILayout.Label("Vessel Area: " + VesselData.FetchArea(vessel).ToString());
-                        //    GUILayout.Label("Vessel Mass: " + VesselData.FetchMass(vessel).ToString());
-                        GUILayout.Space(2);
-                        GUILayout.Label("Orbiting Body: " + vessel.orbitDriver.orbit.referenceBody.GetName());
-                        GUILayout.Space(2);
+#if false
+                            if (ClockType)
+                            {
+                                HoursInDay = 24.0;
+                            }
+                            else
+                            {
+                                HoursInDay = 6.0;
+                            }
+#endif
 
-                        if (StationKeeping == true)
-                        {
-                            GUILayout.Label("Current Total Decay Rate: Vessel is Station Keeping");
-                            GUILayout.Space(2);
-                        }
-                        else
-                        {
-                            double TotalDecayRatePerSecond = Math.Abs(DecayManager.DecayRateAtmosphericDrag(vessel)) + Math.Abs(DecayManager.DecayRateRadiationPressure(vessel)) + Math.Abs(DecayManager.DecayRateYarkovskyEffect(vessel)); //+ Math.Abs(DecayManager.DecayRateGravitationalPertubation(vessel));
-                            double ADDR = DecayManager.DecayRateAtmosphericDrag(vessel);
-                            double GPDR = DecayManager.DecayRateGravitationalPertubation(vessel);
-                            double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
-                            double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
+                                HoursInDay = ClockType ? 24d : 6d;
 
-                            GUILayout.Label("Current Total Decay Rate: " + FormatDecayRateToString(TotalDecayRatePerSecond));
-                            GUILayout.Space(2);
+                                //   GUILayout.Label("Vessels count" + VesselData.VesselInformation.CountNodes.ToString());
+                                using (new GUILayout.HorizontalScope())
+                                {
+                                    if (GUILayout.Button(displayedVessel[vessel.id] ? "-" : "+", GUILayout.Width(20)))
+                                    {
+                                        displayedVessel[vessel.id] = !displayedVessel[vessel.id];
+                                    }
+                                    GUILayout.Label("Vessel Name: <B>" + vessel.vesselName + "</B>");
+                                }
 
-#if DEBUG
+                                if (displayedVessel[vessel.id])
+                                {
+                                    //    GUILayout.Label("Vessel Area: " + VesselData.FetchArea(vessel).ToString());
+                                    //    GUILayout.Label("Vessel Mass: " + VesselData.FetchMass(vessel).ToString());
+                                    GUILayout.Space(2);
+                                    GUILayout.Label("Orbiting Body: " + vessel.orbitDriver.orbit.referenceBody.GetName());
+                                    GUILayout.Space(2);
+
+                                    if (StationKeeping == true)
+                                    {
+                                        GUILayout.Label("Current Total Decay Rate: Vessel is Station Keeping");
+                                        GUILayout.Space(2);
+                                    }
+                                    else
+                                    {
+                                        double TotalDecayRatePerSecond = Math.Abs(DecayManager.DecayRateAtmosphericDrag(vessel)) + Math.Abs(DecayManager.DecayRateRadiationPressure(vessel)) + Math.Abs(DecayManager.DecayRateYarkovskyEffect(vessel)); //+ Math.Abs(DecayManager.DecayRateGravitationalPertubation(vessel));
+                                        double ADDR = DecayManager.DecayRateAtmosphericDrag(vessel);
+                                        double GPDR = DecayManager.DecayRateGravitationalPertubation(vessel);
+                                        double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
+                                        double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
+
+                                        GUILayout.Label("Current Total Decay Rate: " + FormatDecayRateToString(TotalDecayRatePerSecond));
+                                        GUILayout.Space(2);
+
+#if false
                             GUILayout.Label("AP: " + vessel.orbit.ApA.ToString("F1"));
                             GUILayout.Label($"PE: " + vessel.orbit.PeA.ToString("F1"));
                             GUILayout.Space(2);
 #endif
 
-                            double TimeUntilDecayInUnits = 0.0;
-                            string TimeUntilDecayInDays = "";
+                                        double TimeUntilDecayInUnits = 0.0;
+                                        string TimeUntilDecayInDays = "";
 
-                            if (ADDR != 0)
-                            {
-                                TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel);
-                                TimeUntilDecayInDays = FormatTimeUntilDecayInDaysToString(TimeUntilDecayInUnits);
-                            }
-                            else
-                            {
-                                TimeUntilDecayInUnits = DecayManager.DecayTimePredictionLinearVariables(vessel);
-                                TimeUntilDecayInDays = FormatTimeUntilDecayInSecondsToString(TimeUntilDecayInUnits);
-                            }
-
-                            GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays);
-                            GUILayout.Space(2);
-                        }
-
-                        GUILayout.Label("Station Keeping: " + StationKeeping);
-                        GUILayout.Space(2);
-                        GUILayout.Label("Station Keeping Fuel Remaining: " + StationKeepingFuelRemaining.ToString("F3"));
-                        GUILayout.Space(2);
-                        GUILayout.Label("Using Fuel Type: " + Resource);//151
-                        GUILayout.Space(2); //151
-
-
-                        if (StationKeeping == true)
-                        {
-                            double DecayRateSKL = 0;
-
-                            DecayRateSKL = DecayManager.DecayRateAtmosphericDrag(vessel) + DecayManager.DecayRateRadiationPressure(vessel) + DecayManager.DecayRateYarkovskyEffect(vessel);
-
-
-                            double StationKeepingLifetime = StationKeepingFuelRemaining / (DecayRateSKL / TimeWarp.CurrentRate * VesselData.FetchEfficiency(vessel) /*ResourceManager.GetEfficiency(Resource)*/ * Settings.ReadResourceRateDifficulty()) / (60 * 60 * HoursInDay);
-
-                            if (StationKeepingLifetime < -5) // SRP Fixes
-                            {
-                                GUILayout.Label("Station Keeping Fuel Lifetime: > 1000 years.");
-                            }
-
-                            else
-                            {
-                                if (StationKeepingLifetime > 365000 && HoursInDay == 24)
-                                {
-                                    GUILayout.Label("Station Keeping Fuel Lifetime: > 1000 years.");
-                                }
-
-                                else if (StationKeepingLifetime > 425000 && HoursInDay == 6)
-                                {
-                                    GUILayout.Label("Station Keeping Fuel Lifetime: > 1000 years.");
-                                }
-
-                                else
-                                {
-                                    if (StationKeepingLifetime > 425 && HoursInDay == 6)
-                                    {
-                                        GUILayout.Label("Station Keeping Fuel Lifetime: " + (StationKeepingLifetime / 425).ToString("F1") + " years.");
-                                    }
-
-                                    else if (StationKeepingLifetime > 365 && HoursInDay == 24)
-                                    {
-                                        GUILayout.Label("Station Keeping Fuel Lifetime: " + (StationKeepingLifetime / 365).ToString("F1") + " years.");
-                                    }
-
-                                    else
-                                    {
-                                        GUILayout.Label("Station Keeping Fuel Lifetime: " + StationKeepingLifetime.ToString("F1") + " days.");
-                                    }
-                                }
-                            }
-                            GUILayout.Space(3);
-                        }
-                        using (new GUILayout.HorizontalScope())
-                        {
-                            if (GUILayout.Button((ToolbarInterface.DecayBreakdownVisible ? "Hide" : "Show") + " Decay Rate Detail")) // Display a new window here?
-                            {
-                                subwindowVessel = vessel;
-                                ToolbarInterface.DecayBreakdownVisible = !ToolbarInterface.DecayBreakdownVisible;
-                            }
-
-                            if (GUILayout.Button(StationKeeping ? "Enable Station Keeping" : "Disable Station Keeping"))
-                            {
-                                if (StationKeeping == true)
-                                {
-                                    VesselData.UpdateStationKeeping(vessel, false);
-                                    ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + ": Station Keeping Disabled");
-
-                                }
-
-                                if (StationKeeping == false)
-                                {
-                                    if (StationKeepingManager.EngineCheck(vessel))
-                                    {
-                                        if (StationKeepingFuelRemaining > 0.01) // Good enough...
+                                        if (ADDR != 0)
                                         {
-
-                                            VesselData.UpdateStationKeeping(vessel, true);
-                                            ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + ": Station Keeping Enabled");
+                                            TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel);
+                                            TimeUntilDecayInDays = FormatTimeUntilDecayInDaysToString(TimeUntilDecayInUnits);
                                         }
                                         else
                                         {
-                                            ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + " has no fuel to Station Keep!");
+                                            TimeUntilDecayInUnits = DecayManager.DecayTimePredictionLinearVariables(vessel);
+                                            TimeUntilDecayInDays = FormatTimeUntilDecayInSecondsToString(TimeUntilDecayInUnits);
+                                        }
+
+                                        GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays);
+                                        GUILayout.Space(2);
+                                    }
+
+                                    GUILayout.Label("Station Keeping: " + StationKeeping);
+                                    GUILayout.Space(2);
+                                    GUILayout.Label("Station Keeping Fuel Remaining: " + StationKeepingFuelRemaining.ToString("F3"));
+                                    GUILayout.Space(2);
+                                    GUILayout.Label("Using Fuel Type: " + Resource);//151
+                                    GUILayout.Space(2); //151
+
+
+                                    if (StationKeeping == true)
+                                    {
+                                        double DecayRateSKL = 0;
+
+                                        DecayRateSKL = DecayManager.DecayRateAtmosphericDrag(vessel) + DecayManager.DecayRateRadiationPressure(vessel) + DecayManager.DecayRateYarkovskyEffect(vessel);
+
+
+                                        double StationKeepingLifetime = StationKeepingFuelRemaining / (DecayRateSKL / TimeWarp.CurrentRate * VesselData.FetchEfficiency(vessel) /*ResourceManager.GetEfficiency(Resource)*/ * Settings.ReadResourceRateDifficulty()) / (60 * 60 * HoursInDay);
+
+                                        if (StationKeepingLifetime < -5) // SRP Fixes
+                                        {
+                                            GUILayout.Label("Station Keeping Fuel Lifetime: > 1000 years.");
+                                        }
+
+                                        else
+                                        {
+                                            if (StationKeepingLifetime > 365000 && HoursInDay == 24)
+                                            {
+                                                GUILayout.Label("Station Keeping Fuel Lifetime: > 1000 years.");
+                                            }
+
+                                            else if (StationKeepingLifetime > 425000 && HoursInDay == 6)
+                                            {
+                                                GUILayout.Label("Station Keeping Fuel Lifetime: > 1000 years.");
+                                            }
+
+                                            else
+                                            {
+                                                if (StationKeepingLifetime > 425 && HoursInDay == 6)
+                                                {
+                                                    GUILayout.Label("Station Keeping Fuel Lifetime: " + (StationKeepingLifetime / 425).ToString("F1") + " years.");
+                                                }
+
+                                                else if (StationKeepingLifetime > 365 && HoursInDay == 24)
+                                                {
+                                                    GUILayout.Label("Station Keeping Fuel Lifetime: " + (StationKeepingLifetime / 365).ToString("F1") + " years.");
+                                                }
+
+                                                else
+                                                {
+                                                    GUILayout.Label("Station Keeping Fuel Lifetime: " + StationKeepingLifetime.ToString("F1") + " days.");
+                                                }
+                                            }
+                                        }
+                                        GUILayout.Space(3);
+                                    }
+                                    using (new GUILayout.HorizontalScope())
+                                    {
+                                        if (GUILayout.Button((ToolbarInterface.DecayBreakdownVisible ? "Hide" : "Show") + " Decay Rate Detail")) // Display a new window here?
+                                        {
+                                            subwindowVessel = vessel;
+                                            ToolbarInterface.DecayBreakdownVisible = !ToolbarInterface.DecayBreakdownVisible;
+                                        }
+
+                                        if (GUILayout.Button((StationKeeping ? "Disable" : "Enable") + " Station Keeping"))
+                                        {
+                                            if (StationKeeping == true)
+                                            {
+                                                VesselData.UpdateStationKeeping(vessel, false);
+                                                ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + ": Station Keeping Disabled");
+
+                                            }
+
+                                            if (StationKeeping == false)
+                                            {
+                                                if (StationKeepingManager.EngineCheck(vessel))
+                                                {
+                                                    if (StationKeepingFuelRemaining > 0.01) // Good enough...
+                                                    {
+
+                                                        VesselData.UpdateStationKeeping(vessel, true);
+                                                        ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + ": Station Keeping Enabled");
+                                                    }
+                                                    else
+                                                    {
+                                                        ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + " has no fuel to Station Keep!");
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + " has no Engines or RCS modules on board!");
+                                                }
+                                            }
                                         }
                                     }
-                                    else
+                                    if (vessel.id != FlightGlobals.ActiveVessel.id)
                                     {
-                                        ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + " has no Engines or RCS modules on board!");
+                                        if (GUILayout.Button("Switch to vessel"))
+                                        {
+                                            VesselSwitcher.SwitchToGuid(vessel.id);
+                                        }
                                     }
                                 }
+
+                                DrawLine(4, 4);
+                            }
+                            else
+                            {
+                                GUILayout.Label($"Vessel Name: <B>{vessel.vesselName}</B>");
+                                GUILayout.Label($"Situation: {vessel.situation.ToString()}");
+                                DrawLine(4, 4);
                             }
                         }
-                        GUILayout.Space(2);
-                        GUILayout.Label("_____________________________________");
-                        GUILayout.Space(3);
-                        GUILayout.EndVertical();
-                    }
-                    else
-                    {
-                        GUILayout.Label($"Vessel Name: <B>{vessel.vesselName}</B>");
-                        GUILayout.Label($"Situation: {vessel.situation.ToString()}");
-                        GUILayout.Space(2);
-                        GUILayout.Label("_____________________________________");
-                        GUILayout.Space(3);
                     }
                 }
-            }
             GUILayout.EndScrollView();
             // Optionally display the tooltip near the mouse cursor
-            // if (HighLogic.CurrentGame.Parameters.CustomParams<MissionPlannerSettings>().showTooltips)
+            if (HighLogic.CurrentGame.Parameters.CustomParams<OD3>().showTooltips)
             {
                 if (!string.IsNullOrEmpty(GUI.tooltip))
                 {
                     Vector2 mouse = Event.current.mousePosition;
-                    Vector2 size = comboBoxStyle.CalcSize(new GUIContent(GUI.tooltip));
+                    var content = new GUIContent(GUI.tooltip);
+                    Vector2 size = GUI.skin.label.CalcSize(content);
 
                     // Small offset so it doesn’t overlap the cursor
                     Rect tipRect = new Rect(mouse.x + 16f, mouse.y + 16f,
-                                            (float)((size.x + 8f) * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling),
-                                            (float)((size.y + 4f) * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
-                    GUI.Box(tipRect, GUI.tooltip);
+                                            (float)(size.x + 8f),
+                                            (float)(size.y + 4f));
+                    GUI.Box(tipRect, content);
                 }
             }
         }
@@ -508,13 +644,14 @@ namespace OrbitalDecay
             GUILayout.EndHorizontal();
 
             GUILayout.BeginVertical();
-            using (new GUILayout.HorizontalScope())
-            {
-                GUILayout.FlexibleSpace();
-                GUILayout.Label("_________________________________________");
-                GUILayout.FlexibleSpace();
-            }
-            GUILayout.Space(3);
+            DrawLine(4, 4);
+            //using (new GUILayout.HorizontalScope())
+            //{
+            //GUILayout.FlexibleSpace();
+            //GUILayout.Label("_________________________________________");
+            //GUILayout.FlexibleSpace();
+            //}
+            //GUILayout.Space(3);
 
             double DecayDifficulty = HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
             double ResourceDifficulty = Settings.ReadResourceRateDifficulty();
@@ -548,9 +685,10 @@ namespace OrbitalDecay
                 ScreenMessages.PostScreenMessage("Decay Multiplier set to: " + (MultiplierValue / 5).ToString("F2"));
             }
 
-            GUILayout.Space(2);
-            GUILayout.Label("_________________________________________");
-            GUILayout.Space(3);
+            //GUILayout.Space(2);
+            DrawLine(4, 4);
+            //GUILayout.Label("_________________________________________");
+            //GUILayout.Space(3);
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
             MultiplierValue2 = GUILayout.HorizontalSlider(MultiplierValue2, 0.5f, 50.0f);
             GUILayout.Space(2);
@@ -565,9 +703,10 @@ namespace OrbitalDecay
                 ScreenMessages.PostScreenMessage("Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
             }
 
-            GUILayout.Space(2);
-            GUILayout.Label("_________________________________________");
-            GUILayout.Space(3);
+            //GUILayout.Space(2);
+            DrawLine(4, 4);
+            //GUILayout.Label("_________________________________________");
+            //GUILayout.Space(3);
             GUI.skin.label.alignment = TextAnchor.MiddleCenter;
             windowScaling2 = GUILayout.HorizontalSlider(windowScaling2, 0.8f, 2f);
             GUILayout.Space(2);

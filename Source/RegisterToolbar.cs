@@ -30,8 +30,11 @@ namespace OrbitalDecay
         public static GUIStyle hSmallScrollBar;
         public static GUIStyle windowStyle;
         public static GUIStyle comboBoxStyle;
+
         public static Rect MainwindowPosition = new Rect(150, 75, WINWIDTH + 40, 500);
         public static Rect DecayBreakdownwindowPosition = new Rect(0, 0, 450, 150);
+
+        public static Texture2D lineTex;
 
         void Start()
         {
@@ -61,7 +64,8 @@ namespace OrbitalDecay
                 padding = new RectOffset(0, 0, 0, 0),
                 margin = new RectOffset(0, 0, 0, 0),
                 border = new RectOffset(0, 0, 0, 0),
-                overflow = new RectOffset(0, 0, 0, 0)
+                overflow = new RectOffset(0, 0, 0, 0),
+                imagePosition = ImagePosition.ImageOnly,
             };
             // IMPORTANT: remove background textures so Unity can't add its own box
             noPadStyle.normal.background = null;
@@ -76,25 +80,40 @@ namespace OrbitalDecay
             comboBoxStyle = GUI.skin.box;
 
             UpdateWindowSizes();
+            InitLine();
         }
 
+        static void InitLine()
+        {
+            if (lineTex == null)
+            {
+                lineTex = new Texture2D(1, 1);
+                lineTex.SetPixel(0, 0, Color.white);
+                lineTex.Apply();
+            }
+        }
         public static void UpdateWindowSizes()
         {
-            WINWIDTH = (float)(WINWIDTH_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
-            VI_BUTTON = (float)(VI_BUTTON_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
-            INFO_WIDTH = (float)(INFO_WIDTH_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
+            if (HighLogic.CurrentGame != null)
+            {
+                WINWIDTH = (float)(WINWIDTH_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
+                VI_BUTTON = (float)(VI_BUTTON_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
+                INFO_WIDTH = (float)(INFO_WIDTH_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
 
-            MainwindowPosition = new Rect(MainwindowPosition.x, MainwindowPosition.y,
-                (float)(WINWIDTH + 40f * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling),
-                (float)(500 * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
+                MainwindowPosition = new Rect(MainwindowPosition.x, MainwindowPosition.y,
+                    (float)(WINWIDTH + 40f * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling),
+                    (float)(500 * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
 
-            DecayBreakdownwindowPosition = new Rect(DecayBreakdownwindowPosition.x, DecayBreakdownwindowPosition.y,
-                (float)(450 * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling),
-                (float)(150 * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
+                DecayBreakdownwindowPosition = new Rect(DecayBreakdownwindowPosition.x, DecayBreakdownwindowPosition.y,
+                    (float)(450 * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling),
+                    (float)(150 * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
 
-            FONTSIZE = (float)(FONTSIZE_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
-            LARGEFONTSIZE = Mathf.Round((float)(LARGEFONTSIZE_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
-            SCROLLVIEW_HEIGHT = Mathf.Round((float)(SCROLLVIEW_HEIGHT_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
+                FONTSIZE = (float)(FONTSIZE_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
+                LARGEFONTSIZE = Mathf.Round((float)(LARGEFONTSIZE_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
+                SCROLLVIEW_HEIGHT = Mathf.Round((float)(SCROLLVIEW_HEIGHT_CONST * HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling));
+
+                UserInterface.UpdateTextures();
+            }
         }
     }
 }

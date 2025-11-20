@@ -68,11 +68,13 @@ namespace OrbitalDecay
             double AmplitudeOfRotation = 0;
             double RotationPhase = 0;
 
+#if false
             if (LoadingCheck.PersistentRotationInstalled)
             {
                 // Add Persistent Rotation Compatibility here! //1.6.0
             }
             else
+#endif
             {
                 if (vessel.isActiveVessel)
                 {

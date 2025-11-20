@@ -51,7 +51,6 @@ namespace OrbitalDecay
 
         private float _uptInterval = 1.0f;
         private float _lastUpdate;
-        private float _lastUpdaten = 0.0f;
         private float _lastUpdate2 = 0.0f;
 
         public static double DecayValue;
@@ -176,30 +175,11 @@ namespace OrbitalDecay
             }
         }
 
-#if false
-        public void QuickSaveUpdate(ConfigNode node)
-        {
-            VesselData.OnQuickSave();
-        } // 1.5.0 QuickSave functionality // Thanks zajc3w!
-#endif
-
-
         public void QuickLoadUpdate()
         {
             VesselData.OnQuickLoad(); // 1.5.3 Fixes
             VesselData.VesselInfo.Clear();
-            //VesselData.VesselInformation.ClearNodes();
             print("WhitecatIndustries - OrbitalDecay - Vessel Information lost OnQuickLoadUpdate");
-            //string filePath = KSPUtil.ApplicationRootPath + "GameData/WhitecatIndustries/OrbitalDecay/PluginData/VesselData.cfg";
-#if false
-            ConfigNode fileM = new ConfigNode();
-            ConfigNode fileN = new ConfigNode("VESSEL");
-            fileN.AddValue("name", "WhitecatsDummyVessel");
-            fileN.AddValue("id", "000");
-            fileN.AddValue("persistence", "WhitecatsDummySaveFileThatNoOneShouldNameTheirSave");
-            fileM.AddNode(fileN);
-            VesselData.VesselInformation.AddNode(fileM);
-#endif
             VesselData.VesselInfo[Guid.Empty] = new Vessel_Information("WhitecatsDummyVessel", Guid.Empty);
 
             VesselData.OnQuickSave();
@@ -331,14 +311,6 @@ namespace OrbitalDecay
             {
                 if (FlightGlobals.ActiveVessel.isActiveAndEnabled) // Vessel is ready
                 {
-#if false
-                    if (VesselData.FetchFuelLost() > 0)
-                    {
-                        ResourceManager.RemoveResources(FlightGlobals.ActiveVessel, VesselData.FetchFuelLost());
-                        VesselData.SetFuelLost(0);
-
-                    }
-#endif
                     if (modVessel != FlightGlobals.ActiveVessel.id)
                     {
                         ModuleOrbitalDecay mod = FlightGlobals.ActiveVessel.FindPartModuleImplementing<ModuleOrbitalDecay>();
@@ -465,19 +437,6 @@ namespace OrbitalDecay
         #endregion
 
         #region Active Specific Subroutines
-
-#if false
-        public void ActiveVesselOrbitManage()
-        {
-            // Redundant in 1.1.0
-
-            if (ActiveVesselOnOrbit) return;
-            if (FlightGlobals.ActiveVessel.situation != Vessel.Situations.ORBITING) return;
-            ActiveVesselOnOrbit = true;
-            VesselData.WriteVesselData(FlightGlobals.ActiveVessel);
-
-        } // Redundant in 1.1.0
-#endif
 
         public static void CatchUpOrbit(Vessel vessel)
         {
@@ -1015,16 +974,6 @@ namespace OrbitalDecay
             if (TimeWarp.CurrentRate == 0 || TimeWarp.CurrentRate > 0 && TimeWarp.WarpMode == TimeWarp.Modes.LOW)
             {
                 if (vessel.vesselType == VesselType.EVA) return;
-#if false
-                foreach (Part p in vessel.parts)
-                {
-                    if (p.physicalSignificance == Part.PhysicalSignificance.FULL &&
-                        p.Rigidbody != null)
-                    {
-                        // p.Rigidbody.AddForce((Vector3d.back * (decayForce))); // 1.5.0 Too Fast Still
-                    }
-                }
-#endif
                 VesselData.UpdateVesselSMA(vessel, newSemiMajorAxis);
 
             }

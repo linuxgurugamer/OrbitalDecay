@@ -67,7 +67,7 @@ Changelog
 	Fixed the toolbar button status after clicking the X button
 	Fixed code to allow stationkeeping to work with parts with both RCS and engines to work 
 
-1.7.0.8 (unreleased)
+1.7.0.8  - RC1
 	Fixed Selecting toggle to show active vessel and then switching to any other scene would cause nothing to show
 	Removed more float/double parsing of strings
 	Simplified code for converting lines of numbers to numeric arrays
@@ -78,4 +78,20 @@ Changelog
 	Cleaned up filter button placement and spaced them out evenly
 	Added GUI scaling
 	Cleaned up disabled code
+
+1.7.0.9 - RC2
+	Fixed enable/disable Station Keeping being reversed
+	Cleaned up some code when a game is being saved
+	Fixed an issue where if a bad value (NaN) was in a file, NaN was being shown on the data screen and the ship was unable to do station keeping
+	Enabled harder settings for RSS (Realistic Decay, 24 hour clock). (see next line)
+	Fixed code for the RSS to only set options on a new game
+	Added buttons to expand/contract the data for each vessel being displayed
+	Changed horizontal lines from underscores to an actual line
+	Normalized the spacing above and below the horizontal lines
 	
+	Thanks to @Niako (pkmniako) for this:
+		New/updated icons
+
+	Added option to switch between flat and shaded icons
+	Added scaling of the buttons
+	Added a button to allow switching to a vessel
