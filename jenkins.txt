@@ -34,7 +34,7 @@
 2:OrbitalDecay,Source/OrbitalDecay.csproj,WhitecatIndustries/OrbitalDecay.version,GameData/WhitecatIndustries/OrbitalDecay/Plugins
 
 # 3:SOURCEFILE, DESTDIR
-3:OrbitalDecay.version,GameData/OrbitalDecay
+3:WhitecatIndustries/OrbitalDecay.version,GameData/WhitecatIndustries/OrbitalDecay
 3:LICENSE.md,GameData/WhitecatIndustries/OrbitalDecay
 #3:README.md,GameData/WhitecatIndustries/OrbitalDecay
 
