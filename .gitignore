@@ -230,7 +230,4 @@ $RECYCLE.BIN/
 #
 *~
 *.swp
-*.dll
-*.pdb
 .vs
-*.zip
