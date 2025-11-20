@@ -40,21 +40,21 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="ClickThroughBlocker">
-      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
+      <HintPath>$(KSPDIR)\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
     </Reference>
     <Reference Include="KSP_Log">
-      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\SpaceTuxLibrary\Plugins\KSP_Log.dll</HintPath>
+      <HintPath>$(KSPDIR)\GameData\SpaceTuxLibrary\Plugins\KSP_Log.dll</HintPath>
     </Reference>
     <Reference Include="SolarCycleSimulator">
-      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\WhitecatIndustries\SolarCycleSimulator\Plugins\SolarCycleSimulator.dll</HintPath>
+      <HintPath>$(KSPDIR)\GameData\WhitecatIndustries\SolarCycleSimulator\Plugins\SolarCycleSimulator.dll</HintPath>
     </Reference>
     <Reference Include="SpaceTuxUtility, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\SpaceTuxLibrary\Plugins\SpaceTuxUtility.dll</HintPath>
+      <HintPath>$(KSPDIR)\GameData\SpaceTuxLibrary\Plugins\SpaceTuxUtility.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="ToolbarControl">
-      <HintPath>R:\KSP\KSP_1.12.5-dev\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
+      <HintPath>$(KSPDIR)\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
