@@ -67,15 +67,14 @@ namespace OrbitalDecay
             {
                 ToolbarInterface.GuiOff();
             }
-            GUILayout.BeginVertical();
-            GUILayout.Space(20);
+            using (new GUILayout.VerticalScope())
+            {
+                GUILayout.Space(20);
 
-            scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, hSmallScrollBar, GUI.skin.verticalScrollbar);
-
-            InformationTab();
-            GUILayout.EndScrollView();
-
-            GUILayout.EndVertical();
+                scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, hSmallScrollBar, GUI.skin.verticalScrollbar);
+                InformationTab();
+                GUILayout.EndScrollView();
+            }
             GUI.DragWindow();
             MainwindowPosition.height = Math.Min(MainwindowPosition.height, Screen.height - 100);
             MainwindowPosition.x = Mathf.Clamp(MainwindowPosition.x, 0f, Screen.width - MainwindowPosition.width);
@@ -96,118 +95,108 @@ namespace OrbitalDecay
             double VesselMass = CalculateMass();
             double VesselArea = CalculateArea();
 
-            GUILayout.BeginHorizontal(GUILayout.Width(WINWIDTH ));
-            GUI.skin.label.fontSize = (int)Math.Round(LARGEFONTSIZE);
-            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Vessel Information", GUILayout.Width(VI_BUTTON ));
-            GUI.skin.label.alignment = TextAnchor.MiddleLeft;
-            GUI.skin.label.fontSize = (int)Math.Round(FONTSIZE);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginVertical();
-
-
-            GUILayout.Space(3);
-            GUILayout.Label("Vessel Information:");
-            //GUILayout.Space(2);
-            GUILayout.Label("_________________________________________");
-            //GUILayout.Space(2);
-            GUILayout.Label("Mass: " + (CalculateMass() * 1000).ToString("F2") + " Kg");
-            //GUILayout.Space(2);
-            GUILayout.Label("Prograde Area: " + CalculateArea().ToString("F2") + " Square Meters");
-            //GUILayout.Space(2);
-            GUILayout.Label("Total Area: " + (CalculateArea() * 4).ToString("F2") + " Square Meters");
-            //GUILayout.Space(2);
-            GUILayout.Label("_________________________________________");
-            //GUILayout.Space(3);
-
-            GUILayout.Label("Decay Information:");
-            //GUILayout.Space(2);
-            //GUILayout.Label("_________________________________________");
-            //GUILayout.Space(2);
-            GUILayout.Label("Reference Body: " + ReferenceBody.name);
-            GUILayout.Space(2);
-
-            for (int b = 0; b < FlightGlobals.Bodies.Count; b++)
+            using (new GUILayout.HorizontalScope(GUILayout.Width(WINWIDTH)))
             {
-                CelestialBody body = FlightGlobals.Bodies[b];
-                if (body.atmosphere)
+                GUI.skin.label.fontSize = (int)Math.Round(LARGEFONTSIZE);
+                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                GUILayout.Label("Vessel Information", GUILayout.Width(VI_BUTTON));
+                GUI.skin.label.alignment = TextAnchor.MiddleLeft;
+                GUI.skin.label.fontSize = (int)Math.Round(FONTSIZE);
+            }
+
+            using (new GUILayout.VerticalScope())
+            {
+                GUILayout.Space(3);
+                GUILayout.Label("Vessel Information:");
+                GUILayout.Label("_________________________________________");
+                GUILayout.Label("Mass: " + (CalculateMass() * 1000).ToString("F2") + " Kg");
+                GUILayout.Label("Prograde Area: " + CalculateArea().ToString("F2") + " Square Meters");
+                GUILayout.Label("Total Area: " + (CalculateArea() * 4).ToString("F2") + " Square Meters");
+                GUILayout.Label("_________________________________________");
+
+                GUILayout.Label("Decay Information:");
+                GUILayout.Label("Reference Body: " + ReferenceBody.name);
+                GUILayout.Space(2);
+
+                for (int b = 0; b < FlightGlobals.Bodies.Count; b++)
                 {
-                    if (GUILayout.Button(body.name, GUILayout.Width(WINWIDTH )))
+                    CelestialBody body = FlightGlobals.Bodies[b];
+                    if (body.atmosphere)
                     {
-                        ReferenceBody = body;
-                        SetMaxDisplayValue(ReferenceBody);
-                        AltitudeValue = Math.Max((float)ReferenceBody.atmosphereDepth, AltitudeValue);
-                        AltitudeValue = Math.Min(AltitudeValue, MaxDisplayValue);
+                        if (GUILayout.Button(body.name, GUILayout.Width(WINWIDTH)))
+                        {
+                            ReferenceBody = body;
+                            SetMaxDisplayValue(ReferenceBody);
+                            AltitudeValue = Math.Max((float)ReferenceBody.atmosphereDepth, AltitudeValue);
+                            AltitudeValue = Math.Min(AltitudeValue, MaxDisplayValue);
+                        }
+                        GUILayout.Space(2);
                     }
-                    GUILayout.Space(2);
                 }
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.Space(2);
-            GUILayout.Label("Reference Altitude:");
-            GUILayout.Space(2);
-            AltitudeValue = GUILayout.HorizontalSlider(AltitudeValue, (float)ReferenceBody.atmosphereDepth, MaxDisplayValue);
-            GUILayout.Space(2);
-            GUILayout.Label("Altitude set: " + (AltitudeValue / 1000).ToString("F1") + "Km.");
-            //GUILayout.Space(2);
-            GUILayout.Label("Decay Rate (Atmospheric Drag): " + UserInterface.FormatDecayRateToString(
-                DecayManager.EditorDecayRateAtmosphericDrag(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)
-                ));
-            //GUILayout.Space(2);
-            GUILayout.Label("Decay Rate (Radiation Pressure): " + UserInterface.FormatDecayRateSmallToString(DecayManager.EditorDecayRateRadiationPressure(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)));
-            //GUILayout.Space(2);
-            GUILayout.Label("Estimated Orbital Lifetime: " + UserInterface.FormatTimeUntilDecayInDaysToString(DecayManager.DecayTimePredictionEditor(CalculateArea(), CalculateMass() * 1000, ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)));
-            GUILayout.Space(2);
-            GUILayout.Label("_________________________________________");
-            GUILayout.Space(3);
+                GUILayout.Space(2);
+                GUILayout.Label("Reference Altitude:");
+                GUILayout.Space(2);
+                AltitudeValue = GUILayout.HorizontalSlider(AltitudeValue, (float)ReferenceBody.atmosphereDepth, MaxDisplayValue);
+                GUILayout.Space(2);
+                GUILayout.Label("Altitude set: " + (AltitudeValue / 1000).ToString("F1") + "Km.");
+                //GUILayout.Space(2);
+                GUILayout.Label("Decay Rate (Atmospheric Drag): " + UserInterface.FormatDecayRateToString(
+                    DecayManager.EditorDecayRateAtmosphericDrag(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)
+                    ));
+                //GUILayout.Space(2);
+                GUILayout.Label("Decay Rate (Radiation Pressure): " + UserInterface.FormatDecayRateSmallToString(DecayManager.EditorDecayRateRadiationPressure(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)));
+                //GUILayout.Space(2);
+                GUILayout.Label("Estimated Orbital Lifetime: " + UserInterface.FormatTimeUntilDecayInDaysToString(DecayManager.DecayTimePredictionEditor(CalculateArea(), CalculateMass() * 1000, ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)));
+                GUILayout.Space(2);
+                GUILayout.Label("_________________________________________");
+                GUILayout.Space(3);
 
-            GUILayout.Label("Station Keeping Information:");
-            //GUILayout.Space(2);
-            GUILayout.Label("_________________________________________");
-            GUILayout.Space(2);
-            GUILayout.Label("Total Fuel: " + (GetFuel() * 1000).ToString("F1") + " Kg.");
-            //GUILayout.Space(2);
-            GUILayout.Label("Useable Resources: ");
+                GUILayout.Label("Station Keeping Information:");
+                //GUILayout.Space(2);
+                GUILayout.Label("_________________________________________");
+                GUILayout.Space(2);
+                GUILayout.Label("Total Fuel: " + (GetFuel() * 1000).ToString("F1") + " Kg.");
+                //GUILayout.Space(2);
+                GUILayout.Label("Useable Resources: ");
 
-            Dictionary<string, double> ResourceQuantites = new Dictionary<string, double>();
-            //   double tempHold = 0;
-            for (int i = 0; i < EditorLogic.SortedShipList.Count; i++)
-            {
-                Part part = EditorLogic.SortedShipList[i];
-                for (int r = 0; r < part.Resources.Count; r++)
+                Dictionary<string, double> ResourceQuantites = new Dictionary<string, double>();
+                //   double tempHold = 0;
+                for (int i = 0; i < EditorLogic.SortedShipList.Count; i++)
                 {
-                    PartResource res = part.Resources[r];
-                    if (ResourceQuantites.ContainsKey(res.resourceName))
-                        ResourceQuantites[res.resourceName] += res.maxAmount;
-                    else
-                        ResourceQuantites[res.resourceName] = res.maxAmount;
-                    //GUILayout.Label(res.resourceName + ": " + res.maxAmount);
+                    Part part = EditorLogic.SortedShipList[i];
+                    for (int r = 0; r < part.Resources.Count; r++)
+                    {
+                        PartResource res = part.Resources[r];
+                        if (ResourceQuantites.ContainsKey(res.resourceName))
+                            ResourceQuantites[res.resourceName] += res.maxAmount;
+                        else
+                            ResourceQuantites[res.resourceName] = res.maxAmount;
+                        //GUILayout.Label(res.resourceName + ": " + res.maxAmount);
+                    }
                 }
+
+                GetMaximumPossibleLifetime();
+                foreach (var resource in AllUsableFuels)
+                {
+                    GUILayout.Label(resource.Key + " : " + ResourceQuantites[resource.Key].ToString("F0"));
+                }
+
+
+
+
+                GUILayout.Space(2);
+                GUILayout.Label("Maximum possible Station Keeping fuel lifetime: " + (UserInterface.FormatTimeUntilDecayInDaysToString(GetMaximumPossibleLifetime())));
+                GUILayout.Space(2);
+
+                GUILayout.Label("Maximum possible lifetime: " + (UserInterface.FormatTimeUntilDecayInDaysToString(DecayManager.DecayTimePredictionEditor(CalculateArea(), CalculateMass() * 1000, ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody) +
+                  +DecayManager.EditorDecayRateAtmosphericDrag(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)
+                 + GetMaximumPossibleLifetime())));
+
+                GUILayout.Space(2);
+                GUILayout.Label("_________________________________________");
+                GUILayout.Space(3);
+
             }
-
-            GetMaximumPossibleLifetime();
-            foreach (var resource in AllUsableFuels)
-            {
-                GUILayout.Label(resource.Key + " : " + ResourceQuantites[resource.Key].ToString("F0"));
-            }
-
-
-
-
-            GUILayout.Space(2);
-            GUILayout.Label("Maximum possible Station Keeping fuel lifetime: " + (UserInterface.FormatTimeUntilDecayInDaysToString(GetMaximumPossibleLifetime())));
-            GUILayout.Space(2);
-
-            GUILayout.Label("Maximum possible lifetime: " + (UserInterface.FormatTimeUntilDecayInDaysToString(DecayManager.DecayTimePredictionEditor(CalculateArea(), CalculateMass() * 1000, ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody) +
-              +DecayManager.EditorDecayRateAtmosphericDrag(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)
-             + GetMaximumPossibleLifetime())));
-
-            GUILayout.Space(2);
-            GUILayout.Label("_________________________________________");
-            GUILayout.Space(3);
-
-            //GUILayout.EndVertical();
         }
 
         public double CalculateMass()

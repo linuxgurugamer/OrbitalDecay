@@ -125,34 +125,34 @@ namespace OrbitalDecay
             {
                 ToolbarInterface.GuiOff();
             }
-            GUILayout.BeginVertical();
-            GUILayout.Space(10);
-            GUILayout.BeginHorizontal();
-
-            for (int i = 0; i < tabs.Length; ++i)
+            using (new GUILayout.VerticalScope())
             {
-                if (GUILayout.Button(tabs[i]))
+                GUILayout.Space(10);
+                using (new GUILayout.HorizontalScope())
                 {
-                    currentTab = i;
-                    windowScaling2 = (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling;
+                    for (int i = 0; i < tabs.Length; ++i)
+                    {
+                        if (GUILayout.Button(tabs[i]))
+                        {
+                            currentTab = i;
+                            windowScaling2 = (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling;
+                        }
+                    }
+                }
+                GUILayout.Space(10);
+                switch (currentTab)
+                {
+                    case 0:
+                        InformationTab();
+                        break;
+                    case 1:
+                        SettingsTab();
+                        break;
+
+                    default:
+                        break;
                 }
             }
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(10);
-            switch (currentTab)
-            {
-                case 0:
-                    InformationTab();
-                    break;
-                case 1:
-                    SettingsTab();
-                    break;
-
-                default:
-                    break;
-            }
-            GUILayout.EndVertical();
             GUI.DragWindow();
             MainwindowPosition.x = Mathf.Clamp(MainwindowPosition.x, 0f, Screen.width - MainwindowPosition.width);
             MainwindowPosition.y = Mathf.Clamp(MainwindowPosition.y, 0f, Screen.height - MainwindowPosition.height);
@@ -293,8 +293,8 @@ namespace OrbitalDecay
                     GUIContent guiContent;
 
                     guiContent = FilterTypes.Contains(VesselType.Probe) ?
-                                            new GUIContent(Icon_Unmanned_highlighted, "Unmanned") :
-                                            new GUIContent(Icon_Unmanned, "Unmanned");
+                                            new GUIContent(Icon_Unmanned_highlighted, "Probe") :
+                                            new GUIContent(Icon_Unmanned, "Probe");
                     GUILayout.FlexibleSpace();
                     if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
                     {
@@ -304,7 +304,6 @@ namespace OrbitalDecay
                             FilterTypes.Add(VesselType.Probe);
                     }
 
-                    //GUILayout.Space(3);
                     guiContent = FilterTypes.Contains(VesselType.Relay) ?
                         new GUIContent(Icon_Relay_highlighted, "Relay") :
                         new GUIContent(Icon_Relay, "Relay");
@@ -318,7 +317,6 @@ namespace OrbitalDecay
                             FilterTypes.Add(VesselType.Relay);
                     }
 
-                    //GUILayout.Space(3);
 
                     guiContent = FilterTypes.Contains(VesselType.Ship) ?
                         new GUIContent(Icon_Ship_highlighted, "Ship") :
@@ -333,7 +331,6 @@ namespace OrbitalDecay
                             FilterTypes.Add(VesselType.Ship);
                     }
 
-                    //GUILayout.Space(3);
                     guiContent = FilterTypes.Contains(VesselType.Station) ?
                         new GUIContent(Icon_Station_highlighted, "Station") :
                         new GUIContent(Icon_Station, "Station");
@@ -345,8 +342,6 @@ namespace OrbitalDecay
                         else
                             FilterTypes.Add(VesselType.Station);
                     }
-
-                    //GUILayout.Space(3);
 
                     guiContent = FilterTypes.Contains(VesselType.SpaceObject) ?
                         new GUIContent(Icon_Spaceobject_highlighted, "Space Object") :
@@ -390,10 +385,10 @@ namespace OrbitalDecay
                                                         GUILayout.Height(SCROLLVIEW_HEIGHT));
             bool Realistic = Settings.ReadRD();
             bool ClockType = Settings.Read24Hr();
-            //151var Resource = Settings.ReadStationKeepingResource();
             var filterString1 = filterString.ToLower();
 
             foreach (Vessel vessel in FlightGlobals.Vessels)
+            {
                 if (vessel != null)
                 {
                     if (!displayedVessel.ContainsKey(vessel.id))
@@ -416,29 +411,7 @@ namespace OrbitalDecay
                                 double DaysInYear = 0;
                                 bool KerbinTime = GameSettings.KERBIN_TIME;
 
-#if false
-                            if (KerbinTime)
-                            {
-                                DaysInYear = 9203545 / (60 * 60 * HoursInDay);
-                            }
-                            else
-                            {
-                                DaysInYear = 31557600 / (60 * 60 * HoursInDay);
-                            }
-#endif
-
                                 DaysInYear = KerbinTime ? (9203545 / (60 * 60 * HoursInDay)) : (31557600 / (60 * 60 * HoursInDay));
-
-#if false
-                            if (ClockType)
-                            {
-                                HoursInDay = 24.0;
-                            }
-                            else
-                            {
-                                HoursInDay = 6.0;
-                            }
-#endif
 
                                 HoursInDay = ClockType ? 24d : 6d;
 
@@ -467,36 +440,40 @@ namespace OrbitalDecay
                                     }
                                     else
                                     {
-                                        double TotalDecayRatePerSecond = Math.Abs(DecayManager.DecayRateAtmosphericDrag(vessel)) + Math.Abs(DecayManager.DecayRateRadiationPressure(vessel)) + Math.Abs(DecayManager.DecayRateYarkovskyEffect(vessel)); //+ Math.Abs(DecayManager.DecayRateGravitationalPertubation(vessel));
                                         double ADDR = DecayManager.DecayRateAtmosphericDrag(vessel);
                                         double GPDR = DecayManager.DecayRateGravitationalPertubation(vessel);
                                         double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
                                         double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
 
+                                        double TotalDecayRatePerSecond = Math.Abs(ADDR) + Math.Abs(GPDR) + Math.Abs(PRDR) + Math.Abs(YEDR);
+                                        //Math.Abs(DecayManager.DecayRateAtmosphericDrag(vessel)) + 
+                                        //Math.Abs(DecayManager.DecayRateRadiationPressure(vessel)) + 
+                                        //Math.Abs(DecayManager.DecayRateYarkovskyEffect(vessel)); 
+                                        //+ Math.Abs(DecayManager.DecayRateGravitationalPertubation(vessel));
+
                                         GUILayout.Label("Current Total Decay Rate: " + FormatDecayRateToString(TotalDecayRatePerSecond));
                                         GUILayout.Space(2);
-
-#if false
-                            GUILayout.Label("AP: " + vessel.orbit.ApA.ToString("F1"));
-                            GUILayout.Label($"PE: " + vessel.orbit.PeA.ToString("F1"));
-                            GUILayout.Space(2);
-#endif
 
                                         double TimeUntilDecayInUnits = 0.0;
                                         string TimeUntilDecayInDays = "";
 
                                         if (ADDR != 0)
                                         {
-                                            TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel);
-                                            TimeUntilDecayInDays = FormatTimeUntilDecayInDaysToString(TimeUntilDecayInUnits);
+                                            //TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel);
+                                            TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel, TotalDecayRatePerSecond, HoursInDay);
                                         }
                                         else
                                         {
                                             TimeUntilDecayInUnits = DecayManager.DecayTimePredictionLinearVariables(vessel);
-                                            TimeUntilDecayInDays = FormatTimeUntilDecayInSecondsToString(TimeUntilDecayInUnits);
                                         }
 
-                                        GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays);
+                                        TimeUntilDecayInDays = FormatTimeUntilDecayInSecondsToString(TimeUntilDecayInUnits);
+
+                                        double days = TimeUntilDecayInUnits / (3600*HoursInDay);
+                                        if (days < 100000)
+                                            GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays + " (" + days.ToString("N0") + " days)");
+                                        else
+                                            GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays);
                                         GUILayout.Space(2);
                                     }
 
@@ -554,6 +531,7 @@ namespace OrbitalDecay
                                         }
                                         GUILayout.Space(3);
                                     }
+
                                     using (new GUILayout.HorizontalScope())
                                     {
                                         if (GUILayout.Button((ToolbarInterface.DecayBreakdownVisible ? "Hide" : "Show") + " Decay Rate Detail")) // Display a new window here?
@@ -593,7 +571,8 @@ namespace OrbitalDecay
                                             }
                                         }
                                     }
-                                    if (vessel.id != FlightGlobals.ActiveVessel.id)
+
+                                    if (HighLogic.LoadedSceneIsFlight && vessel.id != FlightGlobals.ActiveVessel.id)
                                     {
                                         if (GUILayout.Button("Switch to vessel"))
                                         {
@@ -613,7 +592,9 @@ namespace OrbitalDecay
                         }
                     }
                 }
+            }
             GUILayout.EndScrollView();
+
             // Optionally display the tooltip near the mouse cursor
             if (HighLogic.CurrentGame.Parameters.CustomParams<OD3>().showTooltips)
             {
@@ -634,97 +615,95 @@ namespace OrbitalDecay
 
         public void SettingsTab()
         {
-
-            GUILayout.BeginHorizontal();
-            GUI.skin.label.fontSize = (int)LARGEFONTSIZE;
-            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            GUILayout.Label("Control Panel", GUILayout.Width(INFO_WIDTH));
-            GUI.skin.label.alignment = TextAnchor.MiddleLeft;
-            GUI.skin.label.fontSize = (int)FONTSIZE;
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginVertical();
-            DrawLine(4, 4);
-            //using (new GUILayout.HorizontalScope())
-            //{
-            //GUILayout.FlexibleSpace();
-            //GUILayout.Label("_________________________________________");
-            //GUILayout.FlexibleSpace();
-            //}
-            //GUILayout.Space(3);
-
-            double DecayDifficulty = HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
-            double ResourceDifficulty = Settings.ReadResourceRateDifficulty();
-
-            GUILayout.Space(2);
-            if (GUILayout.Button("Toggle Kerbin Day (6 hour) / Earth Day (24 hour)"))
+            using (new GUILayout.HorizontalScope())
             {
-                Settings.Write24H(!Settings.Read24Hr());
-                if (Settings.Read24Hr())
+                GUI.skin.label.fontSize = (int)LARGEFONTSIZE;
+                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                GUILayout.Label("Control Panel", GUILayout.Width(INFO_WIDTH));
+                GUI.skin.label.alignment = TextAnchor.MiddleLeft;
+                GUI.skin.label.fontSize = (int)FONTSIZE;
+            }
+
+            using (new GUILayout.VerticalScope())
+            {
+                DrawLine(4, 4);
+                //using (new GUILayout.HorizontalScope())
+                //{
+                //GUILayout.FlexibleSpace();
+                //GUILayout.Label("_________________________________________");
+                //GUILayout.FlexibleSpace();
+                //}
+                //GUILayout.Space(3);
+
+                double DecayDifficulty = HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
+                double ResourceDifficulty = Settings.ReadResourceRateDifficulty();
+
+                GUILayout.Space(2);
+                if (GUILayout.Button("Toggle Kerbin Day (6 hour) / Earth Day (24 hour)"))
                 {
-                    ScreenMessages.PostScreenMessage("Earth Day (24 hour) set.");
+                    Settings.Write24H(!Settings.Read24Hr());
+                    if (Settings.Read24Hr())
+                    {
+                        ScreenMessages.PostScreenMessage("Earth Day (24 hour) set.");
+                    }
+                    else
+                    {
+                        ScreenMessages.PostScreenMessage("Kerbin Day (6 hour) set.");
+                    }
+
                 }
-                else
+                GUILayout.Space(3);
+                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                MultiplierValue = GUILayout.HorizontalSlider(MultiplierValue, 0.5f, 50.0f);
+                GUILayout.Space(2);
+                GUILayout.Label("Current Decay multiplier: " + DecayDifficulty.ToString("F1"));
+                GUILayout.Space(2);
+                GUILayout.Label("New Decay multiplier: " + (MultiplierValue / 5).ToString("F1"));
+                GUILayout.Space(2);
+
+                if (GUILayout.Button("Set Multiplier"))
                 {
-                    ScreenMessages.PostScreenMessage("Kerbin Day (6 hour) set.");
+                    Settings.WriteDifficulty(MultiplierValue / 5);
+                    ScreenMessages.PostScreenMessage("Decay Multiplier set to: " + (MultiplierValue / 5).ToString("F2"));
                 }
 
+                //GUILayout.Space(2);
+                DrawLine(4, 4);
+                //GUILayout.Label("_________________________________________");
+                //GUILayout.Space(3);
+                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                MultiplierValue2 = GUILayout.HorizontalSlider(MultiplierValue2, 0.5f, 50.0f);
+                GUILayout.Space(2);
+                GUILayout.Label("Resource drain rate multiplier: " + ResourceDifficulty.ToString("F1"));
+                GUILayout.Space(2);
+                GUILayout.Label("New Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
+                GUILayout.Space(2);
+
+                if (GUILayout.Button("Set Multiplier"))
+                {
+                    Settings.WriteResourceRateDifficulty(MultiplierValue2 / 5);
+                    ScreenMessages.PostScreenMessage("Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
+                }
+
+                //GUILayout.Space(2);
+                DrawLine(4, 4);
+                //GUILayout.Label("_________________________________________");
+                //GUILayout.Space(3);
+                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                windowScaling2 = GUILayout.HorizontalSlider(windowScaling2, 0.8f, 2f);
+                GUILayout.Space(2);
+                GUILayout.Label("Window Scaling: " + HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling.ToString("F1"));
+                GUILayout.Space(2);
+                GUILayout.Label("New Window Scaling: " + windowScaling2.ToString("F1"));
+                GUILayout.Space(2);
+
+                if (GUILayout.Button("Set Window Scaling"))
+                {
+                    HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling = windowScaling2;
+                    RegisterToolbar.UpdateWindowSizes();
+                }
+                GUILayout.Space(2);
             }
-            GUILayout.Space(3);
-            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            MultiplierValue = GUILayout.HorizontalSlider(MultiplierValue, 0.5f, 50.0f);
-            GUILayout.Space(2);
-            GUILayout.Label("Current Decay multiplier: " + DecayDifficulty.ToString("F1"));
-            GUILayout.Space(2);
-            GUILayout.Label("New Decay multiplier: " + (MultiplierValue / 5).ToString("F1"));
-            GUILayout.Space(2);
-
-            if (GUILayout.Button("Set Multiplier"))
-            {
-                Settings.WriteDifficulty(MultiplierValue / 5);
-                ScreenMessages.PostScreenMessage("Decay Multiplier set to: " + (MultiplierValue / 5).ToString("F2"));
-            }
-
-            //GUILayout.Space(2);
-            DrawLine(4, 4);
-            //GUILayout.Label("_________________________________________");
-            //GUILayout.Space(3);
-            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            MultiplierValue2 = GUILayout.HorizontalSlider(MultiplierValue2, 0.5f, 50.0f);
-            GUILayout.Space(2);
-            GUILayout.Label("Resource drain rate multiplier: " + ResourceDifficulty.ToString("F1"));
-            GUILayout.Space(2);
-            GUILayout.Label("New Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
-            GUILayout.Space(2);
-
-            if (GUILayout.Button("Set Multiplier"))
-            {
-                Settings.WriteResourceRateDifficulty(MultiplierValue2 / 5);
-                ScreenMessages.PostScreenMessage("Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
-            }
-
-            //GUILayout.Space(2);
-            DrawLine(4, 4);
-            //GUILayout.Label("_________________________________________");
-            //GUILayout.Space(3);
-            GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-            windowScaling2 = GUILayout.HorizontalSlider(windowScaling2, 0.8f, 2f);
-            GUILayout.Space(2);
-            GUILayout.Label("Window Scaling: " + HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling.ToString("F1"));
-            GUILayout.Space(2);
-            GUILayout.Label("New Window Scaling: " + windowScaling2.ToString("F1"));
-            GUILayout.Space(2);
-
-            if (GUILayout.Button("Set Window Scaling"))
-            {
-                HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling = windowScaling2;
-                RegisterToolbar.UpdateWindowSizes();
-            }
-
-
-
-            GUILayout.Space(2);
-            GUILayout.EndVertical();
         }
 
         public void DecayBreakdownWindow(int id)
@@ -734,43 +713,54 @@ namespace OrbitalDecay
                 if (ToolbarInterface.DecayBreakdownVisible)
                     ToolbarInterface.DecayBreakdownVisible = false;
             }
-            GUILayout.BeginVertical();
-            GUILayout.Space(10);
-            try
+            using (new GUILayout.VerticalScope())
             {
-                Vessel vessel = subwindowVessel;
-                double ADDR = DecayManager.DecayRateAtmosphericDrag(vessel);
-                double GPDR = DecayManager.DecayRateGravitationalPertubation(vessel);
-                double GPIDR = MasConManager.GetSecularIncChange(vessel, vessel.orbitDriver.orbit.LAN, vessel.orbitDriver.orbit.meanAnomaly, vessel.orbitDriver.orbit.argumentOfPeriapsis, vessel.orbitDriver.orbit.eccentricity, vessel.orbitDriver.orbit.inclination, vessel.orbitDriver.orbit.semiMajorAxis, vessel.orbitDriver.orbit.epoch);
-                double GPLANDR = MasConManager.GetSecularLANChange(vessel, vessel.orbitDriver.orbit.LAN, vessel.orbitDriver.orbit.meanAnomaly, vessel.orbitDriver.orbit.argumentOfPeriapsis, vessel.orbitDriver.orbit.eccentricity, vessel.orbitDriver.orbit.inclination, vessel.orbitDriver.orbit.semiMajorAxis, vessel.orbitDriver.orbit.epoch);
-                double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
-                double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
+                GUILayout.Space(10);
+                try
+                {
+                    Vessel vessel = subwindowVessel;
+                    double ADDR = DecayManager.DecayRateAtmosphericDrag(vessel);
+                    double GPDR = DecayManager.DecayRateGravitationalPertubation(vessel);
+                    double GPIDR = MasConManager.GetSecularIncChange(vessel, vessel.orbitDriver.orbit.LAN, vessel.orbitDriver.orbit.meanAnomaly, vessel.orbitDriver.orbit.argumentOfPeriapsis, vessel.orbitDriver.orbit.eccentricity, vessel.orbitDriver.orbit.inclination, vessel.orbitDriver.orbit.semiMajorAxis, vessel.orbitDriver.orbit.epoch);
+                    double GPLANDR = MasConManager.GetSecularLANChange(vessel, vessel.orbitDriver.orbit.LAN, vessel.orbitDriver.orbit.meanAnomaly, vessel.orbitDriver.orbit.argumentOfPeriapsis, vessel.orbitDriver.orbit.eccentricity, vessel.orbitDriver.orbit.inclination, vessel.orbitDriver.orbit.semiMajorAxis, vessel.orbitDriver.orbit.epoch);
+                    double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
+                    double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
 
-                GUILayout.Label("Vessel: " + vessel.GetName());
-                GUILayout.Space(4);
-                GUILayout.Label("Atmospheric Drag Decay Rate (Delta SMA): " + FormatDecayRateToString(ADDR));
-                GUILayout.Space(2);
-                GUILayout.Label("Radiation Pressure Decay Rate (Delta SMA): " + FormatDecayRateToString(PRDR));
-                GUILayout.Space(2);
-                GUILayout.Label("Gravitational Effect Decay Rate (Delta SMA): " + FormatDecayRateToString(GPDR));
-                GUILayout.Space(2);
-                GUILayout.Label("Gravitational Effect Decay Rate (Delta INC): " + FormatDecayRateDegreesToString(GPIDR));
-                GUILayout.Space(2);
-                GUILayout.Label("Gravitational Effect Decay Rate (Delta LAN): " + FormatDecayRateDegreesToString(GPLANDR));
-                GUILayout.Space(2);
-                GUILayout.Label("Yarkovsky Effect Decay Rate (Delta SMA): " + FormatDecayRateSmallToString(YEDR));
-                GUILayout.Space(2);
-                GUILayout.Label("Note: Prediction estimates accurate to +/- 10% per day.");
+                    GUILayout.Label("Vessel: " + vessel.GetName());
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        GUILayout.Space(30);
+                        GUILayout.Label("AP: " + vessel.orbit.ApA.ToString("F1"));
+                    }
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        GUILayout.Space(30);
+                        GUILayout.Label("PE: " + vessel.orbit.PeA.ToString("F1"));
+                    }
+                    GUILayout.Space(8);
+                    GUILayout.Label("Atmospheric Drag Decay Rate (Delta SMA): " + FormatDecayRateToString(ADDR));
+                    GUILayout.Space(2);
+                    GUILayout.Label("Radiation Pressure Decay Rate (Delta SMA): " + FormatDecayRateToString(PRDR));
+                    GUILayout.Space(2);
+                    GUILayout.Label("Gravitational Effect Decay Rate (Delta SMA): " + FormatDecayRateToString(GPDR));
+                    GUILayout.Space(2);
+                    GUILayout.Label("Gravitational Effect Decay Rate (Delta INC): " + FormatDecayRateDegreesToString(GPIDR));
+                    GUILayout.Space(2);
+                    GUILayout.Label("Gravitational Effect Decay Rate (Delta LAN): " + FormatDecayRateDegreesToString(GPLANDR));
+                    GUILayout.Space(2);
+                    GUILayout.Label("Yarkovsky Effect Decay Rate (Delta SMA): " + FormatDecayRateSmallToString(YEDR));
+                    GUILayout.Space(2);
+                    GUILayout.Label("Note: Prediction estimates accurate to +/- 10% per day.");
+                }
+                catch (ArgumentNullException)
+                {
+                    GUILayout.Label("WARNING: Error detected, this is a MasCon issue, this will not affect gameplay.");
+                    GUILayout.Space(2);
+                    GUILayout.Label("Please make a note of your vessel latitude and longitude and reference body and post in the Orbital Decay Forum.");
+                    GUILayout.Space(2);
+                    GUILayout.Label("Thanks, Whitecat106");
+                }
             }
-            catch (ArgumentNullException)
-            {
-                GUILayout.Label("WARNING: Error detected, this is a MasCon issue, this will not affect gameplay.");
-                GUILayout.Space(2);
-                GUILayout.Label("Please make a note of your vessel latitude and longitude and reference body and post in the Orbital Decay Forum.");
-                GUILayout.Space(2);
-                GUILayout.Label("Thanks, Whitecat106");
-            }
-            GUILayout.EndVertical();
             GUI.DragWindow();
             //MainwindowPosition.x = Mathf.Clamp(MainwindowPosition.x, 0f, Screen.width - MainwindowPosition.width);
             //MainwindowPosition.y = Mathf.Clamp(MainwindowPosition.y, 0f, Screen.height - MainwindowPosition.height);

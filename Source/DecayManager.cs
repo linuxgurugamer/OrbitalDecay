@@ -28,18 +28,20 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+using static OrbitalDecay.RegisterToolbar;
+
 namespace OrbitalDecay
 {
     // [KSPAddon(KSPAddon.Startup.EveryScene, false)]
 
     [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
-    public class DecayManagerFlightAndKSP: DecayManager
+    public class DecayManagerFlightAndKSP : DecayManager
     {
 
     }
 
     [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
-    public class DecayManagerTrackingStation: DecayManager
+    public class DecayManagerTrackingStation : DecayManager
     {
 
     }
@@ -521,8 +523,8 @@ namespace OrbitalDecay
             //orbit.Init();
 
             orbit.UpdateFromUT(HighLogic.CurrentGame.UniversalTime);
-            vessel.orbitDriver.pos = vessel.orbit.pos.xzy; 
-            vessel.orbitDriver.vel = vessel.orbit.vel; 
+            vessel.orbitDriver.pos = vessel.orbit.pos.xzy;
+            vessel.orbitDriver.vel = vessel.orbit.vel;
 
             CelestialBody newBody = vessel.orbitDriver.orbit.referenceBody;
             if (newBody == oldBody) return;
@@ -1344,6 +1346,18 @@ namespace OrbitalDecay
 
         #region Timing Subroutines
 
+        public static double DecayTimePredictionExponentialsVariables(Vessel vessel, double TotalDecayRatePerSecond, double HoursInDay)
+        {
+            double initialSemiMajorAxis = VesselData.FetchSMA(vessel);
+            CelestialBody body = vessel.orbitDriver.orbit.referenceBody;
+            double baseAltitude = body.atmosphereDepth ;
+
+            double diff = initialSemiMajorAxis - baseAltitude - body.Radius;
+            Log.Info($"TotalDecayRatePerSecond: {TotalDecayRatePerSecond}  baseAltitude: {baseAltitude}  initialSemiMajorAxis: {initialSemiMajorAxis}  diff: {diff}");
+            return diff / (TotalDecayRatePerSecond); // * HoursInDay * 3600);
+        }
+
+#if false
         public static double DecayTimePredictionExponentialsVariables(Vessel vessel)
         {
             double initialSemiMajorAxis = VesselData.FetchSMA(vessel);
@@ -1394,15 +1408,19 @@ namespace OrbitalDecay
 
             equivalentAltitude = equivalentAltitude + body.Radius;
 
+            //Log.Info($"initialPeriod: {initialPeriod}  beta: {beta}  equivalentAltitude: {equivalentAltitude}  atmosphericDensity: {atmosphericDensity}");
+            //double time1 = initialPeriod / (60.0 * 60.0) / 4.0 * Math.PI * ((2.0 * beta * equivalentAltitude + 1.0) / (atmosphericDensity * (beta * beta) * (equivalentAltitude * equivalentAltitude * equivalentAltitude)));
+            double time1 = initialPeriod / 2827.431d * ((2.0 * beta * equivalentAltitude + 1.0) / (atmosphericDensity * (beta * beta) * (equivalentAltitude * equivalentAltitude * equivalentAltitude)));
 
-            double time1 = initialPeriod / (60.0 * 60.0) / 4.0 * Math.PI * ((2.0 * beta * equivalentAltitude + 1.0) / (atmosphericDensity * (beta * beta) * (equivalentAltitude * equivalentAltitude * equivalentAltitude)));
             double time2 = time1 * (vesselMass / (2.2 * vesselArea)) * (1 - Math.Pow(Math.E, beta * (baseAltitude - (equivalentAltitude - body.Radius) / 1000)));
+            //Log.Info($"vesselMass: {vesselMass}  vesselArea: {vesselArea}   baseAltitude: {baseAltitude}  equivalentAltitude: {equivalentAltitude}  body.Radius: {body.Radius}");
 
             double daysUntilDecay = time2;
 
-            return daysUntilDecay;
+            return daysUntilDecay * 10;
         } // 1.4.0
 
+#endif
         public static double DecayTimePredictionEditor(double area, double mass, double sma, double eccentricity, CelestialBody body)
         {
             double initialSemiMajorAxis = sma;

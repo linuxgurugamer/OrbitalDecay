@@ -95,3 +95,8 @@ Changelog
 	Added option to switch between flat and shaded icons
 	Added scaling of the buttons
 	Added a button to allow switching to a vessel
+
+1.7.0.10 - RC3
+	Replaced all GUILayout.BeginHorizontal/GUILayout.EndHorizontal with the newer "using (new GUILayout.HorizontalScope())"; did the same for vertical
+	Fixed nullref when trying to show details before actually getting to flight, was caused by new option to switch to a vessel
+	Replaced calculation of time to decay for display with simpler calculation
