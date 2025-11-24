@@ -27,6 +27,7 @@ using SpaceTuxUtility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using static GameEvents;
 using static OrbitalDecay.RegisterToolbar;
 
@@ -295,20 +296,24 @@ namespace OrbitalDecay
 
         public static double FetchMass(Vessel vessel)
         {
+            float mass = 0;
             if (VesselInfo.ContainsKey(vessel.id))
-                return VesselInfo[vessel.id].Mass;
-            return 0;
+                mass = VesselInfo[vessel.id].Mass;
+
+            mass = Math.Max(mass, Settings.ReadRD() ? 100 : 1000);
+            return mass;
         }
 
 
         public static double FetchArea(Vessel vessel)
         {
+            double area = 0;
             if (VesselInfo.ContainsKey(vessel.id))
             {
-                return VesselInfo[vessel.id].Area;
+                area =  VesselInfo[vessel.id].Area;
             }
-
-            return 0;
+            area = Math.Max(area, Settings.ReadRD() ? 1 : 5);
+            return area;
         }
 
         public static void UpdateStationKeeping(Vessel vessel, bool StationKeeping)

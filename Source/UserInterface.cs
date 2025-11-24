@@ -483,9 +483,9 @@ namespace OrbitalDecay
                                 {
                                     GUILayout.Space(30);
                                     var result = OrbitFromAE.ComputeApPe(VesselData.FetchSMA(vessel), VesselData.FetchECC(vessel), vessel.mainBody);
-                                    GUILayout.Label($"AP: {result.ApAltitude.ToString("F1")}");
+                                    GUILayout.Label($"AP: {(result.ApAltitude/1000).ToString("N1")} km");
                                     GUILayout.Space(20);
-                                    GUILayout.Label($"PE: {result.PeAltitude.ToString("F1")}");
+                                    GUILayout.Label($"PE: {(result.PeAltitude/1000).ToString("N1")} km");
                                 }
 
                                 if (displayedVessel[vessel.id])
@@ -829,17 +829,17 @@ namespace OrbitalDecay
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Space(30);
-                        GUILayout.Label("AP: " + result.ApAltitude.ToString("F1"));
+                        GUILayout.Label("AP: " + (result.ApAltitude/1000).ToString("N1"));
                     }
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Space(30);
-                        GUILayout.Label("PE: " + result.PeAltitude.ToString("F1"));
+                        GUILayout.Label("PE: " + (result.PeAltitude/1000).ToString("N1"));
                     }
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Space(30);
-                        GUILayout.Label("Mass: " + VesselData.FetchMass(vessel).ToString("F1"));
+                        GUILayout.Label("Mass: " + VesselData.FetchMass(vessel).ToString("N1"));
                     }
 
                     GUILayout.Space(8);

@@ -32,6 +32,7 @@ namespace OrbitalDecay
         [GameParameters.CustomParameterUI("Planetarium Debris Tracking", toolTip = "")]
         public bool PlanetariumDebrisTracking = true;
 
+
         public override void SetDifficultyPreset(GameParameters.Preset preset) { }
         public override bool Enabled(MemberInfo member, GameParameters parameters) { return true; }
         public override bool Interactible(MemberInfo member, GameParameters parameters) { return true; }

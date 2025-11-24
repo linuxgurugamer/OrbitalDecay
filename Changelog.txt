@@ -112,3 +112,8 @@ Changelog
 	Cleaned up the settings page a bit
 	Fixed a couple of buttons which weren't scaling properly
 
+1.7.0.13-RC6
+	Adjusted calculation of time to decay, added multiplier of 16.
+	Merged both the flight and editor calculation of the time to decay
+	Cleaned up formatting for altitude and mass display
+
