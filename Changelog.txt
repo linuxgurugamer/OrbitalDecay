@@ -100,3 +100,9 @@ Changelog
 	Replaced all GUILayout.BeginHorizontal/GUILayout.EndHorizontal with the newer "using (new GUILayout.HorizontalScope())"; did the same for vertical
 	Fixed nullref when trying to show details before actually getting to flight, was caused by new option to switch to a vessel
 	Replaced calculation of time to decay for display with simpler calculation
+
+1.7.0.11-RC4
+	Restored original calc of time-to-decay
+	Fixed error in displayed Approximate time to Decay
+	Icons updated by @Niako
+	Fixed issue with decay rate for the active vessel being different from other vessels.

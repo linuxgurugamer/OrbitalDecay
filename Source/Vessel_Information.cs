@@ -13,6 +13,7 @@ namespace OrbitalDecay
         public string ReferenceBody;
 
         public double SMA;
+        public double SemiMinorAxis;
         public double ECC;
         public double INC;
         public double LPE;

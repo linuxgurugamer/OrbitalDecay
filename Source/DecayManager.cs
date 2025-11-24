@@ -149,8 +149,8 @@ namespace OrbitalDecay
 
         public void UpdateActiveVesselInformationPart(Part part) // Until eventdata OnPartResourceFlowState works! // 1.3.0
         {
-            if (part.vessel != FlightGlobals.ActiveVessel || TimeWarp.CurrentRate != 0) return;
             if (HighLogic.LoadedScene != GameScenes.FLIGHT || GuiToggled) return;
+            if (part.vessel != FlightGlobals.ActiveVessel || TimeWarp.CurrentRate != 0) return;
             VesselData.UpdateActiveVesselData(FlightGlobals.ActiveVessel);
             GuiToggled = true;
         }
@@ -210,6 +210,7 @@ namespace OrbitalDecay
             }
         }
 
+#if false
         public static bool CheckSceneStateMainNotSpaceCentre(GameScenes scene)
         {
             return scene != GameScenes.LOADING && scene != GameScenes.LOADINGBUFFER && HighLogic.LoadedSceneIsGame && scene != GameScenes.SPACECENTER;
@@ -239,6 +240,7 @@ namespace OrbitalDecay
         {
             return vessel.situation == Vessel.Situations.ORBITING && vessel == FlightGlobals.ActiveVessel;
         }
+#endif
 
         public static bool CheckVesselProximity(Vessel vessel)
         {
@@ -275,7 +277,7 @@ namespace OrbitalDecay
             return close;
         }
 
-        #endregion
+#endregion
 
         ModuleOrbitalDecay mod = null;
         Guid modVessel = Guid.Empty;
@@ -309,7 +311,10 @@ namespace OrbitalDecay
             }
 
 
-            if (Time.timeSinceLevelLoad > 0.4 && HighLogic.LoadedSceneIsFlight && CatchupResourceMassAreaDataComplete == false && (FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL))
+            if (Time.timeSinceLevelLoad > 0.4 && 
+                HighLogic.LoadedSceneIsFlight && 
+                CatchupResourceMassAreaDataComplete == false && 
+                (FlightGlobals.ActiveVessel.situation == Vessel.Situations.ORBITING || FlightGlobals.ActiveVessel.situation == Vessel.Situations.SUB_ORBITAL))
             {
                 if (FlightGlobals.ActiveVessel.isActiveAndEnabled) // Vessel is ready
                 {
@@ -436,7 +441,7 @@ namespace OrbitalDecay
             CatchUpVessels(Vessel.Situations.ORBITING);
         }
 
-        #endregion
+#endregion
 
         #region Active Specific Subroutines
 
@@ -658,6 +663,7 @@ namespace OrbitalDecay
             double multipliers = TimeWarp.CurrentRate * Settings.ReadDecayDifficulty();
 
             VesselData.UpdateVesselSMA(vessel, initialSemiMajorAxis - decayValue * multipliers);
+
             VesselData.UpdateVesselLAN(vessel, VesselData.FetchLAN(vessel));
 
             // Possibly update vessel LAN too? - 1.5.0
@@ -1106,6 +1112,7 @@ namespace OrbitalDecay
                 double equivalentAltitude = initialSemiMajorAxis - body.Radius;
                 double eccentricity = VesselData.FetchECC(vessel);
 
+
                 if (eccentricity > 0.085)
                 {
                     double altitudeAp = initialSemiMajorAxis * (1 + eccentricity) - body.Radius;
@@ -1119,10 +1126,12 @@ namespace OrbitalDecay
                 double gravityAsl = body.GeeASL;
                 double atmosphericMolarMass = body.atmosphereMolarMass;
                 double vesselArea = VesselData.FetchArea(vessel);
+
                 if (vesselArea == 0)
                 {
                     vesselArea = 5.0;
                 }
+
 
                 double distanceTravelled = initialOrbitalVelocity; // Meters
                 double vesselMass = VesselData.FetchMass(vessel);   // Kg
@@ -1143,6 +1152,16 @@ namespace OrbitalDecay
                 double decayRateModifier = Settings.ReadDecayDifficulty();
 
                 decayRate = (initialSemiMajorAxis - finalSemiMajorAxis) * TimeWarp.CurrentRate * decayRateModifier;
+
+#if true
+                Log.Info("DecayRateAtmosphericDrag");
+                Log.Info($"Vessel: {vessel.vesselName}   initialSemiMajorAxis: {initialSemiMajorAxis}   cartesianPositionVectorMagnitude: {cartesianPositionVectorMagnitude}  cartesianPositionVectorMagnitude: {cartesianPositionVectorMagnitude}");
+                Log.Info($"Vessel: {vessel.vesselName}   equivalentAltitude: {equivalentAltitude}  eccentricity: {eccentricity}");
+                Log.Info($"Vessel: {vessel.vesselName}   equivalentAltitude 2: {equivalentAltitude}  initialOrbitalVelocity: {initialOrbitalVelocity}  initialDensity: {initialDensity}  boltzmannConstant: {boltzmannConstant}  altitude: {altitude}  gravityAsl: {gravityAsl}"); ;
+                Log.Info($"Vessel: {vessel.vesselName}   atmosphericMolarMass: {atmosphericMolarMass}  vesselArea: {vesselArea}");
+                Log.Info($"Vessel: {vessel.vesselName}   distanceTravelled: {distanceTravelled}  vesselMass: {vesselMass}  equivalentAltitude: {equivalentAltitude}  atmosphericDensity: {atmosphericDensity}");
+                Log.Info($"Vessel: {vessel.vesselName}   deltaPeriod: {deltaPeriod}  initialPeriod: {initialPeriod}  finalPeriod: {finalPeriod}  finalSemiMajorAxis: {finalSemiMajorAxis}  decayRateModifier: {decayRateModifier}  decayRate: {decayRate}");
+#endif
             }
 
             return decayRate;
@@ -1188,7 +1207,7 @@ namespace OrbitalDecay
             return total;
         } // Total for 1.5.0
 
-        #endregion
+#endregion
 
         #region Editor Decay Rate Subroutines
 
@@ -1346,18 +1365,7 @@ namespace OrbitalDecay
 
         #region Timing Subroutines
 
-        public static double DecayTimePredictionExponentialsVariables(Vessel vessel, double TotalDecayRatePerSecond, double HoursInDay)
-        {
-            double initialSemiMajorAxis = VesselData.FetchSMA(vessel);
-            CelestialBody body = vessel.orbitDriver.orbit.referenceBody;
-            double baseAltitude = body.atmosphereDepth ;
 
-            double diff = initialSemiMajorAxis - baseAltitude - body.Radius;
-            Log.Info($"TotalDecayRatePerSecond: {TotalDecayRatePerSecond}  baseAltitude: {baseAltitude}  initialSemiMajorAxis: {initialSemiMajorAxis}  diff: {diff}");
-            return diff / (TotalDecayRatePerSecond); // * HoursInDay * 3600);
-        }
-
-#if false
         public static double DecayTimePredictionExponentialsVariables(Vessel vessel)
         {
             double initialSemiMajorAxis = VesselData.FetchSMA(vessel);
@@ -1372,6 +1380,7 @@ namespace OrbitalDecay
                 double altitudePe = initialSemiMajorAxis * (1 + orbit.eccentricity) - body.Radius;
                 equivalentAltitude = altitudePe + 900 * Math.Pow(orbit.eccentricity, 0.6);
             }
+
 
             double baseAltitude = body.atmosphereDepth / 1000;
 
@@ -1408,19 +1417,17 @@ namespace OrbitalDecay
 
             equivalentAltitude = equivalentAltitude + body.Radius;
 
-            //Log.Info($"initialPeriod: {initialPeriod}  beta: {beta}  equivalentAltitude: {equivalentAltitude}  atmosphericDensity: {atmosphericDensity}");
+            // The commented out time1 is the original calculation.  The new one is simplified for optimization
             //double time1 = initialPeriod / (60.0 * 60.0) / 4.0 * Math.PI * ((2.0 * beta * equivalentAltitude + 1.0) / (atmosphericDensity * (beta * beta) * (equivalentAltitude * equivalentAltitude * equivalentAltitude)));
-            double time1 = initialPeriod / 2827.431d * ((2.0 * beta * equivalentAltitude + 1.0) / (atmosphericDensity * (beta * beta) * (equivalentAltitude * equivalentAltitude * equivalentAltitude)));
+            double time1 = initialPeriod * Math.PI * (2 * beta * equivalentAltitude + 1) / (14400 * atmosphericDensity * beta * beta * Math.Pow(equivalentAltitude, 3));
 
             double time2 = time1 * (vesselMass / (2.2 * vesselArea)) * (1 - Math.Pow(Math.E, beta * (baseAltitude - (equivalentAltitude - body.Radius) / 1000)));
-            //Log.Info($"vesselMass: {vesselMass}  vesselArea: {vesselArea}   baseAltitude: {baseAltitude}  equivalentAltitude: {equivalentAltitude}  body.Radius: {body.Radius}");
 
             double daysUntilDecay = time2;
 
-            return daysUntilDecay * 10;
+            return daysUntilDecay;
         } // 1.4.0
 
-#endif
         public static double DecayTimePredictionEditor(double area, double mass, double sma, double eccentricity, CelestialBody body)
         {
             double initialSemiMajorAxis = sma;

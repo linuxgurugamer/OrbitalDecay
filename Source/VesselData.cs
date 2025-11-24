@@ -33,25 +33,17 @@ using static OrbitalDecay.RegisterToolbar;
 namespace OrbitalDecay
 {
     [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
-    public class VesselDataFlightAndKSP : VesselData
-    {
-
-    }
+    public class VesselDataFlightAndKSP : VesselData { }
 
     [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
-    public class VesselDataTrackingStation : VesselData
-    {
-
-    }
+    public class VesselDataTrackingStation : VesselData { }
 
 
     public class VesselData : MonoBehaviour
     {
-        //public static ConfigNode VesselInformation = new ConfigNode();
         public static Dictionary<Guid, Vessel_Information> VesselInfo = new Dictionary<Guid, Vessel_Information>();
 
         public static string FilePath;
-        //public static ConfigNode File;
 
         public static double EndSceneWaitTime = 0;
         public static double StartSceneWaitTime = 0;
@@ -66,17 +58,29 @@ namespace OrbitalDecay
         public void Awake()
         {
             if (!HighLogic.LoadedSceneIsGame) return;
-            //FilePath = KSPUtil.ApplicationRootPath +
-            //           "GameData/WhitecatIndustries/OrbitalDecay/PluginData/VesselData.cfg";
+
             ConfigNode File = ConfigNode.Load(FilePath);
             VesselInfo.Clear();
 
             print("WhitecatIndustries - OrbitalDecay - Loaded vessel data, there are " + VesselInfo.Count + " vessels");
 
             GameEvents.onGameSceneSwitchRequested.Add(onGameSceneSwitchRequested);
+            GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoadedGUIReady);
 
             DontDestroyOnLoad(this);
         }
+
+        void onLevelWasLoadedGUIReady(GameScenes scene)
+        {
+            foreach (var vessel in FlightGlobals.Vessels)
+            {
+                VesselData.UpdateVesselSMA(vessel, vessel.orbit.semiMajorAxis);
+                VesselData.UpdateVesselINC(vessel, vessel.orbit.inclination);
+                VesselData.UpdateVesselECC(vessel, vessel.orbit.eccentricity);
+                VesselData.UpdateVesselLAN(vessel, vessel.orbit.LAN);
+            }
+        }
+
 
         public void FixedUpdate()
         {
@@ -113,11 +117,12 @@ namespace OrbitalDecay
                 }
             }
             GameEvents.onGameSceneSwitchRequested.Remove(onGameSceneSwitchRequested);
+            GameEvents.onLevelWasLoadedGUIReady.Remove(onLevelWasLoadedGUIReady);
+
         }
 
         void onGameSceneSwitchRequested(FromToAction<GameScenes, GameScenes> fta)
         {
-            print("WhitecatIndustries - OrbitalDecay - onGameSceneSwitchRequested - Vessel Information saved, " + VesselInfo.Count + " vessels.");
             Vessel_Information.Save(VesselInfo, FilePath);
         }
 
@@ -185,12 +190,7 @@ namespace OrbitalDecay
 
         public static void UpdateActiveVesselData(Vessel vessel)
         {
-            //ConfigNode VesselNode = new ConfigNode("VESSEL");
-            bool found = false;
-
-            found = VesselInfo.ContainsKey(vessel.id);
-
-            if (!found)
+            if (!VesselInfo.ContainsKey(vessel.id))
             {
                 Log.Info($"UpdateActiveVesselData, vessel: {vessel.vesselName}  {vessel.id} not found");
                 var vD = VesselData.BuildConfigNode(vessel);
@@ -305,11 +305,8 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
             {
-                if (VesselInfo[vessel.id].Area == 0)
-                    Log.Info($"FetchArea: id: {vessel.id}   Area: {VesselInfo[vessel.id].Area}");
                 return VesselInfo[vessel.id].Area;
             }
-            Log.Info($"FetchArea, vessel {vessel.vesselName} not found in VesselInfo");
 
             return 0;
         }
@@ -355,7 +352,6 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].SMA;
-            //Log.Info($"FetchSMA, {vessel.vesselName} not found in VesselInfo");
             return 0;
 
         }
@@ -373,7 +369,6 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].ECC;
-            //Log.Info($"FetchECC, {vessel.vesselName} not found in VesselInfo");
             return 0;
         }
 
@@ -390,7 +385,6 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].INC;
-            //Log.Info($"FetchINC, {vessel.vesselName} not found in VesselInfo");
             return 0;
         }
 
@@ -422,7 +416,6 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].LAN;
-            //Log.Info($"FetchLAN, {vessel.vesselName} not found in VesselInfo");
             return 0;
         }
 
@@ -438,7 +431,6 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].MNA;
-            //Log.Info($"FetchMNA, {vessel.vesselName} not found in VesselInfo");
             return 0;
         }
 
@@ -454,7 +446,6 @@ namespace OrbitalDecay
         {
             if (VesselInfo.ContainsKey(vessel.id))
                 return VesselInfo[vessel.id].EPH;
-            //Log.Info($"FetchEPH, {vessel.vesselName} not found in VesselInfo");
             return 0;
         }
 
@@ -532,14 +523,21 @@ namespace OrbitalDecay
             List<ProtoPartSnapshot> PartSnapshots = vesselImage.protoPartSnapshots;
             foreach (ProtoPartSnapshot part in PartSnapshots)
             {
+#if false
                 if (vessel == FlightGlobals.ActiveVessel)
                 {
-                    Area = Area + part.partRef.radiativeArea;
+                    if (part.partRef != null)
+                    {
+                        Area = Area + part.partRef.radiativeArea;
+                    }
                 }
                 else
                 {
                     Area = Area + part.partInfo.partSize * 2.0 * Math.PI;
                 }
+#else
+                Area = Area + part.partInfo.partSize * 2.0; // * Math.PI;
+#endif
             }
 
             return Area / 4.0; // only one side facing prograde

@@ -30,18 +30,18 @@ namespace OrbitalDecay
                     ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH,
                     MODID,
                     "OrbitalDecayButton",
-                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar_highlighted",
                     "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
                     "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar_highlighted",
                     "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar",
+                    "WhitecatIndustries/OrbitalDecay/Icon/Icon_Toolbar_highlighted",
                     MODNAME
                 );
             }
             curScene = HighLogic.LoadedScene;
             GameEvents.onHideUI.Add(onHideUI);
             GameEvents.onShowUI.Add(onShowUI);
-            GameEvents.onGamePause.Add(onGamePause);
-            GameEvents.onGameUnpause.Add(onGameUnpause);
+            //GameEvents.onGamePause.Add(onGamePause);
+            //GameEvents.onGameUnpause.Add(onGameUnpause);
             GameEvents.onGameSceneLoadRequested.Add(onGameSceneLoadRequested);
             visible = hideUI = paused = false;
             DontDestroyOnLoad(this);
@@ -54,8 +54,8 @@ namespace OrbitalDecay
             {
                 GameEvents.onHideUI.Remove(onHideUI);
                 GameEvents.onShowUI.Remove(onShowUI);
-                GameEvents.onGamePause.Remove(onGamePause);
-                GameEvents.onGameUnpause.Remove(onGameUnpause);
+                //GameEvents.onGamePause.Remove(onGamePause);
+                //GameEvents.onGameUnpause.Remove(onGameUnpause);
             }
         }
         void onGameSceneLoadRequested(GameScenes gs)

@@ -237,7 +237,6 @@ namespace OrbitalDecay
             return newTex;
         }
 
-
         public void InformationTab()
         {
             using (new GUILayout.VerticalScope())
@@ -274,8 +273,10 @@ namespace OrbitalDecay
                             displayedVessel[v.id] = false;
                     }
 
-
-                    if (HighLogic.LoadedSceneIsFlight)
+                }
+                if (HighLogic.LoadedSceneIsFlight)
+                {
+                    using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.FlexibleSpace();
                         showActiveVessel = GUILayout.Toggle(showActiveVessel, "");
@@ -283,10 +284,10 @@ namespace OrbitalDecay
                         if (showActiveVessel)
                             displayedVessel[FlightGlobals.ActiveVessel.id] = true;
                     }
-                    else
-                        showActiveVessel = false;
                 }
-                GUILayout.Space(3);
+                     else
+                        showActiveVessel = false;
+               GUILayout.Space(3);
 
                 using (new GUILayout.HorizontalScope())
                 {
@@ -424,13 +425,27 @@ namespace OrbitalDecay
                                     }
                                     GUILayout.Label("Vessel Name: <B>" + vessel.vesselName + "</B>");
                                 }
+                                using (new GUILayout.HorizontalScope())
+                                {
+                                    GUILayout.Space(30);
+                                    var result = OrbitFromAE.ComputeApPe(VesselData.FetchSMA(vessel), VesselData.FetchECC(vessel), vessel.mainBody);
+                                    GUILayout.Label($"AP: {result.ApAltitude.ToString("F1")}");
+                                    GUILayout.Space(20);
+                                    GUILayout.Label($"PE: {result.PeAltitude.ToString("F1")}");
+                                }
 
                                 if (displayedVessel[vessel.id])
                                 {
                                     //    GUILayout.Label("Vessel Area: " + VesselData.FetchArea(vessel).ToString());
                                     //    GUILayout.Label("Vessel Mass: " + VesselData.FetchMass(vessel).ToString());
                                     GUILayout.Space(2);
-                                    GUILayout.Label("Orbiting Body: " + vessel.orbitDriver.orbit.referenceBody.GetName());
+                                    using (new GUILayout.HorizontalScope())
+                                    {
+                                        GUILayout.Label("Orbiting Body: " + vessel.orbitDriver.orbit.referenceBody.GetName());
+                                        GUILayout.FlexibleSpace();
+                                        var semimajor = VesselData.FetchSMA(vessel);
+                                        var mna = VesselData.FetchMNA(vessel);
+                                    }
                                     GUILayout.Space(2);
 
                                     if (StationKeeping == true)
@@ -445,31 +460,31 @@ namespace OrbitalDecay
                                         double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
                                         double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
 
-                                        double TotalDecayRatePerSecond = Math.Abs(ADDR) + Math.Abs(GPDR) + Math.Abs(PRDR) + Math.Abs(YEDR);
+                                        double TotalDecayRatePerSecond = Math.Abs(ADDR) + /* Math.Abs(GPDR) + */ Math.Abs(PRDR) + Math.Abs(YEDR);
                                         //Math.Abs(DecayManager.DecayRateAtmosphericDrag(vessel)) + 
-                                        //Math.Abs(DecayManager.DecayRateRadiationPressure(vessel)) + 
-                                        //Math.Abs(DecayManager.DecayRateYarkovskyEffect(vessel)); 
-                                        //+ Math.Abs(DecayManager.DecayRateGravitationalPertubation(vessel));
+                                        Log.Info($" Vessel: {vessel.vesselName}  ADDR: {ADDR} GPDR: {GPDR}  PRDR: {PRDR}  YEDR: {YEDR}");
 
                                         GUILayout.Label("Current Total Decay Rate: " + FormatDecayRateToString(TotalDecayRatePerSecond));
                                         GUILayout.Space(2);
 
                                         double TimeUntilDecayInUnits = 0.0;
                                         string TimeUntilDecayInDays = "";
+                                        double days = 0;
 
                                         if (ADDR != 0)
                                         {
-                                            //TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel);
-                                            TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel, TotalDecayRatePerSecond, HoursInDay);
+                                            TimeUntilDecayInUnits = DecayManager.DecayTimePredictionExponentialsVariables(vessel);
+                                            TimeUntilDecayInDays = FormatTimeUntilDecayIn_Days_ToString(TimeUntilDecayInUnits);
+                                            days = TimeUntilDecayInUnits;
                                         }
                                         else
                                         {
                                             TimeUntilDecayInUnits = DecayManager.DecayTimePredictionLinearVariables(vessel);
+                                            TimeUntilDecayInDays = FormatTimeUntilDecayIn_Seconds_ToString(TimeUntilDecayInUnits);
+                                            days = TimeUntilDecayInUnits / (3600 * HoursInDay);
                                         }
 
-                                        TimeUntilDecayInDays = FormatTimeUntilDecayInSecondsToString(TimeUntilDecayInUnits);
 
-                                        double days = TimeUntilDecayInUnits / (3600*HoursInDay);
                                         if (days < 100000)
                                             GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays + " (" + days.ToString("N0") + " days)");
                                         else
@@ -546,7 +561,6 @@ namespace OrbitalDecay
                                             {
                                                 VesselData.UpdateStationKeeping(vessel, false);
                                                 ScreenMessages.PostScreenMessage("Vessel: " + vessel.vesselName + ": Station Keeping Disabled");
-
                                             }
 
                                             if (StationKeeping == false)
@@ -726,17 +740,25 @@ namespace OrbitalDecay
                     double PRDR = DecayManager.DecayRateRadiationPressure(vessel);
                     double YEDR = DecayManager.DecayRateYarkovskyEffect(vessel);
 
-                    GUILayout.Label("Vessel: " + vessel.GetName());
+                    //GUILayout.Label("Vessel: " + vessel.GetName());
+                    GUILayout.Label("Vessel: <B>" + vessel.vesselName + "</B>");
+                    var result = OrbitFromAE.ComputeApPe(VesselData.FetchSMA(vessel), VesselData.FetchECC(vessel), vessel.mainBody);
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Space(30);
-                        GUILayout.Label("AP: " + vessel.orbit.ApA.ToString("F1"));
+                        GUILayout.Label("AP: " + result.ApAltitude.ToString("F1"));
                     }
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Space(30);
-                        GUILayout.Label("PE: " + vessel.orbit.PeA.ToString("F1"));
+                        GUILayout.Label("PE: " + result.PeAltitude.ToString("F1"));
                     }
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        GUILayout.Space(30);
+                        GUILayout.Label("Mass: " + VesselData.FetchMass(vessel).ToString("F1"));
+                    }
+
                     GUILayout.Space(8);
                     GUILayout.Label("Atmospheric Drag Decay Rate (Delta SMA): " + FormatDecayRateToString(ADDR));
                     GUILayout.Space(2);
@@ -1064,7 +1086,7 @@ namespace OrbitalDecay
             return DecayRateString;
         }
 
-        public static string FormatTimeUntilDecayInDaysToString(double TimeUntilDecayInDays)
+        public static string FormatTimeUntilDecayIn_Days_ToString(double TimeUntilDecayInDays)
         {
             TimeUntilDecayInDays = Math.Abs(TimeUntilDecayInDays);
 
@@ -1125,7 +1147,7 @@ namespace OrbitalDecay
             return DecayTimeString;
         }
 
-        public string FormatTimeUntilDecayInSecondsToString(double TimeUntilDecayInSeconds)
+        public string FormatTimeUntilDecayIn_Seconds_ToString(double TimeUntilDecayInSeconds)
         {
             TimeUntilDecayInSeconds = Math.Abs(TimeUntilDecayInSeconds);
 
