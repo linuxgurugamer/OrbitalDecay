@@ -106,3 +106,9 @@ Changelog
 	Fixed error in displayed Approximate time to Decay
 	Icons updated by @Niako
 	Fixed issue with decay rate for the active vessel being different from other vessels.
+
+1.7.0.12-RC5 
+	Added sorting of vessel list by name.  Remembers sort between scenes
+	Cleaned up the settings page a bit
+	Fixed a couple of buttons which weren't scaling properly
+

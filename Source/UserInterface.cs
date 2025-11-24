@@ -181,7 +181,8 @@ namespace OrbitalDecay
             Icon_Station,
             Icon_Station_highlighted,
             Icon_Unmanned,
-            Icon_Unmanned_highlighted;
+            Icon_Unmanned_highlighted,
+            Icon_Sort_AZ;
 
 
         public static void UpdateTextures()
@@ -199,6 +200,8 @@ namespace OrbitalDecay
             Icon_Unmanned = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Unmanned", false);
             Icon_Unmanned_highlighted = GameDatabase.Instance.GetTexture(ICON_FOLDER + "Icon_Unmanned_highlighted", false);
 
+            Icon_Sort_AZ = GameDatabase.Instance.GetTexture(ICON_FOLDER_BASE + "sort-az", false); ;
+
             Icon_Debris = ResizeTexture(Icon_Debris, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
             Icon_Debris_highlighted = ResizeTexture(Icon_Debris_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
             Icon_Relay = ResizeTexture(Icon_Relay, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
@@ -210,7 +213,10 @@ namespace OrbitalDecay
             Icon_Station = ResizeTexture(Icon_Station, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
             Icon_Station_highlighted = ResizeTexture(Icon_Station_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
             Icon_Unmanned = ResizeTexture(Icon_Unmanned, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+            Icon_Sort_AZ = ResizeTexture(Icon_Sort_AZ, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+
             Icon_Unmanned_highlighted = ResizeTexture(Icon_Unmanned_highlighted, BUTTON_WIDTH * windowScaling2, BUTTON_HEIGHT * windowScaling2);
+
         }
 
         public static Texture2D ResizeTexture(Texture2D source, float newWidth1, float newHeight1)
@@ -237,8 +243,43 @@ namespace OrbitalDecay
             return newTex;
         }
 
+        SortedList<string, Vessel> sortedVesselList = new SortedList<string, Vessel>();
+        enum Sort { Ascending, Descending };
+        static Sort vesselSort = Sort.Ascending;
+
+        void GetSortedList()
+        {
+            switch (vesselSort)
+            {
+                case Sort.Ascending:
+                    sortedVesselList = SortedListHelpers.Create<string, Vessel>(false);
+                    break;
+
+                case Sort.Descending:
+                    sortedVesselList = SortedListHelpers.Create<string, Vessel>(true);
+                    break;
+            }
+            for (int i = 0; i < FlightGlobals.Vessels.Count; i++)
+            {
+                var v = FlightGlobals.Vessels[i];
+                if (v.vesselType == VesselType.Debris ||
+                    v.vesselType == VesselType.Probe ||
+                    v.vesselType == VesselType.Relay ||
+                    v.vesselType == VesselType.Lander ||
+                    v.vesselType == VesselType.Ship ||
+                    v.vesselType == VesselType.Plane ||
+                    v.vesselType == VesselType.Station ||
+                    v.vesselType == VesselType.Plane ||
+                    v.vesselType == VesselType.Base ||
+                    v.vesselType == VesselType.Plane)
+                    sortedVesselList.Add(FlightGlobals.Vessels[i].vesselName, FlightGlobals.Vessels[i]);
+            }
+
+        }
         public void InformationTab()
         {
+            if (sortedVesselList.Count == 0)
+                GetSortedList();
             using (new GUILayout.VerticalScope())
             {
                 using (new GUILayout.HorizontalScope())
@@ -257,22 +298,20 @@ namespace OrbitalDecay
                 // 1.5.2 Filtering // 
                 using (new GUILayout.HorizontalScope())
                 {
-                    //GUILayout.FlexibleSpace();
                     GUILayout.Label("Filter: ");
                     filterString = GUILayout.TextField(filterString, GUILayout.Width(150));
                     GUILayout.FlexibleSpace();
 
-                    if (GUILayout.Button("+ all", GUILayout.Width(40)))
+                    if (GUILayout.Button("+ all", GUILayout.Width(40 * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling)))
                     {
                         foreach (var v in FlightGlobals.Vessels)
                             displayedVessel[v.id] = true;
                     }
-                    if (GUILayout.Button("- all", GUILayout.Width(40)))
+                    if (GUILayout.Button("- all", GUILayout.Width(40 * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling)))
                     {
                         foreach (var v in FlightGlobals.Vessels)
                             displayedVessel[v.id] = false;
                     }
-
                 }
                 if (HighLogic.LoadedSceneIsFlight)
                 {
@@ -285,9 +324,9 @@ namespace OrbitalDecay
                             displayedVessel[FlightGlobals.ActiveVessel.id] = true;
                     }
                 }
-                     else
-                        showActiveVessel = false;
-               GUILayout.Space(3);
+                else
+                    showActiveVessel = false;
+                GUILayout.Space(3);
 
                 using (new GUILayout.HorizontalScope())
                 {
@@ -376,6 +415,17 @@ namespace OrbitalDecay
                     }
 
                     GUILayout.FlexibleSpace();
+
+                    guiContent = new GUIContent(Icon_Sort_AZ, "Sort");
+
+                    GUILayout.FlexibleSpace();
+                    if (GUILayout.Button(guiContent, RegisterToolbar.noPadStyle))
+                    {
+                        vesselSort = (Sort)(((int)vesselSort + 1) % Enum.GetValues(typeof(Sort)).Length);
+                        GetSortedList();
+                    }
+                    //GUILayout.FlexibleSpace();
+
                 }
 
                 DrawLine(4, 4);
@@ -383,13 +433,17 @@ namespace OrbitalDecay
 
             scrollPosition1 = GUILayout.BeginScrollView(scrollPosition1,
                                                         GUILayout.Width(INFO_WIDTH),
-                                                        GUILayout.Height(SCROLLVIEW_HEIGHT));
+                                                            GUILayout.Height(SCROLLVIEW_HEIGHT));
             bool Realistic = Settings.ReadRD();
             bool ClockType = Settings.Read24Hr();
             var filterString1 = filterString.ToLower();
 
-            foreach (Vessel vessel in FlightGlobals.Vessels)
+
+
+            //foreach (Vessel vessel in FlightGlobals.Vessels)
+            foreach (var v in sortedVesselList)
             {
+                Vessel vessel = v.Value;
                 if (vessel != null)
                 {
                     if (!displayedVessel.ContainsKey(vessel.id))
@@ -419,7 +473,7 @@ namespace OrbitalDecay
                                 //   GUILayout.Label("Vessels count" + VesselData.VesselInformation.CountNodes.ToString());
                                 using (new GUILayout.HorizontalScope())
                                 {
-                                    if (GUILayout.Button(displayedVessel[vessel.id] ? "-" : "+", GUILayout.Width(20)))
+                                    if (GUILayout.Button(displayedVessel[vessel.id] ? "-" : "+", GUILayout.Width(20 * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling)))
                                     {
                                         displayedVessel[vessel.id] = !displayedVessel[vessel.id];
                                     }
@@ -641,18 +695,12 @@ namespace OrbitalDecay
             using (new GUILayout.VerticalScope())
             {
                 DrawLine(4, 4);
-                //using (new GUILayout.HorizontalScope())
-                //{
-                //GUILayout.FlexibleSpace();
-                //GUILayout.Label("_________________________________________");
-                //GUILayout.FlexibleSpace();
-                //}
-                //GUILayout.Space(3);
 
                 double DecayDifficulty = HighLogic.CurrentGame.Parameters.CustomParams<OD>().DecayDifficulty;
                 double ResourceDifficulty = Settings.ReadResourceRateDifficulty();
 
                 GUILayout.Space(2);
+                GUILayout.Label("Kerbin Day: " + (Settings.Read24Hr() ? "Currently 24 hour" : "Currently 6 hour"));
                 if (GUILayout.Button("Toggle Kerbin Day (6 hour) / Earth Day (24 hour)"))
                 {
                     Settings.Write24H(!Settings.Read24Hr());
@@ -666,52 +714,87 @@ namespace OrbitalDecay
                     }
 
                 }
-                GUILayout.Space(3);
-                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-                MultiplierValue = GUILayout.HorizontalSlider(MultiplierValue, 0.5f, 50.0f);
+                DrawLine(4, 4);
+
+
+                //GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    GUILayout.Label("Multipliers");
+                    GUILayout.FlexibleSpace();
+                }
+                GUILayout.Space(2);
                 GUILayout.Space(2);
                 GUILayout.Label("Current Decay multiplier: " + DecayDifficulty.ToString("F1"));
                 GUILayout.Space(2);
-                GUILayout.Label("New Decay multiplier: " + (MultiplierValue / 5).ToString("F1"));
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("New Decay multiplier: " + (MultiplierValue / 5).ToString("F1"));
+                    GUILayout.FlexibleSpace();
+                    using (new GUILayout.VerticalScope())
+                    {
+                        GUILayout.Space(10f * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
+                        MultiplierValue = GUILayout.HorizontalSlider(MultiplierValue, 0.5f, 50.0f, GUILayout.Width(300));
+                    }
+                }
                 GUILayout.Space(2);
 
-                if (GUILayout.Button("Set Multiplier"))
+                if (GUILayout.Button("Set Decay Multiplier", GUILayout.Width(240 * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling)))
                 {
                     Settings.WriteDifficulty(MultiplierValue / 5);
                     ScreenMessages.PostScreenMessage("Decay Multiplier set to: " + (MultiplierValue / 5).ToString("F2"));
                 }
 
-                //GUILayout.Space(2);
-                DrawLine(4, 4);
-                //GUILayout.Label("_________________________________________");
-                //GUILayout.Space(3);
-                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-                MultiplierValue2 = GUILayout.HorizontalSlider(MultiplierValue2, 0.5f, 50.0f);
-                GUILayout.Space(2);
+                //DrawLine(4, 4);
+
+                //GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+
+                GUILayout.Space(20);
                 GUILayout.Label("Resource drain rate multiplier: " + ResourceDifficulty.ToString("F1"));
                 GUILayout.Space(2);
-                GUILayout.Label("New Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("New Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
+                    GUILayout.FlexibleSpace();
+                    using (new GUILayout.VerticalScope())
+                    {
+                        GUILayout.Space(10f * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
+                        MultiplierValue2 = GUILayout.HorizontalSlider(MultiplierValue2, 0.5f, 50.0f, GUILayout.Width(300));
+                    }
+                }
                 GUILayout.Space(2);
 
-                if (GUILayout.Button("Set Multiplier"))
+                if (GUILayout.Button("Set Resource Multiplier", GUILayout.Width(240 * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling)))
                 {
                     Settings.WriteResourceRateDifficulty(MultiplierValue2 / 5);
                     ScreenMessages.PostScreenMessage("Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
                 }
 
-                //GUILayout.Space(2);
                 DrawLine(4, 4);
-                //GUILayout.Label("_________________________________________");
-                //GUILayout.Space(3);
-                GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-                windowScaling2 = GUILayout.HorizontalSlider(windowScaling2, 0.8f, 2f);
+
+                //GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.FlexibleSpace();
+                    GUILayout.Label("Window Scaling");
+                    GUILayout.FlexibleSpace();
+                }
                 GUILayout.Space(2);
                 GUILayout.Label("Window Scaling: " + HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling.ToString("F1"));
                 GUILayout.Space(2);
-                GUILayout.Label("New Window Scaling: " + windowScaling2.ToString("F1"));
+                using (new GUILayout.HorizontalScope())
+                {
+                    GUILayout.Label("New Window Scaling: " + windowScaling2.ToString("F1"));
+                    using (new GUILayout.VerticalScope())
+                    {
+                        GUILayout.Space(10f * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
+                        windowScaling2 = GUILayout.HorizontalSlider(windowScaling2, 0.8f, 2f, GUILayout.Width(300));
+                    }
+                }
                 GUILayout.Space(2);
 
-                if (GUILayout.Button("Set Window Scaling"))
+                if (GUILayout.Button("Set Window Scaling", GUILayout.Width(240 * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling)))
                 {
                     HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling = windowScaling2;
                     RegisterToolbar.UpdateWindowSizes();

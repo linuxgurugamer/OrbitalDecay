@@ -78,6 +78,7 @@
     <Compile Include="RegisterToolbar.cs" />
     <Compile Include="ResourceManager.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="SortedListHelpers.cs" />
     <Compile Include="StationKeepingManager.cs" />
     <Compile Include="StockSettings.cs" />
     <Compile Include="ToolbarInterface.cs" />
