@@ -298,8 +298,18 @@ namespace OrbitalDecay
                 // 1.5.2 Filtering // 
                 using (new GUILayout.HorizontalScope())
                 {
-                    GUILayout.Label("Filter: ");
-                    filterString = GUILayout.TextField(filterString, GUILayout.Width(150));
+                    GUI.skin.label.fontSize = 2 + (int)FONTSIZE;
+                    GUI.skin.textField.fontSize = 2 + (int)FONTSIZE;
+
+                    GUIContent content = new GUIContent("Filter:");
+                    Vector2 size = GUI.skin.label.CalcSize(content);
+
+                    GUILayout.Label("Filter:", GUILayout.Width(size.x+2));
+
+                    filterString = GUILayout.TextField(filterString, GUILayout.Width(200));
+                    GUI.skin.label.fontSize = (int)FONTSIZE;
+                    GUI.skin.textField.fontSize = (int)FONTSIZE;
+
                     GUILayout.FlexibleSpace();
 
                     if (GUILayout.Button("+ all", GUILayout.Width(40 * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling)))
@@ -483,9 +493,9 @@ namespace OrbitalDecay
                                 {
                                     GUILayout.Space(30);
                                     var result = OrbitFromAE.ComputeApPe(VesselData.FetchSMA(vessel), VesselData.FetchECC(vessel), vessel.mainBody);
-                                    GUILayout.Label($"AP: {(result.ApAltitude/1000).ToString("N1")} km");
+                                    GUILayout.Label($"AP: {(result.ApAltitude / 1000).ToString("N1")} km");
                                     GUILayout.Space(20);
-                                    GUILayout.Label($"PE: {(result.PeAltitude/1000).ToString("N1")} km");
+                                    GUILayout.Label($"PE: {(result.PeAltitude / 1000).ToString("N1")} km");
                                 }
 
                                 if (displayedVessel[vessel.id])
@@ -538,11 +548,12 @@ namespace OrbitalDecay
                                             days = TimeUntilDecayInUnits / (3600 * HoursInDay);
                                         }
 
-
+#if false
                                         if (days < 100000)
                                             GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays + " (" + days.ToString("N0") + " days)");
                                         else
                                             GUILayout.Label("Approximate Time Until Decay: " + TimeUntilDecayInDays);
+#endif
                                         GUILayout.Space(2);
                                     }
 
@@ -721,7 +732,7 @@ namespace OrbitalDecay
                 using (new GUILayout.HorizontalScope())
                 {
                     GUILayout.FlexibleSpace();
-                    GUILayout.Label("Multipliers");
+                    GUILayout.Label("<B>Multipliers</B>");
                     GUILayout.FlexibleSpace();
                 }
                 GUILayout.Space(2);
@@ -735,7 +746,7 @@ namespace OrbitalDecay
                     using (new GUILayout.VerticalScope())
                     {
                         GUILayout.Space(10f * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
-                        MultiplierValue = GUILayout.HorizontalSlider(MultiplierValue, 0.5f, 50.0f, GUILayout.Width(300));
+                        MultiplierValue = GUILayout.HorizontalSlider(MultiplierValue, 0.5f, 50.0f, GUILayout.Width(250));
                     }
                 }
                 GUILayout.Space(2);
@@ -751,16 +762,16 @@ namespace OrbitalDecay
                 //GUI.skin.label.alignment = TextAnchor.MiddleCenter;
 
                 GUILayout.Space(20);
-                GUILayout.Label("Resource drain rate multiplier: " + ResourceDifficulty.ToString("F1"));
+                GUILayout.Label("Current Resource drain rate multiplier: " + ResourceDifficulty.ToString("F1"));
                 GUILayout.Space(2);
                 using (new GUILayout.HorizontalScope())
                 {
-                    GUILayout.Label("New Resource drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
+                    GUILayout.Label("New drain rate multiplier: " + (MultiplierValue2 / 5).ToString("F1"));
                     GUILayout.FlexibleSpace();
                     using (new GUILayout.VerticalScope())
                     {
                         GUILayout.Space(10f * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
-                        MultiplierValue2 = GUILayout.HorizontalSlider(MultiplierValue2, 0.5f, 50.0f, GUILayout.Width(300));
+                        MultiplierValue2 = GUILayout.HorizontalSlider(MultiplierValue2, 0.5f, 50.0f, GUILayout.Width(250));
                     }
                 }
                 GUILayout.Space(2);
@@ -781,7 +792,7 @@ namespace OrbitalDecay
                     GUILayout.FlexibleSpace();
                 }
                 GUILayout.Space(2);
-                GUILayout.Label("Window Scaling: " + HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling.ToString("F1"));
+                GUILayout.Label("Current Window Scaling: " + HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling.ToString("F1"));
                 GUILayout.Space(2);
                 using (new GUILayout.HorizontalScope())
                 {
@@ -789,7 +800,7 @@ namespace OrbitalDecay
                     using (new GUILayout.VerticalScope())
                     {
                         GUILayout.Space(10f * (float)HighLogic.CurrentGame.Parameters.CustomParams<OD3>().windowScaling);
-                        windowScaling2 = GUILayout.HorizontalSlider(windowScaling2, 0.8f, 2f, GUILayout.Width(300));
+                        windowScaling2 = GUILayout.HorizontalSlider(windowScaling2, 0.8f, 2f, GUILayout.Width(250));
                     }
                 }
                 GUILayout.Space(2);
@@ -829,12 +840,12 @@ namespace OrbitalDecay
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Space(30);
-                        GUILayout.Label("AP: " + (result.ApAltitude/1000).ToString("N1"));
+                        GUILayout.Label("AP: " + (result.ApAltitude / 1000).ToString("N1"));
                     }
                     using (new GUILayout.HorizontalScope())
                     {
                         GUILayout.Space(30);
-                        GUILayout.Label("PE: " + (result.PeAltitude/1000).ToString("N1"));
+                        GUILayout.Label("PE: " + (result.PeAltitude / 1000).ToString("N1"));
                     }
                     using (new GUILayout.HorizontalScope())
                     {

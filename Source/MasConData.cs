@@ -202,7 +202,7 @@ namespace OrbitalDecay
         {
             bool WithinEffectRange = false;
 
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Moon") // 
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Moon") // 
             {
                 GravityMap LocalGravityMap = ThisGravityMap(vessel.orbitDriver.orbit.referenceBody.GetName());
 

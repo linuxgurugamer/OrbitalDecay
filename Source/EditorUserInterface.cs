@@ -146,7 +146,9 @@ namespace OrbitalDecay
                 //GUILayout.Space(2);
                 GUILayout.Label("Decay Rate (Radiation Pressure): " + UserInterface.FormatDecayRateSmallToString(DecayManager.EditorDecayRateRadiationPressure(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)));
                 //GUILayout.Space(2);
+#if false
                 GUILayout.Label("Estimated Orbital Lifetime: " + UserInterface.FormatTimeUntilDecayIn_Days_ToString(DecayManager.DecayTimePredictionEditor(CalculateArea(), CalculateMass() * 1000, ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)));
+#endif
                 GUILayout.Space(2);
                 GUILayout.Label("_________________________________________");
                 GUILayout.Space(3);
@@ -185,12 +187,14 @@ namespace OrbitalDecay
 
 
                 GUILayout.Space(2);
+#if false
                 GUILayout.Label("Maximum possible Station Keeping fuel lifetime: " + (UserInterface.FormatTimeUntilDecayIn_Days_ToString(GetMaximumPossibleLifetime())));
                 GUILayout.Space(2);
 
                 GUILayout.Label("Maximum possible lifetime: " + (UserInterface.FormatTimeUntilDecayIn_Days_ToString(DecayManager.DecayTimePredictionEditor(CalculateArea(), CalculateMass() * 1000, ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody) +
                   +DecayManager.EditorDecayRateAtmosphericDrag(CalculateMass() * 1000, CalculateArea(), ReferenceBody.Radius + AltitudeValue, 0, ReferenceBody)
                  + GetMaximumPossibleLifetime())));
+#endif
 
                 GUILayout.Space(2);
                 GUILayout.Label("_________________________________________");

@@ -74,7 +74,7 @@ namespace OrbitalDecay
             //Required for Integration 
 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -200,7 +200,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -328,7 +328,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -460,7 +460,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -592,7 +592,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -725,7 +725,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -855,7 +855,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -987,7 +987,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -1119,7 +1119,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -1251,7 +1251,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)
@@ -1383,7 +1383,7 @@ namespace OrbitalDecay
 
             //Required for Integration 
             bool b = false;
-            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "Kerbin") // At the moment only these modeled
+            if (vessel.orbitDriver.orbit.referenceBody.GetName() == "Earth" || vessel.orbitDriver.orbit.referenceBody.GetName() == "zKerbin") // At the moment only these modeled
             {
                 GalAtVesselDistance = MasConData.GalAtPosition(vessel);
                 if (GalAtVesselDistance > 0)

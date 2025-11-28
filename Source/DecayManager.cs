@@ -596,6 +596,15 @@ namespace OrbitalDecay
 
         #region Decay Simulator Subroutines
 
+        double AtmosphericDensity(double equivalentAltitude, double scaleHeight)
+        {
+            double atmosphericDensity;
+            if (Settings.ReadRD())
+            return 6.0 * Math.Pow(10.0, -10.0) * Math.Pow(Math.E, -((equivalentAltitude - 175.0f) / scaleHeight));
+            else
+                return 1.020 * Math.Pow(10.0, 7.0) * Math.Pow(equivalentAltitude + 70.0, -7.172);
+        }
+
         public static void RealisticAtmosphericDragDecay(Vessel vessel)
         {
             Orbit orbit = vessel.orbitDriver.orbit;

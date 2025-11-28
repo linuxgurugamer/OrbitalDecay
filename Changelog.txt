@@ -117,3 +117,10 @@ Changelog
 	Merged both the flight and editor calculation of the time to decay
 	Cleaned up formatting for altitude and mass display
 
+1.7.0.14-RC7 (unreleased)
+	Search field make bigger, and a bit taller
+	Adjusted settings window a bit for better fits
+	Disabled display of estimated orbital time, approximate time to decay in flight or tracking station
+	Disabled Maximum possible Station Keeping and Maximum possible lifetime in editor
+	Disabled the MasCon 
+
